@@ -1,0 +1,8 @@
+*.pyc
+*.swp
+
+data/*
+output/*
+build/*
+local/*
+paracelrun_log

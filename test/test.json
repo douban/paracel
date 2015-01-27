@@ -1,0 +1,10 @@
+{
+  "wu" : "hong",
+  "hong" : 7,
+  "changsheng" : true,
+  "jiang" : 3.141592653,
+  "wul" : ["hong", "xun", "zhang"],
+  "hongl" : [1, 2, 3, 4, 5, 6, 7],
+  "changshengl" : [true, false, false, true, true],
+  "jiangl" : [1.23, 2.34, 3.45, 4.56, 5.67, 6.78, 7.89]
+}
