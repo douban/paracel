@@ -1,0 +1,16 @@
+{
+  "input" : "/nfs/user/xxx/data/train",
+  "predict_input" : "/nfs/user/xxx/data/predict",
+  "output" : "/nfs/user/xxx/paracel/output/mf_result/",
+  "update_file" : "/nfs/user/xxx/paracel/local/lib/libmf_update.so",
+  "update_functions" : ["cnt_updater", "mf_fac_updater", "mf_bias_updater"],
+  "filter_file" : "/nfs/user/xxx/paracel/local/lib/libmf_filter.so",
+  "filter_functions" : ["mf_ubias_filter", "mf_ibias_filter", "mf_W_filter", "mf_H_filter"],
+  "k" : 100,
+  "rounds" : 3,
+  "alpha" : 0.001,
+  "beta" : 0.001,
+  "debug" : false,
+  "ssp_switch" : false,
+  "limit_s" : 0 
+}

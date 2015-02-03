@@ -1,0 +1,13 @@
+{
+  "training_input" : "/nfs/user/xxx/data/train.dat",
+  "test_input" : "/nfs/user/xxx/data/test.dat",
+  "predict_input" : "/nfs/user/xxx/data/test.dat",
+  "output" : "/nfs/user/xxx/paracel/output/lr_test/",
+  "update_file" : "/nfs/user/xxx/paracel/local/lib/liblr_update.so",
+  "update_func" : "lr_theta_update",
+  "method" : "ipm",
+  "rounds" : 5,
+  "alpha" : 0.001,
+  "beta" : 0.01,
+  "debug" : true
+}

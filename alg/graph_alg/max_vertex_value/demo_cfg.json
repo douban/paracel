@@ -1,0 +1,6 @@
+{
+  "input" : "/nfs/user/xxx/data/mvv/demo.txt",
+  "output" : "/nfs/user/xxx/output/mvv_result/",
+  "update_file" : "/nfs/user/xxx/paracel/local/lib/libmvv_update.so",
+  "update_func" : "max_updater"
+}

@@ -1,0 +1,9 @@
+{
+  "input" : "/nfs/user/xxx/data/.csv",
+  "output" : "/nfs/user/xxx/output/kmeans_result/",
+  "type" : "fvec",
+  "kclusters" : 120,
+  "update_file" : "/nfs/user/xxx/paracel/local/lib/libkmeans_update.so",
+  "update_functions" : ["local_update_kmeans_clusters", "local_update_kmeans_groups"],
+  "rounds" : 80
+}

@@ -1,0 +1,6 @@
+{
+  "input" : "/nfs/user/xxx/data/data.csv",
+  "output" : "/nfs/user/xxx/output/sim_dense/",
+  "simbar" : 0.2,
+  "topk" : 50
+}

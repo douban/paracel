@@ -1,0 +1,9 @@
+{
+  "input" : "/nfs/user/xxx/data/data.csv",
+  "output" : "/nfs/user/xxx/output/pagerank_result/",
+  "rounds" : 200,
+  "damping_factor" : 0.85,
+  "handle_file" : "/nfs/user/xxx/paracel/local/lib/libpagerank_handle.so",
+  "update_function" : "init_updater",
+  "filter_function" : "pr_filter"
+}
