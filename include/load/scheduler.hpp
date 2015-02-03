@@ -294,7 +294,7 @@ public:
     }
     paracel::set_type<int> new_rows, new_cols;
     auto union_func1 = [&] (paracel::list_type<int> tmp) {
-      for(auto & item : tmp) { 
+      for(auto & item : tmp) {
         new_rows.insert(item); 
       }
     };

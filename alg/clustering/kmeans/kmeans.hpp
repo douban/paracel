@@ -29,6 +29,8 @@
 namespace paracel {
 namespace alg {
 
+using node_t = paracel::default_id_type;
+
 class kmeans : public paracel::paralg {
 
  public:
