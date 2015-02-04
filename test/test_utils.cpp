@@ -22,6 +22,7 @@
 #include <boost/test/unit_test.hpp>
 #include "utils.hpp"
 #include "test.hpp"
+#include "paracel_types.hpp"
 
 BOOST_AUTO_TEST_CASE (json_parser_test) {
   paracel::json_parser pt("../../test/test.json");
@@ -39,4 +40,20 @@ BOOST_AUTO_TEST_CASE (json_parser_test) {
   BOOST_CHECK_EQUAL_V(pt.parse_v<bool>("changshengl"), vl3);
   std::vector<double> vl4 = {1.23, 2.34, 3.45, 4.56, 5.67, 6.78, 7.89};
   BOOST_CHECK_EQUAL_V(pt.parse_v<double>("jiangl"), vl4);
+}
+
+BOOST_AUTO_TEST_CASE (utils_hash_test) {
+  paracel::hash_type<paracel::default_id_type> hfunc;
+  paracel::default_id_type a = 0, b = 1, c = 2, d = 3;
+  BOOST_CHECK_EQUAL(hfunc(a), 0);
+  BOOST_CHECK_EQUAL(hfunc(b), 1);
+  BOOST_CHECK_EQUAL(hfunc(c), 2);
+  BOOST_CHECK_EQUAL(hfunc(d), 3);
+  paracel::hash_type<std::string> hfunc2;
+  std::string x = "0", y = "1", z = "2", t = "3";
+  a = 2297668033614959926ULL; b = 10159970873491820195ULL; c = 4551451650890805270ULL; d = 8248777770799913213ULL;
+  BOOST_CHECK_EQUAL(hfunc2(x), a);
+  BOOST_CHECK_EQUAL(hfunc2(y), b);
+  BOOST_CHECK_EQUAL(hfunc2(z), c);
+  BOOST_CHECK_EQUAL(hfunc2(t), d);
 }
