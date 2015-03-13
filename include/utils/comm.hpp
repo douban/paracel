@@ -143,7 +143,7 @@ public:
     return m_comm; 
   }
 
-  inline void sync() { 
+  inline void synchronize() { 
     MPI_Barrier(m_comm); 
   }
 

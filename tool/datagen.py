@@ -25,6 +25,8 @@ except:
     print 'optparse module required'
     exit(0)
 
+import numpy as np
+
 def dump_data(output, sample, label, sep):
     f = open(output, 'wb')
     m, n = sample.shape
@@ -70,15 +72,58 @@ def gen_kmeans_data(output, sz, centers, k = 10, sep = ','):
         f.write(str(i) + '\t' + str(label[i]) + '\n')
     f.close()
 
+
+def gen_lda_data(output, n_docs, n_topics = 10):
+    
+    def gen_document(word_dist, n_topics, length = 100, alpha = 0.1):
+        
+        def sample_index(p):
+            return np.random.multinomial(1, p).argmax()
+        
+        theta = np.random.mtrand.dirichlet([alpha] * n_topics)
+        data = []
+        for n in xrange(length * n_topics):
+            z = sample_index(theta)
+            w = sample_index(word_dist[z, :])
+            data.append(w)
+        return data
+
+    def gen_word_distribution(n_topics):
+    
+        def word_prob(width, index, horizontal = False):
+            m = np.zeros((width, width))
+            if horizontal:
+                m[index, :] = 1.0 / width
+            else:
+                m[:, index] = 1.0 / width
+            return m.flatten()
+    
+        width = n_topics / 2
+        vocab_size = width ** 2
+        m = np.zeros((n_topics, vocab_size))
+        for k in xrange(width):
+            m[k, :] = word_prob(width, k)
+        for k in xrange(width):
+            m[k + width, :] = word_prob(width, k, horizontal = True)
+        return m
+
+    word_dist = gen_word_distribution(n_topics)
+    with open(output, 'w') as f:
+        for i in xrange(n_docs):
+            doc = gen_document(word_dist, n_topics)
+            f.write("%s\n" % ' '.join(map(str, doc)))
+
 if __name__ == '__main__':
     optpar = OptionParser()
     optpar.add_option('-m', '--method', action = 'store', type = 'string', dest =
-                    'method', help = 'classification | regression | similarity | kmeans...')
+                    'method', help = 'classification | regression | similarity | kmeans | lda...')
     optpar.add_option('-o', '--out', action = 'store', type = 'string', dest = 'output')
-    optpar.add_option('-s', '--sep', action = 'store', type = 'string', dest = 'sep')
+    optpar.add_option('-s', '--sep', action = 'store', type = 'string', dest =
+                      'sep', help = "seperator, default : ','")
     optpar.add_option('-n', '--datasize', action = 'store', type = 'int', dest = 'size')
     optpar.add_option('-k', '--nfeatures', action = 'store', type = 'int', dest = 'k')
-    optpar.add_option('--ncenters', action = 'store', type = 'int', dest = 'ncenters')
+    optpar.add_option('--ncenters', action = 'store', type = 'int', dest =
+                      'ncenters', help = 'number of centers for kmeans method')
     options, args = optpar.parse_args()
 
     # check input
@@ -110,3 +155,8 @@ if __name__ == '__main__':
             gen_kmeans_data(options.output, options.size, options.ncenters, options.k)
         else:
             gen_kmeans_data(options.output, options.size, options.ncenters)
+    if options.method == 'lda':
+        if options.k:
+            gen_lda_data(options.output, options.size, options.k)
+        else:
+            gen_lda_data(options.output, options.size)

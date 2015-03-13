@@ -31,13 +31,13 @@ struct kvs {
 
 public:
 
-  inline virtual ~kvs() {}
+  virtual ~kvs() {}
   
-  inline bool contains(const K & k) { 
+  bool contains(const K & k) { 
     return kvdct.count(k); 
   }
   
-  inline void set(const K & k, const V & v) { 
+  void set(const K & k, const V & v) { 
     kvdct[k] = v; 
   }
 
@@ -59,14 +59,16 @@ public:
   */
 
   boost::optional<V> get(const K & k) {
-    if(contains(k)) {
-      return boost::optional<V>(kvdct.at(k));
+    auto fi = kvdct.find(k);
+    if(fi != kvdct.end()) {
+      return boost::optional<V>(fi->second);
     } else return boost::none;
   }
 
   bool get(const K & k, V & v) {
-    if(contains(k)) {
-      v = kvdct.at(k);
+    auto fi = kvdct.find(k);
+    if(fi != kvdct.end()) {
+      v = fi->second;
       return true;
     } else {
       return false;
@@ -155,7 +157,7 @@ public:
     return true;
   }
   
-  inline void clean() {
+  void clean() {
     kvdct.clear();
   }
   

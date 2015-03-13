@@ -28,6 +28,54 @@
 #include "test.hpp"
 #include "paracel_types.hpp"
 
+BOOST_AUTO_TEST_CASE (paracel_str_extra_test) {
+  {
+    std::vector<std::string> init_lst = {"hello", "world", "happy", "new", "year", "2015"};
+    std::string seps = "orz";
+    auto together = paracel::str_join(init_lst, seps);
+    BOOST_CHECK_EQUAL(together, "helloorzworldorzhappyorzneworzyearorz2015");
+    auto res1 = paracel::str_split_by_word(together, seps);
+    std::string tmp = together;
+    auto res2 = paracel::str_split_by_word(std::move(tmp), seps);
+    BOOST_CHECK_EQUAL_V(res1, init_lst);
+    BOOST_CHECK_EQUAL_V(res2, init_lst);
+    BOOST_CHECK_EQUAL(paracel::startswith(together, "hello"), true);
+    BOOST_CHECK_EQUAL(paracel::startswith(together, "helo"), false);
+    BOOST_CHECK_EQUAL(paracel::startswith(together, "helloorzworldorzhappyorzneworzyearorz2015"), true);
+    BOOST_CHECK_EQUAL(paracel::startswith(together, "helloorzworldorzhappyorzneworzyearorz20157"), false);
+    BOOST_CHECK_EQUAL(paracel::startswith(together, ""), true);
+    BOOST_CHECK_EQUAL(paracel::endswith(together, "2015"), true);
+    BOOST_CHECK_EQUAL(paracel::endswith(together, "2014"), false);
+    BOOST_CHECK_EQUAL(paracel::endswith(together, "helloorzworldorzhappyorzneworzyearorz2015"), true);
+    BOOST_CHECK_EQUAL(paracel::endswith(together, "7helloorzworldorzhappyorzneworzyearorz2015"), false);
+    BOOST_CHECK_EQUAL(paracel::endswith(together, ""), true);
+  }
+  {
+    std::string tmp = "a|b|c|d|e";
+    std::vector<std::string> r = {"a", "b", "c", "d", "e"};
+    auto r1 = paracel::str_split(tmp, '|');
+    auto r2 = paracel::str_split(tmp, "|");
+    auto r3 = paracel::str_split(tmp, "?|?");
+    BOOST_CHECK_EQUAL_V(r1, r);
+    BOOST_CHECK_EQUAL_V(r2, r);
+    BOOST_CHECK_EQUAL_V(r3, r);
+  }
+}
+
+BOOST_AUTO_TEST_CASE (paracel_random_test) {
+  int incycle_cnt = 0;
+  for(int i = 0; i < 10000000; ++i) {
+    double x = paracel::random_double();
+    double y = paracel::random_double();
+    if(x * x + y * y < 1.)  incycle_cnt += 1;
+  }
+  std::cout << 4 * static_cast<double>(incycle_cnt) / 10000000. << std::endl;
+  
+  for(int i = 0; i < 1000000; ++i) auto r = paracel::random_double_list(100);
+
+  auto r = paracel::random_double_list(1000000);
+}
+
 BOOST_AUTO_TEST_CASE (paracel_json_parser_test) {
   paracel::json_parser pt("../../test/test.json");
   std::string r = "hong";
@@ -150,6 +198,13 @@ BOOST_AUTO_TEST_CASE (eigen_common_usage_test) {
 }
 
 BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
+  
+  Eigen::MatrixXd HH_global = Eigen::MatrixXd::Random(3, 3);
+  std::cout << HH_global << std::endl;
+  Eigen::MatrixXd HH_blk = HH_global.block(0, 0, 2, 2);
+  std::cout << HH_blk << std::endl;
+  std::vector<double> tHt = paracel::mat2vec(HH_blk);
+  std::cout << paracel::vec2mat(tHt, 2) << std::endl;
   
   Eigen::MatrixXd mtx(4, 3);
   mtx << 1., 2., 3.,

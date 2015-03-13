@@ -223,8 +223,8 @@ public:
     return stf;
   }
  
-  void index_mapping(const listriple_type & slotslst, 
-                     paracel::list_type<paracel::compact_triple_type> & stf, 
+  void index_mapping(const listriple_type & slotslst,
+                     paracel::list_type<paracel::compact_triple_type> & stf,
                      paracel::dict_type<paracel::default_id_type, paracel::str_type> & rm,
                      paracel::dict_type<paracel::default_id_type, paracel::str_type> & cm) {
     

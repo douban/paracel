@@ -91,7 +91,7 @@ class pagerank : public paracel::paralg {
                           handle_file,
                           update_function);
     if(get_worker_id() == 0) std::cout << "first bupdate done" << std::endl;
-    sync();
+    paracel_sync();
 
     // read connect info only once
     klstmap.clear();
@@ -115,7 +115,7 @@ class pagerank : public paracel::paralg {
       tmp[paracel::cvt(kv.first) + "_pr"] = init_val;
     }
     paracel_write_multi(tmp);
-    sync();
+    paracel_sync();
   }
 
   void learning() {
@@ -130,7 +130,7 @@ class pagerank : public paracel::paralg {
       }
     }
 
-    sync();
+    paracel_sync();
 
     for(int rd = 0; rd < rounds; ++rd) {
       if(get_worker_id() == 0) std::cout << rd << std::endl;
@@ -156,7 +156,7 @@ class pagerank : public paracel::paralg {
         }
         kvmap[kv.first] = (1. - damping_factor) + damping_factor * sigma;
       }
-      sync();
+      paracel_sync();
 
       std::unordered_map<std::string, double> kvmap_dct;
       // reduce
@@ -164,7 +164,7 @@ class pagerank : public paracel::paralg {
         kvmap_dct[paracel::cvt(kv.first) + "_pr"] = kv.second;
       }
       paracel_write_multi(kvmap_dct);
-      sync();
+      paracel_sync();
     }
     // last pull all
     auto kvmap_tmp = paracel_read_special<double>(handle_file,
@@ -192,7 +192,7 @@ class pagerank : public paracel::paralg {
 
   void solve() {
     init_paras();
-    sync();
+    paracel_sync();
     learning();
   }
 

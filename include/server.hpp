@@ -226,7 +226,6 @@ void thrd_exec(zmq::socket_t & sock) {
     auto msg = paracel::str_split_by_word(scrip, paracel::seperator);
     auto indicator = pk.unpack(msg[0]);
     
-    mutex.lock();
     if(indicator == "contains") {
       auto key = pk.unpack(msg[1]);
       auto result = paracel::tbl_store.contains(key);
@@ -299,6 +298,7 @@ void thrd_exec(zmq::socket_t & sock) {
       bool result = true; 
       rep_pack_send(sock, result);
     }
+    mutex.lock();
     if(indicator == "push") {
       auto key = pk.unpack(msg[1]);
       paracel::tbl_store.set(key, msg[2]);
@@ -432,7 +432,7 @@ void init_thrds(const paracel::str_type & init_host,
     }
   }
 
-  zmq::message_t request(ports.size()); 
+  zmq::message_t request(ports.size());
   std::memcpy((void *)request.data(), &ports[0], ports.size());
   sock.send(request);
 

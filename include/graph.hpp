@@ -290,7 +290,7 @@ public:
     }
   }
  
-  digraph reverse() {
+  void reverse() {
     std::swap(adj, reverse_adj);
   }
 
@@ -321,15 +321,15 @@ public:
     for(auto & v : adj) {
       for(auto & kv : v.second) {
         if(vertex == kv.first) {
-	  cnt += 1;
-	}
+          cnt += 1;
+        }
       }
     }
     return cnt;
   }
   
   inline double avg_degree() { 
-    return e_sz / v_sz; 
+    return static_cast<double>(e_sz / v_sz);
   }
   
   inline int selfloops() {
@@ -552,8 +552,8 @@ class bigraph_continuous {
     return adj[v].size();
   }
 
-  inline paracel::default_id_type indegree(paracel::default_id_type v) {
-    paracel::default_id_type cnt = 0;
+  inline size_t indegree(paracel::default_id_type v) {
+    size_t cnt = 0;
     for(auto & v_bag : adj) {
       for(auto & item : v_bag) {
         if(item.first == v) {
@@ -566,7 +566,7 @@ class bigraph_continuous {
 
   template <class F>
   void traverse(F & func) {
-    for(int i = 0; i < v_sz; ++i) {
+    for(paracel::default_id_type i = 0; i < v(); ++i) {
       for(auto & item : adj[i]) {
         func(i, item.first, item.second);
       }
@@ -581,8 +581,8 @@ class bigraph_continuous {
   }
 
  private:
-  paracel::default_id_type v_sz;
-  paracel::default_id_type e_sz;
+  paracel::default_id_type v_sz = 0;
+  paracel::default_id_type e_sz = 0;
   paracel::list_type<paracel::bag_type<std::pair<paracel::default_id_type, double> >  > adj;
  
  public:

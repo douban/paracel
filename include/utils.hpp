@@ -110,7 +110,7 @@ paracel::list_type<size_t> get_ports() {
 }
 
 // return a uniform random double value in range(0, 1.)
-inline double random_double() {
+double random_double() {
   auto v = random() / static_cast<double>(RAND_MAX);
   while(v == 0 || v == 1.) {
     v = random() / static_cast<double>(RAND_MAX);
@@ -119,10 +119,10 @@ inline double random_double() {
 }
 
 paracel::list_type<double> 
-random_double_list(size_t len, double range = 1.) {
+random_double_list(size_t len, double upper_bnd = 1.) {
   paracel::list_type<double> r;
   for(size_t i = 0; i < len; ++i) {
-    r.push_back(range * random_double());
+    r.push_back(upper_bnd * random_double());
   }
   return r;
 }
@@ -168,7 +168,7 @@ std::vector<double> evec2vec(const Eigen::VectorXd & ev) {
   return v;
 }
 
-// Eigen::MatrixXd only support column-major and return col seq
+// Eigen::MatrixXd is column-major and return col seq
 std::vector<double> mat2vec(const Eigen::MatrixXd & m) {
   std::vector<double> v(m.size());
   Eigen::Map<Eigen::MatrixXd>(v.data(), m.rows(), m.cols()) = m;
@@ -177,11 +177,10 @@ std::vector<double> mat2vec(const Eigen::MatrixXd & m) {
 
 // return row seq
 Eigen::MatrixXd vec2mat(const std::vector<double> & v,
-                        size_t rows) {
-  size_t cols = v.size() / rows;
-  Eigen::MatrixXd m(cols, rows);
-  m = Eigen::MatrixXd::Map(&v[0], cols, rows);
-  return m.transpose();
+                        size_t cols) {
+  size_t rows = v.size() / cols;
+  Eigen::MatrixXd m(rows, cols);
+  return Eigen::MatrixXd::Map(&v[0], rows, cols);
 }
 
 template <class F>

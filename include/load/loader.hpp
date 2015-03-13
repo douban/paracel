@@ -72,7 +72,7 @@ class loader {
                                      pattern);
     partition_obj.files_partition();
     auto linelst = scheduler.schedule_load(partition_obj);
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "lines got" << std::endl;
     
     return linelst;
@@ -89,7 +89,7 @@ class loader {
     partition_obj.files_partition();
     // parallel loading lines
     auto linelst = scheduler.structure_load(partition_obj);
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "lines got" << std::endl;
     
     return linelst;
@@ -120,13 +120,13 @@ class loader {
                              parserfunc, 
                              result);
     linelst.resize(0); linelst.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "slotslst generated" << std::endl;
     
     paracel::list_type<paracel::compact_triple_type> stf, stf_new;
     scheduler.exchange(result, stf);
     result.resize(0); result.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "desirable lines got" << std::endl;
     
     scheduler.index_mapping(stf, stf_new, rm, cm);
@@ -154,13 +154,13 @@ class loader {
     // hash lines into slotslst
     auto result = scheduler.lines_organize(linelst, parserfunc);
     linelst.resize(0); linelst.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "slotslst generated" << std::endl;
 
     // alltoall exchange
     auto stf = scheduler.exchange(result);
     result.resize(0); result.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "desirable lines got" << std::endl;
     
     // mapping inds to ids, get rmap, cmap, std_new...
@@ -188,11 +188,12 @@ class loader {
     paracel::default_id_type indx = 0;
     bool flag = true;
     paracel::list_type<Eigen::VectorXd> mtx_llst;
+    std::cout << linelst.size() << std::endl;
     for(auto & line : linelst) {
       auto stf = parserfunc(line);
       if(flag) { 
         csz = stf.size() - 1; 
-        flag = true; 
+        flag = false; 
       }
       rm[indx] = std::stoull(stf[0]);
       indx += 1;
@@ -249,13 +250,13 @@ class loader {
                              parserfunc, 
                              result);
     linelst.resize(0); linelst.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << " slotslst generated" << std::endl;
     
     paracel::list_type<paracel::compact_triple_type> stf;
     scheduler.exchange(result, stf);
     result.resize(0); result.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     
     for(auto & tpl : stf) {
       grp.add_edge(std::get<0>(tpl), 
@@ -273,13 +274,13 @@ class loader {
     // hash lines into slotslst
     auto result = scheduler.lines_organize(linelst, parserfunc);
     linelst.resize(0); linelst.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "slotslst generated" << std::endl;
     
     // alltoall exchange
     auto stf = scheduler.exchange(result);
     result.resize(0); result.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "desirable lines got" << std::endl;
 
     paracel::dict_type<paracel::str_type, 
@@ -301,14 +302,14 @@ class loader {
                              parserfunc, 
                              result);
     linelst.resize(0); linelst.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "slotslst generated" << std::endl;
     
     // alltoall exchange
     paracel::list_type<paracel::compact_triple_type> stf;
     scheduler.exchange(result, stf);
     result.resize(0); result.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "desirable lines got" << std::endl;
     for(auto & tpl : stf) {
       grp.add_edge(std::get<0>(tpl), 
@@ -326,13 +327,13 @@ class loader {
     // hash lines into slotslst
     auto result = scheduler.lines_organize(linelst, parserfunc);
     linelst.resize(0); linelst.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "slotslst generated" << std::endl;
     
     // alltoall exchange
     auto stf = scheduler.exchange(result);
     result.resize(0); result.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "desirable lines got" << std::endl;
 
     paracel::dict_type<paracel::str_type, 
@@ -356,20 +357,20 @@ class loader {
                              parserfunc, 
                              result);
     linelst.resize(0); linelst.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "slotslst generated" << std::endl;
     
     // alltoall exchange
     paracel::list_type<paracel::compact_triple_type> stf;
     scheduler.exchange(result, stf);
     result.resize(0); result.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
     if(m_comm.get_rank() == 0) std::cout << "desirable lines got" << std::endl;
     
     paracel::list_type<paracel::compact_triple_type> stf_new;
     scheduler.index_mapping(stf, stf_new, rm, cm);
     stf.resize(0); stf.shrink_to_fit(); paracel::cheat_to_os();
-    m_comm.sync();
+    m_comm.synchronize();
 
     for(auto & tpl : stf_new) {
       grp.add_edge(std::get<0>(tpl), 

@@ -1,0 +1,11 @@
+{
+  "input" : "xxx",
+  "output" : "/nfs/user/xxx/paracel/output/gLDA_output/",
+  "alpha" : 0.1,
+  "beta" : 0.1,
+  "k_topics": 10,
+  "iters": 100,
+  "top_words": 500,
+  "handle_fn": "/nfs/user/xxx/paracel/local/lib/libgLDA_handle.so",
+  "debug": false 
+}

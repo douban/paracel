@@ -25,6 +25,7 @@
 
 #include <zmq.hpp>
 
+#include "utils.hpp"
 #include "packer.hpp"
 #include "paracel_types.hpp"
 #include "utils/ext_utility.hpp"
@@ -588,18 +589,18 @@ private:
   paracel::list_type<paracel::str_type> ports_lst;
   paracel::str_type conn_prefix;
   zmq::context_t context;
-  std::unique_ptr<zmq::socket_t> p_contains_sock;
-  std::unique_ptr<zmq::socket_t> p_pull_sock;
-  std::unique_ptr<zmq::socket_t> p_pull_multi_sock;
-  std::unique_ptr<zmq::socket_t> p_pullall_sock;
-  std::unique_ptr<zmq::socket_t> p_push_sock;
-  std::unique_ptr<zmq::socket_t> p_push_multi_sock;
-  std::unique_ptr<zmq::socket_t> p_update_sock;
-  std::unique_ptr<zmq::socket_t> p_bupdate_sock;
-  std::unique_ptr<zmq::socket_t> p_bupdate_multi_sock;
-  std::unique_ptr<zmq::socket_t> p_remove_sock;
-  std::unique_ptr<zmq::socket_t> p_clear_sock;
-  std::unique_ptr<zmq::socket_t> p_ssp_sock;
+  std::unique_ptr<zmq::socket_t> p_contains_sock = nullptr;
+  std::unique_ptr<zmq::socket_t> p_pull_sock = nullptr;
+  std::unique_ptr<zmq::socket_t> p_pull_multi_sock = nullptr;
+  std::unique_ptr<zmq::socket_t> p_pullall_sock = nullptr;
+  std::unique_ptr<zmq::socket_t> p_push_sock = nullptr;
+  std::unique_ptr<zmq::socket_t> p_push_multi_sock = nullptr;
+  std::unique_ptr<zmq::socket_t> p_update_sock = nullptr;
+  std::unique_ptr<zmq::socket_t> p_bupdate_sock = nullptr;
+  std::unique_ptr<zmq::socket_t> p_bupdate_multi_sock = nullptr;
+  std::unique_ptr<zmq::socket_t> p_remove_sock = nullptr;
+  std::unique_ptr<zmq::socket_t> p_clear_sock = nullptr;
+  std::unique_ptr<zmq::socket_t> p_ssp_sock = nullptr;
 
 }; // struct kvclt 
 

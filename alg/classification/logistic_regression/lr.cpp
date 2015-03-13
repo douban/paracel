@@ -139,9 +139,9 @@ void logistic_regression::dgd_learning() {
         loss_error.push_back(calc_loss());
       }
     } // traverse
-    sync(); // sync for map
+    paracel_sync(); // paracel_sync for map
     paracel_bupdate("theta", delta); // update with delta
-    sync(); // sync for reduce
+    paracel_sync(); // paracel_sync for reduce
     
     std::cout << "worker" << get_worker_id() 
         << " finished round: " << rd 
@@ -186,9 +186,9 @@ void logistic_regression::ipm_learning() {
     for(int i = 0; i < data_dim; ++i) {
       delta[i] = wgt * (theta[i] - theta_old[i]);
     }
-    sync(); // sync for map
+    paracel_sync(); // paracel_sync for map
     paracel_bupdate("theta", delta); // update with delta
-    sync(); // sync for reduce
+    paracel_sync(); // paracel_sync for reduce
     
     std::cout << "worker" << get_worker_id() 
         << " finished round: " << rd 
@@ -243,7 +243,7 @@ void logistic_regression::downpour_learning() {
       }
       cnt += 1;
     } // traverse
-    sync();
+    paracel_sync();
 
     std::cout << "worker" << get_worker_id() 
         << " finished round: " << rd 
@@ -298,7 +298,7 @@ void logistic_regression::solve() {
   
   auto lines = paracel_load(input);
   local_parser(lines);
-  sync();
+  paracel_sync();
 
   if(learning_method == "dgd") {
     dgd_learning();
@@ -311,7 +311,7 @@ void logistic_regression::solve() {
   } else {
     ERROR_ABORT("method do not support");
   }
-  sync();
+  paracel_sync();
 }
 
 double logistic_regression::calc_loss() {
@@ -354,7 +354,7 @@ void logistic_regression::predict(const std::string & pred_fn) {
   for(size_t i = 0; i < samples.size(); ++i) {
     predv.push_back(std::make_pair(samples[i], lr_hypothesis(samples[i])));
   }
-  sync();
+  paracel_sync();
 }
 
 } // namespace alg

@@ -121,15 +121,15 @@ class vertex {
           } // for
         } // if
       }
-      sync();
+      pt->paracel_sync();
       vote_to_halt();
       pt->get_comm().allreduce(halt_flag);
       if(halt_flag == pt->get_worker_size()) {
         break;
       }
-      sync();
+      pt->paracel_sync();
     }
-    sync();
+    pt->paracel_sync();
   }
 
   void dump_result(const std::string & prefix) {

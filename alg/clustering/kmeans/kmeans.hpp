@@ -73,7 +73,7 @@ class kmeans : public paracel::paralg {
       };
       auto f_parser = paracel::gen_parser(local_parser);
       //paracel_load_as_matrix(blk_dmtx, row_map, input, f_parser);
-      paracel_load_as_matrix(blk_dmtx, row_map, input, f_parser, "fvec", true);
+      paracel_load_as_matrix(blk_dmtx, row_map, input, f_parser);
 
       // init clusters
       if(get_worker_id() == 0) {
@@ -93,7 +93,7 @@ class kmeans : public paracel::paralg {
     } else if(dtype == "sim") {
       // TODO: sparsity case 
     }
-    sync(); // !
+    paracel_sync(); // !
   }
 
   // TODO: convergence condition
@@ -104,6 +104,7 @@ class kmeans : public paracel::paralg {
 
     // main loop
     for(int rd = 0; rd < rounds; ++rd) {
+      if(get_worker_id() == 0) std::cout << "round: " << rd << std::endl;
       pnt_owner.clear();
       
       // pull clusters
@@ -140,7 +141,7 @@ class kmeans : public paracel::paralg {
 
       // update clusters
       paracel_bupdate("clusters_" + std::to_string(rd), clusters);
-      sync();
+      paracel_sync();
       //paracel_update_default("clusters_" + std::to_string(rd), clusters);
     } // rounds
 
@@ -157,14 +158,14 @@ class kmeans : public paracel::paralg {
                    groups, 
                    update_file, 
                    update_funcs[1]);
-    sync();
+    paracel_sync();
     groups = paracel_read<std::unordered_map<int, std::vector<std::string> > >("kmeans_result");
   }
 
  public:
   void solve() {
     init();
-    sync();
+    paracel_sync();
     learning();
   }
 

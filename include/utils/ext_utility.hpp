@@ -93,7 +93,8 @@ bool startswith(const paracel::str_type & str,
 
 bool endswith(const paracel::str_type & str,
               const std::string & key) {
-  return str.rfind(key) == (str.length() - key.length());
+  if(str.size() < key.size()) return false;
+  return str.rfind(key) == (str.size() - key.size());
 }
 
 bool isfile(const paracel::str_type & f) {
@@ -170,8 +171,8 @@ expand(const paracel::list_type<paracel::str_type> & fname_lst) {
   return fl;
 }
 
-inline double dot_product(const std::vector<double> & a, 
-                          const std::vector<double> & b) {
+double dot_product(const std::vector<double> & a, 
+                   const std::vector<double> & b) {
   return std::inner_product(a.begin(), a.end(), b.begin(), 0.);
 }
 

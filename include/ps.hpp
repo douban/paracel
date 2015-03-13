@@ -118,7 +118,7 @@ class paralg {
       (ps_obj->kvm[clock_server]).
           push_int(key, worker_comm.get_size());
     }
-    worker_comm.sync();
+    paracel_sync();
   }
 
   virtual ~paralg() {
@@ -214,7 +214,7 @@ class paralg {
     // load lines
     paracel::loader<T> ld(fn, worker_comm, parser, pattern, mix_flag);
     paracel::list_type<paracel::str_type> lines = ld.fixload();
-    sync();
+    paracel_sync();
     // create graph 
     ld.create_graph(lines, grp);
     set_decomp_info(pattern);
@@ -232,7 +232,7 @@ class paralg {
     // load lines
     paracel::loader<T> ld(fn, worker_comm, parser, pattern, mix_flag);
     paracel::list_type<paracel::str_type> lines = ld.fixload();
-    sync();
+    paracel_sync();
     // create graph 
     ld.create_graph(lines, grp);
     set_decomp_info(pattern);
@@ -251,7 +251,7 @@ class paralg {
     // load lines
     paracel::loader<T> ld(fn, worker_comm, parser, pattern, mix_flag);
     paracel::list_type<paracel::str_type> lines = ld.fixload();
-    sync();
+    paracel_sync();
     // create graph 
     ld.create_graph(lines, grp, row_map, col_map);
     set_decomp_info(pattern);
@@ -270,7 +270,7 @@ class paralg {
     // load lines
     paracel::loader<T> ld(fn, worker_comm, parser, pattern, mix_flag);
     paracel::list_type<paracel::str_type> lines = ld.fixload();
-    sync();
+    paracel_sync();
     // create sparse matrix
     ld.create_matrix(lines, blk_mtx, row_map, col_map);
     set_decomp_info(pattern);
@@ -305,18 +305,15 @@ class paralg {
   void paracel_load_as_matrix(Eigen::MatrixXd & blk_dense_mtx,
                               paracel::dict_type<paracel::default_id_type, G> & row_map,
                               const T & fn, 
-                              parser_type & parser,
-                              const paracel::str_type & pattern = "fsmap",
-                              bool mix_flag = false) {
+                              parser_type & parser) {
 
-    // TODO: check pattern
     // load lines
-    paracel::loader<T> ld(fn, worker_comm, parser, pattern, mix_flag);
+    paracel::loader<T> ld(fn, worker_comm, parser, "fvec", true);
     paracel::list_type<paracel::str_type> lines = ld.fixload();
-    sync();
+    paracel_sync();
     // create sparse matrix
     ld.create_matrix(lines, blk_dense_mtx, row_map);
-    set_decomp_info(pattern);
+    set_decomp_info("fvec");
     lines.resize(0); lines.shrink_to_fit(); paracel::cheat_to_os();
   }
 
@@ -324,14 +321,10 @@ class paralg {
   template <class T>
   void paracel_load_as_matrix(Eigen::MatrixXd & blk_dense_mtx,
                               const T & fn, 
-                              parser_type & parser,
-                              const paracel::str_type & pattern = "fsmap",
-                              bool mix_flag = false) {
+                              parser_type & parser) {
     paralg::paracel_load_as_matrix(blk_dense_mtx,
                                    rm, fn,
-                                   parser,
-                                   pattern,
-                                   mix_flag);	
+                                   parser);	
   }
 
   // put where you want to control iter with ssp
@@ -632,7 +625,7 @@ class paralg {
     }
     return r;
   }
-
+  
   template <class V>
   void paracel_update(const paracel::str_type & key,
                       const V & delta,
@@ -768,20 +761,20 @@ class paralg {
     total_iters = n;
   }
 
-  inline size_t get_worker_id() {
+  size_t get_worker_id() {
     return worker_comm.get_rank();
   }
 
-  inline size_t get_worker_size() {
+  size_t get_worker_size() {
     return worker_comm.get_size();
   }
 
-  inline size_t get_server_size() {
+  size_t get_server_size() {
     return ps_obj->srv_sz;
   }
 
-  void sync() {
-    worker_comm.sync();
+  void paracel_sync() {
+    worker_comm.synchronize();
   }
 
   /**
@@ -884,7 +877,7 @@ class paralg {
     }
     os.close();
     if(merge && get_worker_id() == 0) {
-      sync();
+      paracel_sync();
       paracel::str_type output_regx = output + filename + "*";
       files_merge(output_regx, filename);
     }
@@ -910,7 +903,7 @@ class paralg {
     }
     os.close();
     if(merge && get_worker_id() == 0) {
-      sync();
+      paracel_sync();
       paracel::str_type output_regx = output + filename + "*";
       files_merge(output_regx, filename);
     }
@@ -936,7 +929,7 @@ class paralg {
     }
     os.close();
     if(merge && get_worker_id() == 0) {
-      sync();
+      paracel_sync();
       paracel::str_type output_regx = output + filename + "*";
       files_merge(output_regx, filename);
     }
@@ -968,7 +961,7 @@ class paralg {
     }
     os.close();
     if(merge && get_worker_id() == 0) {
-      sync();
+      paracel_sync();
       paracel::str_type output_regx = output + filename + "*";
       files_merge(output_regx, filename);
     }
@@ -1002,7 +995,7 @@ class paralg {
     }
     os.close();
     if(merge && get_worker_id() == 0) {
-      sync();
+      paracel_sync();
       paracel::str_type output_regx = output + filename + "*";
       files_merge(output_regx, filename);
     }

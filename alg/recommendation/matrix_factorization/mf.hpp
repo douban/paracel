@@ -127,7 +127,7 @@ class matrix_factorization : public paracel::paralg {
       miu += c;
     };
     rating_graph.traverse(init_lambda);
-    sync();
+    paracel_sync();
     worker_comm.allreduce(miu);
     long long rating_sz_tmp = rating_sz;
     worker_comm.allreduce(rating_sz_tmp);
@@ -171,7 +171,7 @@ class matrix_factorization : public paracel::paralg {
     }
     paracel_write_multi(local_H_dct);
     paracel_write_multi(local_ib_dct);
-    sync();
+    paracel_sync();
     if(id == 0) std::cout << "first push done" << std::endl;
     
     paracel::list_type<paracel::str_type> tmp_wgtx_lst, tmp_wgty_lst;
@@ -195,7 +195,7 @@ class matrix_factorization : public paracel::paralg {
       wgty_map[i] = 1. / static_cast<double>(tmp_y_cnt[indx_cnt]);
       indx_cnt += 1;
     }
-    sync();
+    paracel_sync();
     if(id == 0) std::cout << "initialization done" << std::endl;
   }
 
@@ -314,10 +314,10 @@ class matrix_factorization : public paracel::paralg {
       
       // update paras to servers
       update_mf_fac(old_W, old_H);
-      sync(); // important 
+      paracel_sync(); // important 
       
       update_mf_bias(old_ubias, old_ibias);
-      sync();
+      paracel_sync();
 
       iter_commit();
       if(get_worker_id() == 0) std::cout << "finish round: " << rd << std::endl;
@@ -330,7 +330,7 @@ class matrix_factorization : public paracel::paralg {
     if(debug) { 
       loss_error_train.push_back(cal_rmse(rating_graph));
     }
-    sync();
+    paracel_sync();
     if(get_worker_id() == 0) std::cout << "last pull finished" << std::endl;
   }
 
@@ -341,7 +341,7 @@ class matrix_factorization : public paracel::paralg {
     auto tmp_H = paracel_read_special<vector<double> >(filter_file, filter_funcs[3]);
     auto tear_lambda = [] (const string & str) {
       auto pos1 = str.rfind('_') + 1;
-      return str.substr(pos1, str.size());
+      return str.substr(pos1, str.size() - pos1);
     };
     for(auto & kv : tmp_W) {
       string temp = tear_lambda(kv.first);
@@ -372,9 +372,9 @@ class matrix_factorization : public paracel::paralg {
   virtual void solve() {
     init_parameters(); 
     set_total_iters(rounds);
-    sync();
+    paracel_sync();
     learning();
-    sync();
+    paracel_sync();
   }
 
   void dump_result() {
@@ -390,7 +390,7 @@ class matrix_factorization : public paracel::paralg {
      
       auto tear_lambda = [] (const string & str) {
         auto pos1 = str.rfind('_') + 1;
-        return str.substr(pos1, str.size());
+        return str.substr(pos1, str.size() - pos1);
       };
       auto lambda_ubias = [&] (unordered_map<string, double> & d) {
         unordered_map<string, double> dump_usr_bias;
@@ -487,7 +487,7 @@ class matrix_factorization : public paracel::paralg {
       }
     }
     paracel_dump_vector(predv, "pred_v_", "\n");
-    sync();
+    paracel_sync();
     if(id == 0) std::cout << "dump finished" << std::endl;
   }
 

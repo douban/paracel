@@ -85,11 +85,11 @@ class partition {
     }
   }
 
-  inline paracel::list_type<long> get_start_list() {
+  paracel::list_type<long> get_start_list() {
     return slst;
   }
 
-  inline paracel::list_type<long> get_end_list() {
+  paracel::list_type<long> get_end_list() {
     return elst;
   }
 

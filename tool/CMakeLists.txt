@@ -22,4 +22,8 @@ add_executable(svd_serial svd_serial.cpp)
 target_link_libraries(svd_serial ${Boost_LIBRARIES} comm scheduler)
 install(TARGETS svd_serial RUNTIME DESTINATION bin/tool)
 
+add_executable(gLDA_serial gLDA_serial.cpp)
+target_link_libraries(gLDA_serial ${Boost_LIBRARIES} comm scheduler)
+install(TARGETS gLDA_serial RUNTIME DESTINATION bin/tool)
+
 install(FILES datagen.py DESTINATION bin/tool)

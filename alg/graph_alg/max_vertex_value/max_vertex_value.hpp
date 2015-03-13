@@ -76,7 +76,7 @@ class max_vertex_value : public paracel::paralg {
                       update_file,
                       update_funcs);
     }
-    sync();
+    paracel_sync();
     // following supersteps
     while(1) {
       size_t local_halt_flag = 1;
@@ -96,7 +96,7 @@ class max_vertex_value : public paracel::paralg {
           }
         }
       }
-      sync();
+      paracel_sync();
 
       // update vertex_active_map
       for(auto & kv : vertex_active_map) {
@@ -110,14 +110,14 @@ class max_vertex_value : public paracel::paralg {
           vertex_active_map[vertex] = true; // reactive
         }
       }
-      sync();
+      paracel_sync();
       get_comm().allreduce(local_halt_flag);
       if(local_halt_flag == get_worker_size()) {
         break;
       }
-      sync();
+      paracel_sync();
     }
-    sync();
+    paracel_sync();
   } // solve
 
   void dump_result() {
