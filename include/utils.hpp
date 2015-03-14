@@ -27,10 +27,10 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include <zmq.hpp>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
 
+#include "zmq.hpp"
 #include "utils/comm.hpp"
 #include "utils/hash.hpp"
 #include "utils/decomp.hpp"

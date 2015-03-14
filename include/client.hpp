@@ -23,8 +23,7 @@
 #include <memory>
 #include <functional>
 
-#include <zmq.hpp>
-
+#include "zmq.hpp"
 #include "utils.hpp"
 #include "packer.hpp"
 #include "paracel_types.hpp"
