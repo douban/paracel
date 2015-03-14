@@ -6,7 +6,7 @@
 
 include(CheckCXXSourceRuns)
 
-find_path(ZeroMQ_INCLUDE_DIR zmq.hpp
+find_path(ZeroMQ_INCLUDE_DIR zmq.h
   NO_DEFAULT_PATH
   PATHS
   "/usr/local/include"
@@ -21,11 +21,11 @@ find_library(ZeroMQ_LIBRARY
 message(STATUS "Find ZeroMQ include path: ${ZeroMQ_INCLUDE_DIR}")
 message(STATUS "Find ZeroMQ lib path: ${ZeroMQ_LIBRARY}")
 
-set(CMAKE_REQUIRED_INCLUDES ${ZeroMQ_INCLUDE_DIR})
+set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include" ${ZeroMQ_INCLUDE_DIR})
 set(CMAKE_REQUIRED_LIBRARIES ${ZeroMQ_LIBRARY})
 set(CMAKE_REQUIRED_FLAGS -std=c++11)
 check_cxx_source_runs("
-#include <zmq.hpp>
+#include \"zmq.hpp\"
 int main(int argc, char *argv[])
 {
   zmq::context_t context(1);

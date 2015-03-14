@@ -588,7 +588,8 @@ if __name__ == "__main__":
 
     # set your default mesos master address below
     if options.master == 'mesos':
-        options.master = 'zk://host1:port1,host2:port2,.../path'
+        #options.master = 'zk://host1:port1,host2:port2,.../path'
+        options.master = 'zk://zk1:2181,zk2:2181,zk3:2181,zk4:2181,zk5:2181/mesos_master2'
     elif options.master.startswith('mesos://'):
         if '@' in options.master:
             options.master = options.master[options.master.rfind('@')+1:]

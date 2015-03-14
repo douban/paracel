@@ -2,17 +2,17 @@
 cmake_minimum_required(VERSION 2.8.9)
 ##############################--g++4.7-plus--###################################
 if(EXISTS "gentoo_rules.cmake")
-  find_program(CXX NAMES g++-4.8.1 g++-4.8 g++-4.7.2 g++-4.7.1 g++-4.7 g++)
+  find_program(CXX NAMES g++-4.9 g++-4.8.1 g++-4.8 g++-4.7.2 g++-4.7.1 g++-4.7 g++)
   execute_process(COMMAND sed -i 
                   "s|CMAKE_CXX_COMPILER [^ ]*|CMAKE_CXX_COMPILER ${CXX}|g" 
                   "gentoo_rules.cmake")
-  find_program(CC NAMES gcc-4.8.1 gcc-4.8 gcc-4.7.2 gcc-4.7.1 gcc-4.7 gcc)
+  find_program(CC NAMES gcc-4.9 gcc-4.8.1 gcc-4.8 gcc-4.7.2 gcc-4.7.1 gcc-4.7 gcc)
   execute_process(COMMAND sed -i 
                   "s|CMAKE_C_COMPILER [^ ]*|CMAKE_C_COMPILER ${CC}|g"
                   "gentoo_rules.cmake")
 else()
-  find_program(CMAKE_CXX_COMPILER NAMES g++-4.8.1 g++-4.8 g++-4.7.2 g++-4.7.1 g++-4.7 g++)
-  find_program(CMAKE_C_COMPILER NAMES gcc-4.8.1 gcc-4.8 gcc-4.7.2 gcc-4.7.1 gcc-4.7 gcc)
+  find_program(CMAKE_CXX_COMPILER NAMES g++-4.9 g++-4.8.1 g++-4.8 g++-4.7.2 g++-4.7.1 g++-4.7 g++)
+  find_program(CMAKE_C_COMPILER NAMES gcc-4.9 gcc-4.8.1 gcc-4.8 gcc-4.7.2 gcc-4.7.1 gcc-4.7 gcc)
 endif()
 ################################################################################
 project(paracel CXX C)
@@ -24,6 +24,12 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O3 -DNDEBUG -march=native -ffast-math")
   #set(CMAKE_SHARED_LINKER_FLAGS "-static-libstdc++")
   #set(CMAKE_EXE_LINKER_FLAGS "-static-libstdc++")
+endif()
+
+if(CMAKE_COMPILER_IS_CLANGXX)
+  set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2")
+  set(CMAKE_CXX_FLAGS_DEBUG "-Wall -std=c++11 -O0 -g -fno-inline")
+  set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O3 -DNDEBUG -march=native -ffast-math")
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES RELEASE)
@@ -38,7 +44,7 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILER_FLAGS})
 set(CMAKE_LINK_FLAGS ${CMAKE_LINK_FLAGS} ${MPI_CXX_LINK_FLAGS})
 
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.55.0 REQUIRED COMPONENTS regex filesystem system unit_test_framework)
+find_package(Boost 1.48.0 REQUIRED COMPONENTS regex filesystem system unit_test_framework)
 include_directories(${Boost_INCLUDE_DIRS})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmakes")
