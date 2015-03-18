@@ -36,6 +36,16 @@ def dump_data(output, sample, label, sep):
         f.write(str(label[i]) + '\n')
     f.close()
 
+def gen_wc_data(output):
+    import os
+    cmd = 'wget http://paracel.io/data/kjv12.txt -O ' + output
+    os.system(cmd)
+
+def gen_pr_data(output):
+    import os
+    cmd = 'wget http://paracel.io/data/pr.dat -O ' + output
+    os.system(cmd)
+
 def gen_cls_data(output, sz, k = 100, sep = ','):
     x, y = datasets.make_classification(sz, k)
     dump_data(output, x, y, sep)
@@ -116,7 +126,7 @@ def gen_lda_data(output, n_docs, n_topics = 10):
 if __name__ == '__main__':
     optpar = OptionParser()
     optpar.add_option('-m', '--method', action = 'store', type = 'string', dest =
-                    'method', help = 'classification | regression | similarity | kmeans | lda...')
+                    'method', help = 'wc | classification | regression | pagerank | similarity | kmeans | lda...')
     optpar.add_option('-o', '--out', action = 'store', type = 'string', dest = 'output')
     optpar.add_option('-s', '--sep', action = 'store', type = 'string', dest =
                       'sep', help = "seperator, default : ','")
@@ -127,6 +137,8 @@ if __name__ == '__main__':
     options, args = optpar.parse_args()
 
     # check input
+    if options.method == 'wc':
+        gen_wc_data(options.output)
     if options.method == 'classification':
 		    if options.k and options.sep:
 			      gen_cls_data(options.output, options.size, options.k, options.sep)
@@ -141,6 +153,8 @@ if __name__ == '__main__':
 			      gen_reg_data(options.output, options.size, options.k)
 		    else:
 			      gen_reg_data(options.output, options.size)
+    if options.method == 'pagerank':
+        gen_pr_data(options.output)
     if options.method == 'similarity':
 		    if options.k and options.sep:
 			      gen_sim_data(options.output, options.size, options.k, options.sep)

@@ -72,7 +72,7 @@ class logistic_regression: public paracel::paralg {
   int rounds;
   double alpha, beta;
   bool debug = false;
-  vector<vector<double> > samples;
+  vector<vector<double> > samples, pred_samples;
   vector<double> labels;
   vector<double> theta;
   vector<double> loss_error;

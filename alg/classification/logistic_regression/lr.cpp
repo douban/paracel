@@ -94,7 +94,6 @@ void logistic_regression::local_parser(const vector<string> & linelst,
 // predict data format: feature_1,feature_2,..,feature_k,...
 void logistic_regression::local_parser_pred(const vector<string> & linelst,
                                             const char sep = ',') {
-  samples.resize(0);
   for(auto & line : linelst) {
     vector<double> tmp;
     auto linev = paracel::str_split(line, sep); 
@@ -102,7 +101,7 @@ void logistic_regression::local_parser_pred(const vector<string> & linelst,
     for(int i = 0; i < kdim; ++i) {
       tmp.push_back(std::stod(linev[i]));
     }
-    samples.push_back(tmp);
+    pred_samples.push_back(tmp);
   }
 }
 
@@ -346,13 +345,17 @@ void logistic_regression::test(const std::string & test_fn) {
   local_parser(lines);
   std::cout << "loss in test dataset is: " 
       << calc_loss() << std::endl;
+  paracel_sync();
 }
 
 void logistic_regression::predict(const std::string & pred_fn) {
   auto lines = paracel_load(pred_fn);
+  paracel_sync();
+  pred_samples.resize(0);
   local_parser_pred(lines);
-  for(size_t i = 0; i < samples.size(); ++i) {
-    predv.push_back(std::make_pair(samples[i], lr_hypothesis(samples[i])));
+  predv.resize(0);
+  for(size_t i = 0; i < pred_samples.size(); ++i) {
+    predv.push_back(std::make_pair(pred_samples[i], lr_hypothesis(pred_samples[i])));
   }
   paracel_sync();
 }
