@@ -350,7 +350,6 @@ void logistic_regression::test(const std::string & test_fn) {
 
 void logistic_regression::predict(const std::string & pred_fn) {
   auto lines = paracel_load(pred_fn);
-  paracel_sync();
   pred_samples.resize(0);
   local_parser_pred(lines);
   predv.resize(0);

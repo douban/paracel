@@ -400,6 +400,16 @@ class bigraph {
     v_sz = adj.size();
     e_sz += 1; // suppose no repeat
   }
+
+  void reset() {
+    v_sz = 0;
+    e_sz = 0;
+    adj.clear();
+  }
+
+  void clear() {
+    reset();
+  }
   
   paracel::dict_type<T, paracel::dict_type<T, double> > get_data() { return adj; }
 

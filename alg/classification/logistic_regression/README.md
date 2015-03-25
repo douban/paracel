@@ -5,7 +5,7 @@ Logistic regression, despite its name, is a linear model for classification rath
 1. Enter Paracel's home directory  
 ```cd paracel;``` 
 2. Generate training dataset for classification
-```python ./tool/datagen.py -m classification -o training.dat -n 10000 -k 100```
+```python ./tool/datagen.py -m classification -o training.dat -n 2500 -k 100```
 3. Set up link library path:  
 ```export LD_LIBRARY_PATH=your_paracel_install_path/lib```    
 4. Create a json file named `cfg.json`, see example in [Parameters](#parameters) section below.  
@@ -23,13 +23,12 @@ Default parameters are set in a JSON format file. For example, we create a cfg.j
     "update_file" : "your_paracel_install_path/lib/liblr_update.so",    
     "update_func" : "lr_theta_update",    
     "method" : "ipm",    
-    "rounds" : 5,    
+    "rounds" : 100,    
     "alpha" : 0.001,    
     "beta" : 0.01,    
-    "debug" : false 
-}    
-
-In the configuration file, `test_input` and `predict_input` is set to be the same as `training_input`, you can modify them if you have a test or predict dataset. `update_file` and `update_func` stores the information of registry function needed in our implementation of logistic regression. `rounds` refers to the number of training iterations. `alpha` refers to the learning rate of the [sgd](http://en.wikipedia.org/wiki/Stochastic_gradient_descent) algorithm while `beta` refers to the regularization parameter. There are four types of learning method you can choose with the `method` parameter:
+    "debug" : false     
+}     
+In the configuration file, `test_input` and `predict_input` is set to be the same as `training_input`, you can modify them if you have a test or predict dataset. `update_file` and `update_func` stores the information of registry function needed in our implementation of logistic regression. `rounds` refers to the number of training iterations. `alpha` is the learning rate of the [sgd](http://en.wikipedia.org/wiki/Stochastic_gradient_descent) algorithm and `beta` is the regularization parameter. There are four types of learning method you can choose with the `method` parameter:
  
  * [dgd](http://martin.zinkevich.org/publications/nips2010.pdf): distributed gradient descent learning
  * [ipm](http://research.google.com/pubs/pub36948.html): iterative parameter mixtures learning

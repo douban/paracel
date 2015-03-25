@@ -46,6 +46,18 @@ def gen_pr_data(output):
     cmd = 'wget http://paracel.io/data/pr.dat -O ' + output
     os.system(cmd)
 
+def gen_mf_data(output):
+    import os
+    cmd1 = 'wget http://paracel.io/data/netflix.dat -O ' + output
+    cmd2 = 'wget http://paracel.io/data/netflix_predict.dat -O ' + output + '.predict'
+    os.system(cmd1)
+    os.system(cmd2)
+
+def gen_svd_data(output):
+    import os
+    cmd = 'wget http://paracel.io/data/svd.dat -O ' + output
+    os.system(cmd)
+
 def gen_cls_data(output, sz, k = 100, sep = ','):
     x, y = datasets.make_classification(sz, k)
     dump_data(output, x, y, sep)
@@ -126,7 +138,7 @@ def gen_lda_data(output, n_docs, n_topics = 10):
 if __name__ == '__main__':
     optpar = OptionParser()
     optpar.add_option('-m', '--method', action = 'store', type = 'string', dest =
-                    'method', help = 'wc | classification | regression | pagerank | similarity | kmeans | lda...')
+                    'method', help = 'wc | classification | regression | pagerank | similarity | kmeans | lda | svd | mf...')
     optpar.add_option('-o', '--out', action = 'store', type = 'string', dest = 'output')
     optpar.add_option('-s', '--sep', action = 'store', type = 'string', dest =
                       'sep', help = "seperator, default : ','")
@@ -146,6 +158,8 @@ if __name__ == '__main__':
 			      gen_cls_data(options.output, options.size, options.k)
 		    else:
 			      gen_cls_data(options.output, options.size)
+    if options.method == 'svd':
+        gen_svd_data(options.output)
     if options.method == 'regression':
 		    if options.k and options.sep:
 			      gen_reg_data(options.output, options.size, options.k, options.sep)
@@ -155,6 +169,8 @@ if __name__ == '__main__':
 			      gen_reg_data(options.output, options.size)
     if options.method == 'pagerank':
         gen_pr_data(options.output)
+    if options.method == 'mf':
+        gen_mf_data(options.output)
     if options.method == 'similarity':
 		    if options.k and options.sep:
 			      gen_sim_data(options.output, options.size, options.k, options.sep)

@@ -16,7 +16,7 @@ PageRank is an algorithm used by Google Search to rank websites in their search 
 Default parameters are set in a JSON format file. For example, we create a cfg.json as below(modify `your_pa   racel_install_path`):  
 
 {    
-    "input" : "pr_data.csv",    
+    "input" : "pr.dat",    
     "output" : "./pagerank_result/",    
     "rounds" : 8,    
     "damping_factor" : 0.85,    
