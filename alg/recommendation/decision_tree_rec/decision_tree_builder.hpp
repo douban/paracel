@@ -74,14 +74,16 @@ class decision_tree_builder_factor : public paracel::paralg {
   virtual ~decision_tree_builder_factor() {}
 
   void solve() {
-    ufac.clear(); ifac.clear();
     init_ufac(uinput);
     init_ifac(iinput);
     std::unordered_set<node_t> users;
-    for(auto & kv : ufac) {
-      users.insert(kv.first);
+    for(size_t i = 0; i < ufac.size(); ++i) {
+      users.insert(i);
     }
-    if(get_worker_id() == 0) std::cout << "init done" << std::endl;
+    if(get_worker_id() == 0) {
+      avg_ufacs.push_back(cal_avg_pu(users));
+      std::cout << "init done" << std::endl;
+    }
     paracel_sync();
     for(int k = 0; k < N; ++k) {
       build(k, users);
@@ -92,7 +94,7 @@ class decision_tree_builder_factor : public paracel::paralg {
   void dump() {
     if(get_worker_id() == 0) {
       std::ofstream os;
-      os.open(paracel::todir(output) + "tree_" + std::to_string(get_worker_id()));
+      os.open(paracel::todir(output) + "tree_0");
       for(int k = 0; k < N; ++k) {
         auto tree_data = trees[k].get_tree();
         os << "tree_" << std::to_string(k) << '\t';
@@ -102,21 +104,33 @@ class decision_tree_builder_factor : public paracel::paralg {
         os << std::to_string(tree_data.back()) << '\n';
       }
       os.close();
+      std::ofstream os2;
+      os2.open(paracel::todir(output) + "average_user_factor_0");
+      for(int k = 0; k < ((1 << level) - 1); ++k) {
+        for(int i = 0; i < kdim - 1; ++i) {
+          os2 << std::to_string(avg_ufacs[k][i]) << "|";
+        }
+        os2 << std::to_string(avg_ufacs[k].back()) << '\n';
+      }
+      os2.close();
     }
   }
 
  private:
   // id fac1|fac2|fac3...
   void init_ufac(const std::string & fn) {
-    ufac.clear();
+    ufac.resize(0);
     auto lines = paracel_loadall(fn);
     for(auto & line : lines) {
       auto tmp = paracel::str_split(line, '\t');
       auto facs = paracel::str_split(tmp[1], '|');
       if(kdim == -1) kdim = facs.size();
+      std::vector<double> facs_tmp;
       for(auto & fac : facs) {
-        ufac[paracel::cvt(tmp[0])].push_back(std::stod(fac));
+        facs_tmp.push_back(std::stod(fac));
+        //ufac[paracel::cvt(tmp[0])].push_back(std::stod(fac));
       }
+      ufac.push_back(facs_tmp);
     }
   }
   
@@ -156,7 +170,7 @@ class decision_tree_builder_factor : public paracel::paralg {
       occur.insert(partition_id);
       trees[tree_indx].add(partition_id);
       cnt += 1;
-      //if(get_worker_id() == 0) std::cout << cnt << " build done" << partition_id << std::endl;
+      if(get_worker_id() == 0) std::cout << cnt << " build done" << partition_id << std::endl;
       if(cnt >= ((1 << level) - 1)) break;
     }
   }
@@ -192,28 +206,8 @@ class decision_tree_builder_factor : public paracel::paralg {
         }
       }
 
-      std::vector<double> avg_pu_like(kdim, 0.), avg_pu_hate(kdim, 0.);
-      for(auto & u : U_like) {
-        auto pu_tmp = ufac[u];
-        for(int k = 0; k < kdim; ++k) {
-          avg_pu_like[k] += pu_tmp[k];
-        }
-      }
-      for(auto & u : U_hate) {
-        auto pu_tmp = ufac[u];
-        for(int k = 0; k < kdim; ++k) {
-          avg_pu_hate[k] += pu_tmp[k];
-        }
-      }
-      for(int k = 0; k < kdim; ++k) {
-        if(U_like.size() != 0) {
-          avg_pu_like[k] /= U_like.size();
-        }
-        if(U_hate.size() != 0) {
-          avg_pu_hate[k] /= U_hate.size();
-        }
-      }
-
+      auto avg_pu_like = cal_avg_pu(U_like);
+      auto avg_pu_hate = cal_avg_pu(U_hate);
       double err_like = 0., err_hate = 0.;
       for(auto & u : U_like) {
         err_like += vec_err(ufac[u], avg_pu_like);
@@ -222,7 +216,7 @@ class decision_tree_builder_factor : public paracel::paralg {
         err_hate += vec_err(ufac[u], avg_pu_hate);
       }
       global_err[iid] = err_like + err_hate;
-      std::cout << iid << "|" << global_err[iid] << "\t" << err_like << "|" << U_like.size() << "\t" << err_hate << "|" << U_hate.size() << std::endl;
+      //std::cout << iid << "|" << global_err[iid] << "\t" << err_like << "|" << U_like.size() << "\t" << err_hate << "|" << U_hate.size() << std::endl;
     } // item
 
     node_t partition_id = sentinel;
@@ -301,9 +295,29 @@ class decision_tree_builder_factor : public paracel::paralg {
         U_hate_r.insert(uid);
       }
     }
+    if(get_worker_id() == 0) {
+      avg_ufacs.push_back(cal_avg_pu(U_like_r));
+      avg_ufacs.push_back(cal_avg_pu(U_hate_r));
+    }
     Q.push(U_like_r);
     Q.push(U_hate_r);
     return partition_id;
+  }
+
+  std::vector<double> cal_avg_pu(const std::unordered_set<node_t> & uset) {
+    std::vector<double> result(kdim, 0.);
+    for(auto & u : uset) {
+      auto p_u = ufac[u];
+      for(int k = 0; k < kdim; ++k) {
+        result[k] += p_u[k];
+      }
+    }
+    if(uset.size() != 0) {
+      for(int k = 0; k < kdim; ++k) {
+        result[k] /= uset.size();
+      }
+    }
+    return result;
   }
 
  private:
@@ -313,8 +327,10 @@ class decision_tree_builder_factor : public paracel::paralg {
   int level;
   int N;
   int kdim = -1;
-  std::unordered_map<node_t, std::vector<double> > ufac, ifac;
+  std::unordered_map<node_t, std::vector<double> > ifac;
+  std::vector<std::vector<double> > ufac;
   std::vector<decision_tree> trees;
+  std::vector<std::vector<double> > avg_ufacs;
 }; // class decision_tree_builder_factor
 
 } // namespace alg
