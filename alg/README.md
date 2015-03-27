@@ -33,5 +33,5 @@
 
 ## Topic Modeling
 
-* [LDA](https:/github.com/douban/paracel/tree/master/alg/topic_model)
+* [LDA](https://github.com/douban/paracel/tree/master/alg/topic_model)
 
