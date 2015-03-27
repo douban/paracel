@@ -69,6 +69,7 @@ class decision_tree_builder_factor : public paracel::paralg {
         level(_level),
         N(_tree_num) {
     trees.resize(N);
+    avg_ufacs.resize(N);
   }
 
   virtual ~decision_tree_builder_factor() {}
@@ -81,7 +82,9 @@ class decision_tree_builder_factor : public paracel::paralg {
       users.insert(i);
     }
     if(get_worker_id() == 0) {
-      avg_ufacs.push_back(cal_avg_pu(users));
+      for(int n = 0; n < N; ++n) {
+        avg_ufacs[n].push_back(cal_avg_pu(users));
+      }
       std::cout << "init done" << std::endl;
     }
     paracel_sync();
@@ -104,16 +107,22 @@ class decision_tree_builder_factor : public paracel::paralg {
         os << std::to_string(tree_data.back()) << '\n';
       }
       os.close();
-      std::ofstream os2;
-      os2.open(paracel::todir(output) + "average_user_factor_0");
-      for(int k = 0; k < ((1 << level) - 1); ++k) {
-        for(int i = 0; i < kdim - 1; ++i) {
-          os2 << std::to_string(avg_ufacs[k][i]) << "|";
-        }
-        os2 << std::to_string(avg_ufacs[k].back()) << '\n';
+      for(int n = 0; n < N; ++n) {
+        dump_avg_user_fac(n);
       }
-      os2.close();
     }
+  }
+
+  void dump_avg_user_fac(int k) {
+    std::ofstream os;
+    os.open(paracel::todir(output) + "average_user_factor_" + std::to_string(k));
+    for(int i = 0; i < ((1 << level) - 1); ++i) {
+      for(int j = 0; j < kdim - 1; ++j) {
+        os << std::to_string(avg_ufacs[k][i][j]) << "|";
+      }
+      os << std::to_string(avg_ufacs[k][i].back()) << '\n';
+    }
+    os.close();
   }
 
  private:
@@ -296,8 +305,8 @@ class decision_tree_builder_factor : public paracel::paralg {
       }
     }
     if(get_worker_id() == 0) {
-      avg_ufacs.push_back(cal_avg_pu(U_like_r));
-      avg_ufacs.push_back(cal_avg_pu(U_hate_r));
+      avg_ufacs[tree_indx].push_back(cal_avg_pu(U_like_r));
+      avg_ufacs[tree_indx].push_back(cal_avg_pu(U_hate_r));
     }
     Q.push(U_like_r);
     Q.push(U_hate_r);
@@ -330,7 +339,7 @@ class decision_tree_builder_factor : public paracel::paralg {
   std::unordered_map<node_t, std::vector<double> > ifac;
   std::vector<std::vector<double> > ufac;
   std::vector<decision_tree> trees;
-  std::vector<std::vector<double> > avg_ufacs;
+  std::vector<std::vector<std::vector<double> > > avg_ufacs;
 }; // class decision_tree_builder_factor
 
 } // namespace alg
