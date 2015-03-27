@@ -16,22 +16,22 @@
 
 ## Graph Processing
 
-* [Pagerank](https:/github.com/douban/paracel/tree/master/alg/graph_alg/pagerank)
-* [Max Value Propagation](https:/github.com/douban/paracel/tree/master/alg/graph_alg/max_vertex_value)
+* [Pagerank](https://github.com/douban/paracel/tree/master/alg/graph_alg/pagerank)
+* [Max Value Propagation](https://github.com/douban/paracel/tree/master/alg/graph_alg/max_vertex_value)
 
 ## Recommendation Systems
 
 * [svd(sequential)](https://github.com/douban/paracel/tree/master/tool#svd)
 
-* [Matrix Factorization](https:/github.com/douban/paracel/tree/master/alg/recommendation/matrix_factorization)
+* [Matrix Factorization](https://github.com/douban/paracel/tree/master/alg/recommendation/matrix_factorization)
 
-* [Sparse Similarity](https:/github.com/douban/paracel/tree/master/alg/recommendation/similarity_sparse)
+* [Sparse Similarity](https://github.com/douban/paracel/tree/master/alg/recommendation/similarity_sparse)
 
-* [Dense Similarity](https:/github.com/douban/paracel/tree/master/alg/recommendation/similarity_dense)
+* [Dense Similarity](https://github.com/douban/paracel/tree/master/alg/recommendation/similarity_dense)
 
-* [Decision Tree Recommendation](https:/github.com/douban/paracel/tree/master/alg/recommendation/decision_tree_rec)
+* [Decision Tree Recommendation](https://github.com/douban/paracel/tree/master/alg/recommendation/decision_tree_rec)
 
 ## Topic Modeling
 
-### [LDA](https:/github.com/douban/paracel/tree/master/alg/topic_model)
+* [LDA](https:/github.com/douban/paracel/tree/master/alg/topic_model)
 
