@@ -1,7 +1,11 @@
 ##############################--CMakeLists.txt--################################
 cmake_minimum_required(VERSION 2.8.9)
 ################################################################################
-project(paracel CXX C)
+execute_process(
+  COMMAND uname -s
+  OUTPUT_VARIABLE PARACEL_SYSTEM_NAME
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 ##############################--g++4.7-plus--###################################
 if(EXISTS "gentoo_rules.cmake")
   find_program(CXX NAMES g++-4.9 g++-4.8.1 g++-4.8 g++-4.7.2 g++-4.7.1 g++-4.7 g++)
@@ -12,11 +16,12 @@ if(EXISTS "gentoo_rules.cmake")
   execute_process(COMMAND sed -i 
                   "s|CMAKE_C_COMPILER [^ ]*|CMAKE_C_COMPILER ${CC}|g"
                   "gentoo_rules.cmake")
-elseif(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
+elseif(NOT "${PARACEL_SYSTEM_NAME}" MATCHES "Darwin")
   find_program(CMAKE_CXX_COMPILER NAMES g++-4.9 g++-4.8.1 g++-4.8 g++-4.7.2 g++-4.7.1 g++-4.7 g++)
   find_program(CMAKE_C_COMPILER NAMES gcc-4.9 gcc-4.8.1 gcc-4.8 gcc-4.7.2 gcc-4.7.1 gcc-4.7 gcc)
 endif()
 ################################################################################
+project(paracel CXX C)
 include(CTest)
 ##############################--flags--#########################################
 if(CMAKE_COMPILER_IS_GNUCXX)
