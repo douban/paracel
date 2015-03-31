@@ -102,7 +102,7 @@ class kmeans {
   paralg *pt;
 
   Eigen::MatrixXd blk_dmtx;
-  std::unordered_map<size_t, std::string> row_map; // matrix_indx -> id
+  std::unordered_map<paracel::default_id_type, std::string> row_map; // matrix_indx -> id
   Eigen::MatrixXd *clusters_ptr;
   std::unordered_map<int, std::vector<std::string> > groups; // cluster_indx -> [ids]
 }; // class kmeans

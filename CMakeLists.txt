@@ -1,5 +1,11 @@
 ##############################--CMakeLists.txt--################################
 cmake_minimum_required(VERSION 2.8.9)
+################################################################################
+execute_process(
+  COMMAND uname -s
+  OUTPUT_VARIABLE PARACEL_SYSTEM_NAME
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 ##############################--g++4.7-plus--###################################
 if(EXISTS "gentoo_rules.cmake")
   find_program(CXX NAMES g++-4.9 g++-4.8.1 g++-4.8 g++-4.7.2 g++-4.7.1 g++-4.7 g++)
@@ -10,7 +16,7 @@ if(EXISTS "gentoo_rules.cmake")
   execute_process(COMMAND sed -i 
                   "s|CMAKE_C_COMPILER [^ ]*|CMAKE_C_COMPILER ${CC}|g"
                   "gentoo_rules.cmake")
-else()
+elseif(NOT "${PARACEL_SYSTEM_NAME}" MATCHES "Darwin")
   find_program(CMAKE_CXX_COMPILER NAMES g++-4.9 g++-4.8.1 g++-4.8 g++-4.7.2 g++-4.7.1 g++-4.7 g++)
   find_program(CMAKE_C_COMPILER NAMES gcc-4.9 gcc-4.8.1 gcc-4.8 gcc-4.7.2 gcc-4.7.1 gcc-4.7 gcc)
 endif()
@@ -26,10 +32,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   #set(CMAKE_EXE_LINKER_FLAGS "-static-libstdc++")
 endif()
 
-if(CMAKE_COMPILER_IS_CLANGXX)
-  set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2")
-  set(CMAKE_CXX_FLAGS_DEBUG "-Wall -std=c++11 -O0 -g -fno-inline")
-  set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O3 -DNDEBUG -march=native -ffast-math")
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -stdlib=libc++ -O2")
+  set(CMAKE_CXX_FLAGS_DEBUG "-Wall -std=c++11 -stdlib=libc++ -O0 -g -fno-inline")
+  set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -stdlib=libc++ -O3 -DNDEBUG -march=native -ffast-math")
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES RELEASE)

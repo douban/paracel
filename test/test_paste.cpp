@@ -20,7 +20,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <tr1/unordered_map>
+#include <unordered_map>
 #include "utils/ext_utility.hpp"
 #include "paracel_types.hpp"
 #include "packer.hpp"
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE (paste_test) {
       std::cout << "#" << v << "#" << std::endl;
     std::cout << "--------------------------------" << std::endl;
 
-    std::tr1::unordered_map<paracel::str_type, paracel::list_type<double> > d;
+    std::unordered_map<paracel::str_type, paracel::list_type<double> > d;
     paracel::list_type<double> t1 = {1., 2., 3., 4., 5.};
     paracel::list_type<double> t2 = {5., 4., 3., 2., 1.};
     d["p[0,:]_0"] = t1;
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE (paste_test) {
     auto result3 = paracel::str_split_by_word(s4, paracel::seperator);
 
     std::cout << "--------------------------------" << std::endl;
-    paracel::packer<std::tr1::unordered_map<paracel::str_type, paracel::list_type<double> > > pk4;
+    paracel::packer<std::unordered_map<paracel::str_type, paracel::list_type<double> > > pk4;
     std::cout << "#" << pk1.unpack(result3[0]) << "#" << std::endl;
     auto tmp2 = pk4.unpack(result3[1]);
     for(auto & v : tmp2) {

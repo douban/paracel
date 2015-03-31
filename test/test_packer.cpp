@@ -22,7 +22,6 @@
 #include <map>
 #include <unordered_map>
 #include <tuple>
-#include <tr1/unordered_map>
 #include <msgpack.hpp>
 
 #include "paracel_types.hpp"
@@ -180,10 +179,10 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     }
   }
   {
-    std::tr1::unordered_map<int, int> d;
+    std::unordered_map<int, int> d;
     d[1] = 1;
     d[2] = 2;
-    paracel::packer<std::tr1::unordered_map<int, int> > obj(d);
+    paracel::packer<std::unordered_map<int, int> > obj(d);
     std::string s;
     obj.pack(s);
     auto r = obj.unpack(s);
@@ -192,12 +191,12 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     }
   }
   {
-    std::tr1::unordered_map<paracel::str_type, paracel::list_type<float> > d;
+    std::unordered_map<paracel::str_type, paracel::list_type<float> > d;
     paracel::list_type<float> target1 = {1.1, 2.2, 3.3};
     paracel::list_type<float> target2 = {3.3, 2.2, 1.1};
     d["key_0"] = target1;
     d["key_1"] = target2;
-    paracel::packer<std::tr1::unordered_map<paracel::str_type, paracel::list_type<float> > > obj(d);
+    paracel::packer<std::unordered_map<paracel::str_type, paracel::list_type<float> > > obj(d);
     std::string s;
     obj.pack(s);
     auto r = obj.unpack(s);
@@ -208,12 +207,12 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     }
   }
   {
-    std::tr1::unordered_map<paracel::str_type, paracel::list_type<double> > d;
+    std::unordered_map<paracel::str_type, paracel::list_type<double> > d;
     paracel::list_type<double> target1 = {1.11, 2.22, 3.33};
     paracel::list_type<double> target2 = {3.33, 2.22, 1.11};
     d["key_0"] = target1;
     d["key_1"] = target2;
-    paracel::packer<std::tr1::unordered_map<paracel::str_type, paracel::list_type<double> > > obj(d);
+    paracel::packer<std::unordered_map<paracel::str_type, paracel::list_type<double> > > obj(d);
     std::string s;
     obj.pack(s);
     auto r = obj.unpack(s);

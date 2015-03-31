@@ -19,7 +19,10 @@
 #define FILE_45bb1820_07f5_4c07_8163_35d6870a4475_HPP
 
 #include <sys/types.h>
-#include <endian.h>
+
+#ifndef __APPLE__
+# include <endian.h>
+#endif /* __APPLE__ */
 
 #include <cstdint>
 #include <utility>

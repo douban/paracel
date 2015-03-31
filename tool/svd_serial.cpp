@@ -157,7 +157,7 @@ public:
   paralg *pt;
   int rank, np;
   Eigen::SparseMatrix<double, Eigen::RowMajor> A; // M * N
-  std::unordered_map<size_t, node_t> row_map, col_map;
+  std::unordered_map<paracel::default_id_type, node_t> row_map, col_map;
   Eigen::MatrixXd sigma, U, V;
 }; // class svd
 
