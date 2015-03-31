@@ -281,15 +281,19 @@ BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
   std::cout << L * L.transpose() << std::endl;
   std::cout << "This should equal the matrix A" << std::endl;
 
-  Eigen::MatrixXd ma = Eigen::MatrixXd::Random(3,2);
+  Eigen::MatrixXf ma = Eigen::MatrixXf::Random(3, 2);
   std::cout << "Here is the matrix m:" << std::endl << ma << std::endl;
-  Eigen::JacobiSVD<Eigen::MatrixXd> svd(ma, Eigen::ComputeThinU | Eigen::ComputeThinV);
-  Eigen::MatrixXd SIGMA = svd.singularValues();
-  Eigen::MatrixXd U = svd.matrixU();
-  Eigen::MatrixXd V = svd.matrixV();
-  std::cout << SIGMA.rows() << SIGMA.cols() << U.rows() << U.cols() << V.rows() << V.cols() << std::endl;
-  Eigen::MatrixXd tttmmmppp = U * SIGMA;
-  std::cout << tttmmmppp * V.transpose() << std::endl;
+  Eigen::JacobiSVD<Eigen::MatrixXf> svd(ma, Eigen::ComputeFullU | Eigen::ComputeFullV);
+  Eigen::MatrixXf SIGMA = svd.singularValues();
+  Eigen::MatrixXf U = svd.matrixU();
+  Eigen::MatrixXf V = svd.matrixV();
+  std::cout << SIGMA.rows() << SIGMA.cols() << U.rows() << U.cols()
+            << V.rows() << V.cols() << std::endl;
+  Eigen::MatrixXf sigmaMat = Eigen::MatrixXf::Zero(ma.rows(), ma.cols());
+  sigmaMat.diagonal() = SIGMA;
+
+  std::cout << U * sigmaMat * V.transpose() << std::endl;
+
   std::cout << "Its singular values are:" << std::endl << SIGMA << std::endl;
   std::cout << "Its left singular vectors are columns of the thin U matrix:" << std::endl << U << std::endl;
   std::cout << "Its right singular vectors are columns of the thin V matrix:" << std::endl << V << std::endl;

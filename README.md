@@ -1,5 +1,7 @@
 ![logo](./logo.png)
 
+Build Status: [![https://travis-ci.org/douban/paracel.png](https://travis-ci.org/douban/paracel.png)](https://travis-ci.org/douban/paracel)
+
 Paracel Overview
 ================
 
