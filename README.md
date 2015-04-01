@@ -1,7 +1,6 @@
 ![logo](./logo.png)
 
 # Paracel Overview [![https://travis-ci.org/douban/paracel.png](https://travis-ci.org/douban/paracel.png)](https://travis-ci.org/douban/paracel)
-================
 
 Paracel is a distributed computational framework, designed for many machine learning problems: Logistic Regression, SVD, Matrix Factorization(BFGS, sgd, als, cg), LDA, Lasso...
 
