@@ -439,7 +439,7 @@ public:
     auto scrip = paste(paracel::str_type("push_int"),
                        key,
                        val); 
-    bool stat;
+    bool stat = true;
     auto r = req_send_recv(*p_ssp_sock, scrip, stat);
     return r && stat;
   }

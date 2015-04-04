@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE (f_traints_test) {
   { // test for member func
     class AA {
     public:  
-      typedef double (*func_type)(double, int);
+      //typedef double (*func_type)(double, int);
       static double foo(double a, int b) { return a + (double)b; }
       double too(double a, int b) { return a + (double)b; }
       double goo(double a, int b) const { return a + (double)b; }
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE (f_traints_test) {
     static_assert(std::is_same<double, traits::args<1>::type>::value, "err");
     static_assert(std::is_same<int, traits::args<2>::type>::value, "err");
   
-    typedef double(*func_type)(double, int);
+    //typedef double(*func_type)(double, int);
     //func_type A::*f_pt = &A::f_obj2;
     std::function<double(double, int)> f_obj1 = foo;
   }

@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
 {
   paracel::main_env comm_main_env(argc, argv);
   paracel::Comm comm(MPI_COMM_WORLD);
-  int rk = comm.get_rank();
-  int sz = comm.get_size();
+  auto rk = comm.get_rank();
+  //auto sz = comm.get_size();
 
   {
     double val = static_cast<double>(rk);
