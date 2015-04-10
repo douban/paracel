@@ -60,16 +60,18 @@ class decision_tree_builder_factor : public paracel::paralg {
                                std::string _output,
                                std::string handle_fn,
                                int _level,
-                               int _tree_num)
+                               int tree_start_indx,
+                               int tree_end_indx)
       : paracel::paralg(hosts_dct_str, comm, _output),
         uinput(_uinput),
         iinput(_iinput),
         output(_output),
         handle_file(handle_fn),
         level(_level),
-        N(_tree_num) {
-    trees.resize(N);
-    avg_ufacs.resize(N);
+        N_start(tree_start_indx),
+        N_end(tree_end_indx) {
+    trees.resize(N_end - N_start + 1);
+    avg_ufacs.resize(N_end - N_start + 1);
   }
 
   virtual ~decision_tree_builder_factor() {}
@@ -82,13 +84,13 @@ class decision_tree_builder_factor : public paracel::paralg {
       users.insert(i);
     }
     if(get_worker_id() == 0) {
-      for(int n = 0; n < N; ++n) {
+      for(int n = N_start; n <= N_end; ++n) {
         avg_ufacs[n].push_back(cal_avg_pu(users));
       }
       std::cout << "init done" << std::endl;
     }
     paracel_sync();
-    for(int k = 0; k < N; ++k) {
+    for(int k = N_start; k <= N_end; ++k) {
       build(k, users);
       paracel_sync();
     }
@@ -98,7 +100,7 @@ class decision_tree_builder_factor : public paracel::paralg {
     if(get_worker_id() == 0) {
       std::ofstream os;
       os.open(paracel::todir(output) + "tree_0");
-      for(int k = 0; k < N; ++k) {
+      for(int k = N_start; k <= N_end; ++k) {
         auto tree_data = trees[k].get_tree();
         os << "tree_" << std::to_string(k) << '\t';
         for(size_t i = 0; i < tree_data.size() - 1; ++i) {
@@ -107,7 +109,7 @@ class decision_tree_builder_factor : public paracel::paralg {
         os << std::to_string(tree_data.back()) << '\n';
       }
       os.close();
-      for(int n = 0; n < N; ++n) {
+      for(int n = N_start; n <= N_end; ++n) {
         dump_avg_user_fac(n);
       }
     }
@@ -255,6 +257,15 @@ class decision_tree_builder_factor : public paracel::paralg {
         return a.second < b.second;
       };
       std::sort(tmp_container.begin(), tmp_container.end(), cmp_lambda2);
+      /*
+      if(get_worker_id() == 0) {
+        std::cout << "start" << std::endl;
+        for(int i = 0; i < 100; ++i) {
+          std::cout << tmp_container[i].first << " | " << tmp_container[i].second << std::endl;
+        }
+        std::cout << "end" << std::endl;
+      }
+      */
       if(global_err.size() != 0) {
         std::string key = tmp_container[tree_indx].first;
         partition_id = paracel::cvt(key.substr(4, key.size() - 4));
@@ -334,7 +345,7 @@ class decision_tree_builder_factor : public paracel::paralg {
   std::string output;
   std::string handle_file;
   int level;
-  int N;
+  int N_start, N_end;
   int kdim = -1;
   std::unordered_map<node_t, std::vector<double> > ifac;
   std::vector<std::vector<double> > ufac;

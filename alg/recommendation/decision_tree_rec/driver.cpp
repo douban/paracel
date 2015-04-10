@@ -39,7 +39,8 @@ int main(int argc, char *argv[])
   std::string output = pt.parse<std::string>("output");
   std::string handle_fn = pt.parse<std::string>("handle_file");
   int level = pt.parse<int>("level");
-  int tree_num = pt.parse<int>("tree_num");
+  int tree_start_indx = pt.parse<int>("tree_start_index");
+  int tree_end_indx = pt.parse<int>("tree_end_index");
 
   paracel::alg::decision_tree_builder_factor solver(comm,
                                                     FLAGS_server_info,
@@ -48,7 +49,8 @@ int main(int argc, char *argv[])
                                                     output,
                                                     handle_fn,
                                                     level,
-                                                    tree_num);
+                                                    tree_start_indx,
+                                                    tree_end_indx);
   solver.solve();
   solver.dump();
   return 0;
