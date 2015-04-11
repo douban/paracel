@@ -147,7 +147,7 @@ class LDAmodel: public paracel::paralg {
 		start = time(NULL);
 		FILE* f = fopen((output + std::to_string(worker_id)).c_str(), "w");
 		std::unordered_map<int, std::vector<std::pair<int, double> > > dump_data;
-		auto parser_key = [&](std::unordered_map<std::string, double> tmp_value) {
+		auto parser_key = [&] (std::unordered_map<std::string, double> tmp_value) {
 			for(auto it = tmp_value.begin(); it != tmp_value.end(); it++) {
 				auto key = it->first;
 				auto p1 = key.find("_") + 1;

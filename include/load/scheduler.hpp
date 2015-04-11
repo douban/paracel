@@ -241,12 +241,12 @@ public:
     }
     
     paracel::set_type<paracel::str_type> new_rows, new_cols;
-    auto union_func1 = [&] (paracel::list_type<paracel::str_type> tmp) {
+    auto union_func1 = [&new_rows] (paracel::list_type<paracel::str_type> tmp) {
       for(auto & item : tmp) { 
         new_rows.insert(item); 
       }
     };
-    auto union_func2 = [&] (paracel::list_type<paracel::str_type> tmp) {
+    auto union_func2 = [&new_cols] (paracel::list_type<paracel::str_type> tmp) {
       for(auto & item : tmp) { 
         new_cols.insert(item); 
       }
@@ -297,12 +297,12 @@ public:
       cols.push_back(std::get<1>(tpl));
     }
     paracel::set_type<int> new_rows, new_cols;
-    auto union_func1 = [&] (paracel::list_type<int> tmp) {
+    auto union_func1 = [&new_rows] (paracel::list_type<int> tmp) {
       for(auto & item : tmp) {
         new_rows.insert(item); 
       }
     };
-    auto union_func2 = [&] (paracel::list_type<int> tmp) {
+    auto union_func2 = [&new_cols] (paracel::list_type<int> tmp) {
       for(auto & item : tmp) { 
         new_cols.insert(item); 
       }

@@ -567,7 +567,7 @@ class paralg {
                                         std::vector<std::pair<paracel::str_type, T> >, 
                                         min_heap_cmp<T> >;
     min_heap tmplst;
-    auto handler = [&] (const paracel::dict_type<paracel::str_type, T> & d) {
+    auto handler = [&tmplst, k] (const paracel::dict_type<paracel::str_type, T> & d) {
       for(auto & kv : d) {
         auto node = paracel::heap_node<paracel::str_type, T>(kv.first, kv.second);
         tmplst.push(node.val);
@@ -596,7 +596,7 @@ class paralg {
                                         std::vector<std::pair<paracel::str_type, T> >,
                                         min_heap_cmp<T> >;
     min_heap tmplst;
-    auto handler = [&] (const paracel::dict_type<paracel::str_type, T> & d) {
+    auto handler = [&tmplst, k] (const paracel::dict_type<paracel::str_type, T> & d) {
       for(auto & kv : d) {
         auto node = paracel::heap_node<paracel::str_type, T>(kv.first, kv.second);
         tmplst.push(node.val);
