@@ -60,8 +60,8 @@ class pagerank : public paracel::paralg {
     if(get_worker_id() == 0) std::cout << "load done" << std::endl;
 
     auto cnt_lambda = [&] (const node_t & a,
-                                const node_t & b,
-                                double c) {
+                           const node_t & b,
+                           double c) {
       if(!kvmap.count(a)) {
         kvmap[a] = 1.;
       } else {
@@ -73,8 +73,8 @@ class pagerank : public paracel::paralg {
     // make sure there are no same pieces
     // generate kv + local combine
     auto kvinit_lambda = [&] (const node_t & a,
-                                             const node_t & b,
-                                             double c) {
+                              const node_t & b,
+                              double c) {
       klstmap[b].push_back(std::make_pair(a, kvmap[a]));
     };
     local_graph.traverse(kvinit_lambda);
