@@ -70,8 +70,8 @@ class decision_tree_builder_factor : public paracel::paralg {
         level(_level),
         N_start(tree_start_indx),
         N_end(tree_end_indx) {
-    trees.resize(N_end - N_start + 1);
-    avg_ufacs.resize(N_end - N_start + 1);
+    trees.resize(N_end + 1);
+    avg_ufacs.resize(N_end + 1);
   }
 
   virtual ~decision_tree_builder_factor() {}
