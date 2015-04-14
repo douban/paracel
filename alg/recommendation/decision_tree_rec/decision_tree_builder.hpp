@@ -257,15 +257,17 @@ class decision_tree_builder_factor : public paracel::paralg {
         return a.second < b.second;
       };
       std::sort(tmp_container.begin(), tmp_container.end(), cmp_lambda2);
+     
       /*
       if(get_worker_id() == 0) {
-        std::cout << "start" << std::endl;
+        std::cout << "start" << tmp_container.size() << std::endl;
         for(int i = 0; i < 100; ++i) {
-          std::cout << tmp_container[i].first << " | " << tmp_container[i].second << std::endl;
+          std::cout << tmp_container[i].first << " " << tmp_container[i].second << std::endl;
         }
         std::cout << "end" << std::endl;
       }
       */
+
       if(global_err.size() != 0) {
         std::string key = tmp_container[tree_indx].first;
         partition_id = paracel::cvt(key.substr(4, key.size() - 4));
@@ -274,6 +276,7 @@ class decision_tree_builder_factor : public paracel::paralg {
       for(auto & kv : err_tmp) {
         paracel_remove(kv.first);
       }
+      paracel_sync();
     } else {
       double min_err = DBL_MAX;
       for(auto & kv : global_err) {
