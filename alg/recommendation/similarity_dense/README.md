@@ -39,9 +39,9 @@ If you want to calculate ab cosine similarities, here we offer you another execu
 The only difference is the configuration file. For example, we create a ab_cos_cfg.json as below:
 
 {    
-    "input_a" : "training_a.dat",
-    "input_b" : "training_b.dat",
-    "output" : "./ab_sim_dense_output/",
-    "simbar" : 0.2,
-    "topk" : 10
-} 
+    "input_a" : "training1.dat",        
+    "input_b" : "training2.dat",        
+    "output" : "./sim_dense_output/",       
+    "simbar" : 0.2,       
+    "topk" : 10           
+}        
