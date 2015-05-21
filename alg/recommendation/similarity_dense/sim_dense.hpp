@@ -25,6 +25,7 @@
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
+#include <iostream>
 
 #include "ps.hpp"
 #include "load.hpp"
@@ -61,20 +62,22 @@ class sim_dense : public paracel::paralg {
  public:
   sim_dense(paracel::Comm comm,
             string hosts_dct_str,
-            string _input,
+            string _input_a,
+            string _input_b,
             string _output,
             double _simbar = 0.0,
             int _ktop = 20)
       : paracel::paralg(hosts_dct_str, comm, _output),
-        input(_input),
+        input_a(_input_a),
+        input_b(_input_b),
         output(_output),
         simbar(_simbar),
         ktop(_ktop) {}
 
   virtual ~sim_dense() {}
 
-  double cal_sim(const vector<double> & a,
-                 const vector<double> & b) {
+  inline double cal_sim(const vector<double> & a,
+                        const vector<double> & b) {
     return paracel::dot_product(a, b);
   }
 
@@ -148,7 +151,7 @@ class sim_dense : public paracel::paralg {
       }
       item_vects[paracel::cvt(v[0])] = tmp;
     };
-    paracel_load_handle(input, local_parser);
+    paracel_load_handle(input_a, local_parser);
     normalize(item_vects);
 
     auto handler = [&] (const vector<string> & linelst) {
@@ -165,11 +168,11 @@ class sim_dense : public paracel::paralg {
       learning(all_item_vects);
       //select_top();
     };
-    paracel_sequential_loadall(input, handler);
+    paracel_sequential_loadall(input_b, handler);
   }
   
  private:
-  string input;
+  string input_a, input_b;
   string output;
   double simbar = 0.; // lower bound similarity
   int ktop = 20;

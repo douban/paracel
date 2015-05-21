@@ -19,7 +19,7 @@ Default parameters are set in a JSON format file. For example, we create a cfg.j
     "input" : "training.dat",    
     "output" : "./sim_dense_output/",    
     "simbar" : 0.2,    
-    "topk" : 10,    
+    "topk" : 10    
 }    
 `simbar` refers to the minimum similarity bound below which items will be filtered. `topk` keep k items with largest k similarities.
 
@@ -33,3 +33,15 @@ item_id2,feature1,feature2,...,featurek
 item_id1 item_id2:sim|item_id3:sim...   
 item_id2 item_id3:sim|item_id4:sim...   
 Each line represents the k most similar items and corresponding simiarity values with each item.
+
+# AB Cosine Similarity
+If you want to calculate ab cosine similarities, here we offer you another executable file named ab_sim_dense.
+The only difference is the configuration file. For example, we create a ab_cos_cfg.json as below:
+
+{    
+    "input_a" : "training_a.dat",
+    "input_b" : "training_b.dat",
+    "output" : "./ab_sim_dense_output/",
+    "simbar" : 0.2,
+    "topk" : 10
+} 

@@ -1,0 +1,7 @@
+{
+  "input_a" : "/nfs/user/xxx/data/data1.csv",
+  "input_b" : "/nfs/user/xxx/data/data2.csv",
+  "output" : "/nfs/user/xxx/output/sim_dense/",
+  "simbar" : 0.2,
+  "topk" : 50
+}
