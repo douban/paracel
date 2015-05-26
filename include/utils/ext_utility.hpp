@@ -20,6 +20,7 @@
 #include <glob.h>
 
 #include <map>
+#include <ctime>
 #include <vector>
 #include <numeric>
 
@@ -179,6 +180,21 @@ double dot_product(const std::vector<double> & a,
 paracel::str_type todir(const paracel::str_type & f) {
   if(endswith(f, "/")) return f;
   return f + "/";
+}
+
+std::string add_folder_suffix_with_date(const std::string & folder) {
+  time_t t = time(0);
+  tm *now = localtime(&t);
+  std::string suffix = std::to_string(now->tm_year + 1900) 
+      + std::to_string(now->tm_mon + 1) 
+      + std::to_string(now->tm_mday);
+  std::string new_folder;
+  if(endswith(folder, "/")) {
+    new_folder = std::string(folder.begin(), folder.end() - 1) + suffix + "/";
+  } else {
+    new_folder = folder + suffix + "/";
+  }
+  return new_folder;
 }
 
 } // namespace paracel
