@@ -13,6 +13,7 @@
  *
  */
 
+#include <ctime>
 #include <string>
 #include <mpi.h>
 #include <google/gflags.h>
@@ -37,6 +38,9 @@ int main(int argc, char *argv[])
   std::string user_fac_input = pt.parse<std::string>("user_fac_input");
   std::string item_fac_input = pt.parse<std::string>("item_fac_input");
   std::string output = pt.parse<std::string>("output");
+  time_t t = time(0); // get time now
+  struct tm *now = localtime(&t);
+  std::string output_suffix = std::to_string(now->tm_year + 1900) + std::to_string(now->tm_mon + 1) + std::to_string(now->tm_mday);
   std::string handle_fn = pt.parse<std::string>("handle_file");
   int level = pt.parse<int>("level");
   int tree_start_indx = pt.parse<int>("tree_start_index");
@@ -46,7 +50,7 @@ int main(int argc, char *argv[])
                                                     FLAGS_server_info,
                                                     user_fac_input,
                                                     item_fac_input,
-                                                    output,
+                                                    output + output_suffix,
                                                     handle_fn,
                                                     level,
                                                     tree_start_indx,
