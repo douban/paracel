@@ -25,6 +25,7 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
+#include <chrono>
 
 #include "lr.hpp"
 #include "ps.hpp"
@@ -118,12 +119,13 @@ void logistic_regression::dgd_learning() {
   double coff2 = 2. * beta * alpha;
   vector<double> delta(data_dim); 
 
+  unsigned time_seed = std::chrono::system_clock::now().time_since_epoch().count();
   // train loop
   for(int rd = 0; rd < rounds; ++rd) {
     for(int i = 0; i < data_dim; ++i) {
       delta[i] = 0.;
     }
-    std::random_shuffle(idx.begin(), idx.end()); 
+    std::shuffle(idx.begin(), idx.end(), std::default_random_engine(time_seed)); 
     theta = paracel_read<vector<double> >("theta"); 
     
     // traverse data
@@ -164,9 +166,10 @@ void logistic_regression::ipm_learning() {
   double wgt = 1. / get_worker_size();
   vector<double> delta(data_dim);
 
+  unsigned time_seed = std::chrono::system_clock::now().time_since_epoch().count();
   // train loop
   for(int rd = 0; rd < rounds; ++rd) {
-    std::random_shuffle(idx.begin(), idx.end()); 
+    std::shuffle(idx.begin(), idx.end(), std::default_random_engine(time_seed)); 
     theta = paracel_read<vector<double> >("theta"); 
     vector<double> theta_old(theta);
 
@@ -213,9 +216,10 @@ void logistic_regression::downpour_learning() {
   double coff2 = 2. * beta * alpha;
   vector<double> delta(data_dim);
 
+  unsigned time_seed = std::chrono::system_clock::now().time_since_epoch().count();
   // train loop
   for(int rd = 0; rd < rounds; ++rd) {
-    std::random_shuffle(idx.begin(), idx.end()); 
+    std::shuffle(idx.begin(), idx.end(), std::default_random_engine(time_seed));
     theta = paracel_read<vector<double> >("theta"); 
     vector<double> theta_old(theta);
     
@@ -264,9 +268,10 @@ void logistic_regression::agd_learning() {
   double coff2 = 2. * beta * alpha;
   vector<double> delta(data_dim);
 
+  unsigned time_seed = std::chrono::system_clock::now().time_since_epoch().count();
   // train loop
   for(int rd = 0; rd < rounds; ++rd) {
-    std::random_shuffle(idx.begin(), idx.end()); 
+    std::shuffle(idx.begin(), idx.end(), std::default_random_engine(time_seed)); 
     theta = paracel_read<vector<double> >("theta"); 
     vector<double> theta_old(theta);
 

@@ -17,6 +17,7 @@
 #define FILE_2fae05e7_4f3a_2ac3_dc77_f92f7070193b_HPP
 
 #include <string>
+#include <chrono>
 #include <algorithm>
 #include <unordered_map>
 
@@ -81,7 +82,8 @@ class kmeans : public paracel::paralg {
         for(size_t i = 0; i < (size_t)kclusters; ++i) {
           indxs.push_back(i);
         }
-        //std::random_shuffle(indxs.begin(), indxs.end());
+        //unsigned time_seed = std::chrono::system_clock::now().time_since_epoch().count();
+        //std::shuffle(indxs.begin(), indxs.end(), std::default_random_engine(time_seed));
         indxs.resize(kclusters);
         std::vector<std::vector<double> > init_clusters;
         for(int i = 0; i < kclusters; ++i) {

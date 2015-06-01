@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 #include "ps.hpp"
 #include "utils.hpp"
@@ -72,9 +73,10 @@ class ridge_regression: public paracel::paralg {
     double coff2 = 2. * beta * alpha;
     double wgt = 1. / get_worker_size();
     std::vector<double> delta(data_dim);
-    
+
+    unsigned time_seed = std::chrono::system_clock::now().time_since_epoch().count();
     for(int rd = 0; rd < rounds; ++rd) {
-      std::random_shuffle(idx.begin(), idx.end());
+      std::shuffle(idx.begin(), idx.end(), std::default_random_engine(time_seed));
       theta = paracel_read<std::vector<double> >("theta");
       std::vector<double> theta_old(theta);
       
