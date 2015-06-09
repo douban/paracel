@@ -410,6 +410,17 @@ class bigraph {
   void clear() {
     reset();
   }
+
+  bool is_connected(const T & a, const T & b) {
+    if(adj[a].count(b)) {
+      return true;
+    }
+    return false;
+  }
+
+  double get_wgt(const T & a, const T & b) {
+    return adj[a][b];
+  }
   
   paracel::dict_type<T, paracel::dict_type<T, double> > get_data() { return adj; }
 
