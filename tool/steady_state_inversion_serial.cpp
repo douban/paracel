@@ -84,7 +84,9 @@ class steady_state_inversion {
     learning();
   }
 
-  void dump() {}
+  void dump_result() {
+    pt->paracel_dump_dict(score, "score_");
+  }
 
  private:
   double trans_prob(const string & i, const string & j) {
@@ -111,6 +113,28 @@ class steady_state_inversion {
     }
     return r;
   }
+  
+  double newton_root(const unordered_map<string, std::pair<double, double> > & AC,
+                     double L,
+                     string j) {
+    double x = score[j]; // start with sj(t-1)
+    for(int it = 0; it < 100; ++it) {
+      double f = 0, fp = 0.;
+      for(auto & kv : AC) {
+        double ai = kv.second.first;
+        double ci = kv.second.second;
+        double coff1 = pl[kv.first] * ai; // pi * ai
+        double coff2 = ai * x + ci;
+        f += coff1 * x * (1. / coff2);
+        fp += coff1 * ci * (1 / pow(coff2, 2.));
+      }
+      f = f - L;
+      if(fabs(f) <= 1e-10) { break; }
+      x = x - f / fp;
+      if(x != x) { std::cout << "overflow" << std::endl; break; }
+    }
+    return x;
+  }
 
   double q_solve(string rnode) {
     unordered_map<string, std::pair<double, double> > AC;
@@ -132,28 +156,6 @@ class steady_state_inversion {
     return newton_root(AC, pr[rnode] * (1 - delta), rnode);
   }
   
-  double newton_root(const unordered_map<string, std::pair<double, double> > & AC,
-                     double L,
-                     string j) {
-    double x = score[j]; // start with sj(t-1)
-    for(int it = 0; it < 100; ++it) {
-      double f = 0, fp = 0.;
-      for(auto & kv : AC) {
-        double ai = kv.second.first;
-        double coff1 = pl[j] * ai; // pi * ai
-        double ci = kv.second.second;
-        double coff2 = ai * x + ci;
-        f += coff1 * x * (1. / coff2);
-        fp += coff1 * ci * (1 / pow(coff2, 2.));
-      }
-      f = f - L;
-      if(fabs(f) <= 1e-10) { break; }
-      x = x - f / fp;
-      if(x != x) { break; } // overflow
-    }
-    return x;
-  }
-
   void learning() {
     int t = 0;
     int outlier = 0;
@@ -164,18 +166,26 @@ class steady_state_inversion {
         string j = kv.first;
         double pj = kv.second;
         if(q(j) < (pj * (1 - epsilon))) {
+          std::cout << j << " qj " << q(j) << "|" << pj * (1 - epsilon) << std::endl;
           outlier += 1;
+          std::cout << j << " before: " << score[j] << std::endl;
           // solve x
-          score[j] = q_solve(j);
+          score_new[j] = q_solve(j);
+          std::cout << j << " after: " << score_new[j] << std::endl;
         }
       } // for
-    } while(outlier && t < 1000); // do-while
+      for(auto & kv : score_new) {
+        score[kv.first] = kv.second;
+      }
+      std::cout << "it: " << t << " with outliers:" << outlier << std::endl;
+      std::cout << std::endl;
+    } while(outlier && t < 100); // do-while
   }
 
  private:
   string bigraph_input, dis_input;
   paracel::bigraph<string> bi_G;
-  unordered_map<string, double> score;
+  unordered_map<string, double> score_new, score;
   unordered_map<string, double> pl, pr;
   paralg *pt;
 }; // class steady_state_inversion
@@ -200,7 +210,7 @@ int main(int argc, char *argv[])
 
   paracel::tool::steady_state_inversion solver(comm, bigraph_input, dis_input, output);
   solver.solve();
-  solver.dump();
+  solver.dump_result();
   
   return 0;
 }
