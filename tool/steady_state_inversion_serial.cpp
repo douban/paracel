@@ -82,10 +82,15 @@ class steady_state_inversion {
 
     // train model
     learning();
+    for(auto & kv : score) {
+      if(paracel::endswith(kv.first, "R")) {
+        score_new[kv.first] = kv.second;
+      }
+    }
   }
 
   void dump_result() {
-    pt->paracel_dump_dict(score, "score_");
+    pt->paracel_dump_dict(score_new, "score_");
   }
 
  private:
@@ -129,7 +134,7 @@ class steady_state_inversion {
         fp += coff1 * ci * (1 / pow(coff2, 2.));
       }
       f = f - L;
-      if(fabs(f) <= 1e-10) { break; }
+      if(fabs(f) <= 1e-10 || fp == 0) { break; }
       x = x - f / fp;
       if(x != x) { std::cout << "overflow" << std::endl; break; }
     }
@@ -165,7 +170,9 @@ class steady_state_inversion {
       for(auto & kv : pr) {
         string j = kv.first;
         double pj = kv.second;
-        if(q(j) < (pj * (1 - epsilon))) {
+        double left_v = q(j);
+        if(left_v == 0.) { continue; }
+        if(left_v < (pj * (1 - epsilon))) {
           std::cout << j << " qj " << q(j) << "|" << pj * (1 - epsilon) << std::endl;
           outlier += 1;
           std::cout << j << " before: " << score[j] << std::endl;
