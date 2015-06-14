@@ -16,6 +16,7 @@
 #include <cmath>
 #include <string>
 #include <iostream>
+#include <algorithm>
 #include <unordered_map>
 
 #include <google/gflags.h>
@@ -37,6 +38,7 @@ namespace tool {
 
 const double epsilon = 0.00001;
 const double delta = epsilon / 2.;
+const int ktop = 100;
 
 class steady_state_inversion {
  
@@ -87,10 +89,32 @@ class steady_state_inversion {
         score_new[kv.first] = kv.second;
       }
     }
+
+    // calculate transfer prob matrix
+    for(auto & kv_outside : pl) {
+      vector<std::pair<string, double> > ktop_lst_tmp;
+      auto i = kv_outside.first;
+      for(auto & kv_inside : pr) {
+        auto j = kv_inside.first;
+        double prob = trans_prob(i, j);
+        if(prob > 0.) { // save mem
+          ktop_lst_tmp.push_back(std::make_pair(j.substr(0, j.size() - 1), prob));
+        }
+      }
+      std::sort(ktop_lst_tmp.begin(), ktop_lst_tmp.end(), [] (std::pair<string, double> a,
+                                                              std::pair<string, double> b) {
+                                                              return a.second > b.second;
+                                                          });
+      if((int)ktop_lst_tmp.size() >= ktop) { ktop_lst_tmp.resize(ktop); }
+      if(ktop_lst_tmp.size() > 1e-10) {
+        transfer_prob_mtx[i.substr(0, i.size() - 1)] = ktop_lst_tmp;
+      }
+    } // for
   }
 
   void dump_result() {
     pt->paracel_dump_dict(score_new, "score_");
+    pt->paracel_dump_prob_mtx(transfer_prob_mtx, "transfer_prob_matrix_");
   }
 
  private:
@@ -186,7 +210,7 @@ class steady_state_inversion {
       }
       std::cout << "it: " << t << " with outliers:" << outlier << std::endl;
       std::cout << std::endl;
-    } while(outlier && t < 100); // do-while
+    } while(outlier && t < 20); // do-while
   }
 
  private:
@@ -195,6 +219,7 @@ class steady_state_inversion {
   unordered_map<string, double> score_new, score;
   unordered_map<string, double> pl, pr;
   paralg *pt;
+  unordered_map<string, vector<std::pair<string, double> > > transfer_prob_mtx;
 }; // class steady_state_inversion
 
 } // namespace tool 

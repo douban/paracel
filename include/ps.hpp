@@ -1114,6 +1114,40 @@ class paralg {
     }
   }
 
+  void paracel_dump_prob_mtx(const paracel::dict_type<paracel::str_type, 
+                                                      paracel::list_type<std::pair<paracel::str_type,
+                                                                        double> > > & data,
+                              const paracel::str_type & filename = "result_",
+                              bool append_flag = false,
+                              bool merge = false) {
+      std::ofstream os;
+      if(append_flag) {
+        os.open(paracel::todir(output)
+                + filename
+                + std::to_string(worker_comm.get_rank()),
+                std::ofstream::app);
+      } else {
+        os.open(paracel::todir(output)
+                + filename
+                + std::to_string(worker_comm.get_rank()));
+      }
+      for(auto & kv : data) {
+        os << kv.first + '\t';
+        if(kv.second.size() == 0) { continue; }
+        for(size_t i = 0; i < kv.second.size() - 1; ++i) {
+          os << kv.second[i].first << ':'
+              << std::to_string(kv.second[i].second) << '|';
+        }
+        os << kv.second.back().first << ':'
+            << kv.second.back().second << '\n';
+      }
+      os.close();
+      if(merge && get_worker_id() == 0) {
+        paracel_sync();
+        // TODO
+      }
+  }
+
   template <class T, class F>
   T data_merge(T & data,
                F & func,
