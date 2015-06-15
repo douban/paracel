@@ -1,4 +1,4 @@
-![logo](./logo.png)
+![logo](/logo.png)
 
 # Paracel Overview [![https://travis-ci.org/douban/paracel.png](https://travis-ci.org/douban/paracel.png)](https://travis-ci.org/douban/paracel)
 
