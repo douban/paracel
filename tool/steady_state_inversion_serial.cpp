@@ -36,7 +36,7 @@ using paracel::str_split;
 namespace paracel {
 namespace tool {
 
-const double epsilon = 0.00001;
+const double epsilon = 0.0001;
 const double delta = epsilon / 2.;
 const int ktop = 100;
 
