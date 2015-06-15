@@ -1,8 +1,8 @@
-#! /usr/bin/env python 
+#! /usr/bin/env python
 
 #
-# Copyright (c) 2014, Douban Inc. 
-#   All rights reserved. 
+# Copyright (c) 2014, Douban Inc.
+#   All rights reserved.
 #
 # Distributed under the BSD License. Check out the LICENSE file for full text.
 #
@@ -22,7 +22,6 @@ except:
 
 import os
 import sys
-import json
 import socket
 import random
 import subprocess
@@ -44,10 +43,7 @@ def paracelrun_cpp_proxy(nsrv, initport):
     return p.stdout.readline()
 
 def get_free_port():
-    import os
-    import random 
     def is_avaliable(port):
-        import os
         cmd = 'netstat -tuln | grep LISTEN | cut -f 2 -d :'
         tmp = os.popen(cmd)
         content = tmp.read()
@@ -78,7 +74,7 @@ def init_starter(method, mem_limit, ppn, hostfile):
     elif method == 'local':
         starter = 'mpirun -n'
     else:
-        print 'method ', method, ' not supported.' 
+        print 'method ', method, ' not supported.'
         sys.exit(1)
     return starter
 
@@ -118,7 +114,7 @@ if __name__ == '__main__':
                       action = 'store', type = 'string', dest = 'config',
                       help = 'config file in json fmt, for alg usage')
     (options, args) = optpar.parse_args()
-    
+
     nsrv = 1
     nworker = 1
     if options.parasrv_num:
@@ -134,10 +130,10 @@ if __name__ == '__main__':
         options.mem_limit_server = options.mem_limit
     if not options.hostfile_server:
         options.hostfile_server = options.hostfile
-    
+
     server_starter = init_starter(options.method_server, str(options.mem_limit_server), str(options.ppn_server), options.hostfile_server)
     worker_starter = init_starter(options.method, str(options.mem_limit), str(options.ppn), options.hostfile)
-    
+
     #initport = random.randint(30000, 65000)
     #initport = get_free_port()
     initport = 11777
@@ -157,5 +153,6 @@ if __name__ == '__main__':
         logger.info(alg_cmd)
         os.system(alg_cmd)
         os.killpg(procs.pid, 9)
-    except:
+    except Exception as e:
+        logger.exception(e)
         os.killpg(procs.pid, 9)
