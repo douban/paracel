@@ -101,7 +101,7 @@ if __name__ == '__main__':
     optpar.add_option('-m', '--method', default = 'local',
                       action = 'store', type = 'string', dest = 'method',
                       help = 'running method for workers', metavar = 'local | mesos | mpi')
-    optpar.add_option('--ppn', default = 1,
+    optpar.add_option('--ppn', default = 4,
                       action = 'store', type = 'int', dest = 'ppn',
                       help = 'mesos case: procs number per node for workers')
     optpar.add_option('--mem_limit', default = 200,
