@@ -143,12 +143,36 @@ public:
     return pt->get<T>(key);
   }
   template <class T>
+  T check_parse(const paracel::str_type & key) {
+    auto r = pt->get<T>(key);
+    if(paracel::isfile(r) || paracel::isdir(r)) {
+      return r;
+    } else {
+      std::cerr << r << ": not exist as a file or directory." << std::endl;
+      throw std::invalid_argument("file or directory not exist.\n");
+    }
+  }
+  template <class T>
   paracel::list_type<T> parse_v(const paracel::str_type & key) {
     paracel::list_type<T> r;
     for(auto & v : pt->get_child(key)) {
       auto tmp = v.second.get_value<T>();
       r.push_back(tmp);
     }
+    return r;
+  }
+  template <class T>
+  paracel::list_type<T> check_parse_v(const paracel::str_type & key) {
+    paracel::list_type<T> r;
+    for(auto & v : pt->get_child(key)) {
+      auto tmp = v.second.get_value<T>();
+      if(paracel::isfile(tmp) || paracel::isdir(tmp)) {
+        r.push_back(tmp);
+      } else {
+        std::cerr << tmp << ": not exist as a file or directory." << std::endl;
+        throw std::invalid_argument("file or directory not exist.\n");
+      }
+    } // for
     return r;
   }
 };
