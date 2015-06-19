@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string input = pt.parse<std::string>("input");
+  std::string input = pt.check_parse<std::string>("input");
   std::string output = pt.parse<std::string>("output");
   double lambda = pt.parse<double>("lambda");
   int rounds = pt.parse<int>("rounds");

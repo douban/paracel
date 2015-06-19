@@ -236,8 +236,8 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   paracel::json_parser pt(FLAGS_cfg_file);
-  string bigraph_input = pt.parse<string>("bigraph_input");
-  string dis_input = pt.parse<string>("distribution_input");
+  string bigraph_input = pt.check_parse<string>("bigraph_input");
+  string dis_input = pt.check_parse<string>("distribution_input");
   string output = pt.parse<string>("output");
 
   paracel::tool::steady_state_inversion solver(comm, bigraph_input, dis_input, output);

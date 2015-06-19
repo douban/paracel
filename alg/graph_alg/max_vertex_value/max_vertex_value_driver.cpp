@@ -34,9 +34,9 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string input = pt.parse<std::string>("input");
+  std::string input = pt.check_parse<std::string>("input");
   std::string output = pt.parse<std::string>("output");
-  std::string update_file = pt.parse<std::string>("update_file");
+  std::string update_file = pt.check_parse<std::string>("update_file");
   std::string update_func = pt.parse<std::string>("update_func");
   
   paracel::alg::max_vertex_value mvv_solver(comm,

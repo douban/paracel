@@ -39,11 +39,11 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser jp(FLAGS_cfg_file);
-  string input = jp.parse<string>("input");
+  string input = jp.check_parse<string>("input");
   string output = jp.parse<string>("output");
   string type = jp.parse<string>("type");
   int k = jp.parse<int>("kclusters");
-  string update_fn = jp.parse<string>("update_file");
+  string update_fn = jp.check_parse<string>("update_file");
   vector<string> update_funcs = jp.parse_v<string>("update_functions");
   int rounds = jp.parse<int>("rounds");
   paracel::alg::kmeans solver(comm,

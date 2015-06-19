@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
   google::SetUsageMessage("[options]\n\t--server_info\n\t--cfg_file\n");
   google::ParseCommandLineFlags(&argc, &argv, true);
   paracel::json_parser pt(FLAGS_cfg_file);
-  string input = pt.parse<string>("input");
+  string input = pt.check_parse<string>("input");
   string output = pt.parse<string>("output");
   string fmt = pt.parse<string>("format");
   int ktop = pt.parse<int>("topk");

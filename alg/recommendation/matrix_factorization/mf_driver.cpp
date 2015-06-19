@@ -39,12 +39,12 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string input = pt.parse<std::string>("input");
-  std::string pred_input = pt.parse<std::string>("predict_input");
+  std::string input = pt.check_parse<std::string>("input");
+  std::string pred_input = pt.check_parse<std::string>("predict_input");
   std::string output = pt.parse<std::string>("output");
-  std::string update_fn = pt.parse<std::string>("update_file");
+  std::string update_fn = pt.check_parse<std::string>("update_file");
   std::vector<std::string> update_funcs = pt.parse_v<std::string>("update_functions");
-  std::string filter_fn = pt.parse<std::string>("filter_file");
+  std::string filter_fn = pt.check_parse<std::string>("filter_file");
   std::vector<std::string> filter_funcs = pt.parse_v<std::string>("filter_functions");
   int k = pt.parse<int>("k");
   int rounds = pt.parse<int>("rounds");

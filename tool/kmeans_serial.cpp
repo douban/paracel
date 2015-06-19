@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
   google::SetUsageMessage("[options]\n\t--cfg_file\n");
   google::ParseCommandLineFlags(&argc, &argv, true);
   paracel::json_parser jp(FLAGS_cfg_file);
-  std::string input = jp.parse<std::string>("input");
+  std::string input = jp.check_parse<std::string>("input");
   std::string output = jp.parse<std::string>("output");
   int ktop = jp.parse<int>("kclusters");
   int rounds = jp.parse<int>("rounds");

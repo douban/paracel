@@ -36,11 +36,11 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser jp(FLAGS_cfg_file);
-  string input = jp.parse<string>("input");
+  string input = jp.check_parse<string>("input");
   string output = jp.parse<string>("output");
   int rounds = jp.parse<int>("rounds");
   double df = jp.parse<double>("damping_factor");
-  string handle_fn = jp.parse<string>("handle_file");
+  string handle_fn = jp.check_parse<string>("handle_file");
   string update_fcn = jp.parse<string>("update_function");
   string filter_fcn = jp.parse<string>("filter_function");
   

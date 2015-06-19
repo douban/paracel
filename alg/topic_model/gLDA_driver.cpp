@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 	google::ParseCommandLineFlags(&argc, &argv, true);
 
 	paracel::json_parser pt(FLAGS_cfg_file);
-	std::string input = pt.parse<std::string>("input");
+	std::string input = pt.check_parse<std::string>("input");
 	std::string output = pt.parse<std::string>("output");
 	double alpha = pt.parse<double>("alpha");
 	double beta = pt.parse<double>("beta");
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
 	int iters = pt.parse<int>("iters");
 	int top_words = pt.parse<int>("top_words");
-	std::string handle_fn = pt.parse<std::string>("handle_file");
+	std::string handle_fn = pt.check_parse<std::string>("handle_file");
 	bool debug = pt.parse<bool>("debug");
 	paracel::alg::LDAmodel solver(comm,
                                 FLAGS_server_info,

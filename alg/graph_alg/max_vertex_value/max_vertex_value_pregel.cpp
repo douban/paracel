@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   paracel::json_parser jp(FLAGS_cfg_file);
-  std::string input = jp.parse<std::string>("input");
+  std::string input = jp.check_parse<std::string>("input");
   std::string output = jp.parse<std::string>("output");
 
   auto local_parser = [] (const std::string & line) {

@@ -34,10 +34,10 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string user_fac_input = pt.parse<std::string>("user_fac_input");
-  std::string item_fac_input = pt.parse<std::string>("item_fac_input");
+  std::string user_fac_input = pt.check_parse<std::string>("user_fac_input");
+  std::string item_fac_input = pt.check_parse<std::string>("item_fac_input");
   std::string output = pt.parse<std::string>("output");
-  std::string handle_fn = pt.parse<std::string>("handle_file");
+  std::string handle_fn = pt.check_parse<std::string>("handle_file");
   int level = pt.parse<int>("level");
   int tree_start_indx = pt.parse<int>("tree_start_index");
   int tree_end_indx = pt.parse<int>("tree_end_index");

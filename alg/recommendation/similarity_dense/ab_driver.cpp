@@ -31,8 +31,8 @@ int main(int argc, char *argv[])
   google::SetUsageMessage("[options]\n\t--server_info\n\t--cfg_file\n");
   google::ParseCommandLineFlags(&argc, &argv, true);
   paracel::json_parser jp(FLAGS_cfg_file);
-  string input_a = jp.parse<string>("input_a");
-  string input_b = jp.parse<string>("input_b");
+  string input_a = jp.check_parse<string>("input_a");
+  string input_b = jp.check_parse<string>("input_b");
   string output = jp.parse<string>("output");
   double simbar = jp.parse<double>("simbar");
   int ktop = jp.parse<int>("topk");
