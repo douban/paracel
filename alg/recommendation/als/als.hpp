@@ -1,0 +1,162 @@
+/**
+ * Copyright (c) 2014, Douban Inc. 
+ *   All rights reserved. 
+ *
+ * Distributed under the BSD License. Check out the LICENSE file for full text.
+ *
+ * Paracel - A distributed optimization framework with parameter server.
+ *
+ * Downloading
+ *   git clone https://github.com/douban/paracel.git 
+ *
+ * Authors: Hong Wu <xunzhangthu@gmail.com>
+ *
+ */
+
+/**
+ * A subprocedure of training user/item factor, just one iteration.
+ *
+ */
+
+#ifndef FILE_ff90b44a_7b01_0d57_e654_70570f34db29_HPP
+#define FILE_ff90b44a_7b01_0d57_e654_70570f34db29_HPP
+
+#include <string>
+#include <vector>
+#include <unordered_set>
+#include <unordered_map>
+
+#include <eigen3/Eigen/Dense>
+
+#include "ps.hpp"
+#include "graph.hpp"
+#include "load.hpp"
+#include "utils.hpp"
+
+namespace paracel {
+namespace alg {
+
+using node_t = paracel::default_id_type;
+
+class alternating_least_square_standard : public paracel::paralg {
+ 
+ public:
+  alternating_least_square_standard(paracel::Comm comm,
+                                    std::string hosts_dct_str,
+                                    std::string _rating_input,
+                                    std::string _factor_input,
+                                    std::string _output,
+                                    std::string _pattern,
+                                    double _lambda)
+  : paracel::paralg(hosts_dct_str, comm, _output),
+    rating_input(_rating_input),
+    factor_input(_factor_input),
+    pattern(_pattern),
+    lambda(_lambda) {}
+
+  virtual ~alternating_least_square_standard() {}
+
+  virtual void solve() {
+
+    // load rating_graph, partition with pattern
+    auto local_parser_rating = [] (const std::string & line) {
+      return paracel::str_split(line, ',');
+    };
+    auto rating_parser_func = paracel::gen_parser(local_parser_rating);
+    paracel_load_as_graph(rating_graph,
+                          rating_input,
+                          rating_parser_func,
+                          pattern);
+
+    std::unordered_set<std::string> local_H_set;
+    std::vector<double> empty;
+    auto traverse_lambda = [&] (const node_t & a, const node_t & b, double c) {
+      W[a] = empty;
+      local_H_set.insert(paracel::cvt(b));
+    };
+    rating_graph.traverse(traverse_lambda);
+    
+    // load H 
+    auto local_parser_factor = [&] (const std::vector<std::string> & linelst) {
+      for(auto & line : linelst) {
+        std::vector<double> tmp;
+        auto v = paracel::str_split(line, '\t');
+        kdim = v.size() - 1;
+        if(local_H_set.count(v[0])) {
+          for(size_t i = 1; i < v.size(); ++i) {
+            tmp.push_back(std::stod(v[i]));
+          }
+          H[paracel::cvt(v[0])] = tmp;
+        } // if
+      } // for
+    };
+    paracel_sequential_loadall(factor_input, local_parser_factor);
+    
+    learning();
+    paracel_sync();
+  }
+
+  void dump_result() {
+    std::unordered_map<std::string, std::vector<double> > dump_W;
+    for(auto & kv : W) {
+      dump_W[std::to_string(kv.first)] = kv.second;
+    }
+    paracel_dump_dict(dump_W, "W_");
+  }
+
+ private:
+  void learning() {
+    for(auto & kv : W) {
+      auto uid = kv.first;
+      std::vector<double> ai_vec;
+      std::vector<std::vector<double> > H_sub_vec;
+      auto local_lambda = [&] (const node_t & a,
+                               const node_t & b,
+                               double v) {
+        H_sub_vec.push_back(H[b]);
+        ai_vec.push_back(v);
+      };
+      rating_graph.traverse(uid, local_lambda);
+      Eigen::MatrixXd H_sub(kdim, H_sub_vec.size());
+      auto ai = paracel::vec2evec(ai_vec);
+      // construct H_sub, ai
+      for(int i = 0; i < kdim; ++i) {
+        H_sub.row(i) = Eigen::VectorXd::Map(&H_sub_vec[i][0], H_sub_vec[i].size());
+      }
+      // solve als by: inv(H_sub.transpose() * H_sub + lambda * I) * H_sub.transpose() * ai
+      auto H_sub_T = H_sub.transpose();
+      Eigen::MatrixXd I = Eigen::MatrixXd(kdim, kdim);
+      auto T1 = H_sub_T * H_sub + lambda * I;
+      auto T2 = H_sub_T * ai;
+      W[uid] = paracel::evec2vec(T1.inverse() * T2);
+    } // for
+  }
+
+ private:
+  std::string rating_input, factor_input;
+  std::string pattern = "fmap"; // fmap(to train user factor) and smap(to train item factor)
+  double lambda;
+  int kdim = 100;
+  paracel::bigraph<node_t> rating_graph;
+  std::unordered_map<node_t, std::vector<double> > W, H;
+}; // class alternating_least_square_standard
+
+/*
+class alternating_least_square_mem_opt : public paracel::paralg {
+
+ public:
+  alternating_least_square_mem_opt() {}
+  virtual void ~alternating_least_square_mem_opt () {}
+  virtual void solve() {}
+  void dump_result() {}
+ private:
+  void learning() {}
+ private:
+  // TODO
+}; // class alternating_least_square_mem_opt 
+*/
+
+} // namespace alg
+} // namespace paracel
+
+#endif
