@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
                                                            output,
                                                            pattern, lambda);
   H_solver.solve();
+  std::cout << "train done" << std::endl;
   H_solver.dump_result();
   return 0;
 }

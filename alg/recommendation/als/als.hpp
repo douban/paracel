@@ -79,12 +79,13 @@ class alternating_least_square_standard : public paracel::paralg {
     // load H 
     auto local_parser_factor = [&] (const std::vector<std::string> & linelst) {
       for(auto & line : linelst) {
-        std::vector<double> tmp;
         auto v = paracel::str_split(line, '\t');
-        kdim = v.size() - 1;
+        auto fac = paracel::str_split(v[1], '|');
+        kdim = fac.size();
+        std::vector<double> tmp;
         if(local_H_set.count(v[0])) {
-          for(size_t i = 1; i < v.size(); ++i) {
-            tmp.push_back(std::stod(v[i]));
+          for(auto & vv : fac) {
+            tmp.push_back(std::stod(vv));
           }
           H[paracel::cvt(v[0])] = tmp;
         } // if
@@ -117,11 +118,11 @@ class alternating_least_square_standard : public paracel::paralg {
         ai_vec.push_back(v);
       };
       rating_graph.traverse(uid, local_lambda);
-      Eigen::MatrixXd H_sub(kdim, H_sub_vec.size());
+      Eigen::MatrixXd H_sub(H_sub_vec.size(), kdim);
       auto ai = paracel::vec2evec(ai_vec);
       // construct H_sub, ai
-      for(int i = 0; i < kdim; ++i) {
-        H_sub.row(i) = Eigen::VectorXd::Map(&H_sub_vec[i][0], H_sub_vec[i].size());
+      for(size_t i = 0; i < H_sub_vec.size(); ++i) {
+        H_sub.row(i) = Eigen::VectorXd::Map(&H_sub_vec[i][0], kdim);
       }
       // solve als by: inv(H_sub.transpose() * H_sub + lambda * I) * H_sub.transpose() * ai
       auto H_sub_T = H_sub.transpose();
