@@ -144,7 +144,8 @@ public:
   }
   template <class T>
   T check_parse(const paracel::str_type & key) {
-    auto r = pt->get<T>(key);
+    auto rr = pt->get<T>(key);
+    T r = paracel::expand(rr).back();
     if(paracel::isfile(r) || paracel::isdir(r)) {
       return r;
     } else {
@@ -165,7 +166,7 @@ public:
   paracel::list_type<T> check_parse_v(const paracel::str_type & key) {
     paracel::list_type<T> r;
     for(auto & v : pt->get_child(key)) {
-      auto tmp = v.second.get_value<T>();
+      T tmp = v.second.get_value<T>().back();
       if(paracel::isfile(tmp) || paracel::isdir(tmp)) {
         r.push_back(tmp);
       } else {
