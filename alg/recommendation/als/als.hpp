@@ -36,7 +36,8 @@
 namespace paracel {
 namespace alg {
 
-using node_t = paracel::default_id_type;
+using node_t = std::string;
+//using node_t = paracel::default_id_type;
 
 class alternating_least_square_standard : public paracel::paralg {
  
@@ -72,7 +73,7 @@ class alternating_least_square_standard : public paracel::paralg {
     std::vector<double> empty;
     auto traverse_lambda = [&] (const node_t & a, const node_t & b, double c) {
       W[a] = empty;
-      local_H_set.insert(paracel::cvt(b));
+      local_H_set.insert(b);
     };
     rating_graph.traverse(traverse_lambda);
     
@@ -87,7 +88,7 @@ class alternating_least_square_standard : public paracel::paralg {
           for(auto & vv : fac) {
             tmp.push_back(std::stod(vv));
           }
-          H[paracel::cvt(v[0])] = tmp;
+          H[v[0]] = tmp;
         } // if
       } // for
     };
@@ -98,11 +99,7 @@ class alternating_least_square_standard : public paracel::paralg {
   }
 
   void dump_result() {
-    std::unordered_map<std::string, std::vector<double> > dump_W;
-    for(auto & kv : W) {
-      dump_W[std::to_string(kv.first)] = kv.second;
-    }
-    paracel_dump_dict(dump_W, "W_");
+    paracel_dump_dict(W, "W_");
   }
 
  private:
