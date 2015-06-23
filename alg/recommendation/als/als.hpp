@@ -126,11 +126,15 @@ class alternating_least_square_standard : public paracel::paralg {
       }
       // solve als by: inv(H_sub.transpose() * H_sub + lambda * I) * H_sub.transpose() * ai
       auto H_sub_T = H_sub.transpose();
-      Eigen::MatrixXd I = Eigen::MatrixXd(kdim, kdim);
+      Eigen::MatrixXd I = Eigen::MatrixXd::Identity(kdim, kdim);
       auto T1 = H_sub_T * H_sub + lambda * I;
       auto T2 = H_sub_T * ai;
       W[uid] = paracel::evec2vec(T1.inverse() * T2);
     } // for
+  }
+
+  void validate() {
+    //
   }
 
  private:
