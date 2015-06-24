@@ -23,6 +23,7 @@
 #include <ctime>
 #include <vector>
 #include <numeric>
+#include <utility>
 
 #include <boost/algorithm/string/regex.hpp>
 
@@ -60,18 +61,11 @@ string_lst str_split(const paracel::str_type & str,
   return result;
 }
 
-string_lst str_split_by_word(const paracel::str_type & str, 
+template <class T>
+string_lst str_split_by_word(T && str, 
                              const paracel::str_type & seps) {
   string_lst result;
-  boost::algorithm::split_regex(result, str, boost::regex(seps));
-  if(result.back() == "") result.pop_back();
-  return result;
-}
-
-string_lst str_split_by_word(paracel::str_type && str, 
-                             const paracel::str_type & seps) {
-  string_lst result;
-  boost::algorithm::split_regex(result, std::move(str), boost::regex(seps));
+  boost::algorithm::split_regex(result, std::forward<T>(str), boost::regex(seps));
   if(result.back() == "") result.pop_back();
   return result;
 }
