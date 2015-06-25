@@ -62,13 +62,15 @@ def get_free_port():
         port = random.randint(10000, 65535)
     return port
 
-def init_starter(method, mem_limit, ppn, hostfile):
+def init_starter(method, mem_limit, ppn, hostfile, group):
     starter = ''
     if not hostfile:
         hostfile = '~/.mpi/large.18'
-
     if method == 'mesos':
-        starter = './mrun -m ' + mem_limit + ' -p ' + ppn + ' -n'
+        if group:
+            starter = './mrun -m ' + mem_limit + ' -p ' + ppn + ' -g ' + group + ' -n'
+        else:
+            starter = './mrun -m ' + mem_limit + ' -p ' + ppn + ' -n'
     elif method == 'mpi':
         starter = 'mpirun --hostfile ' + hostfile + ' -n'
     elif method == 'local':
@@ -113,6 +115,12 @@ if __name__ == '__main__':
     optpar.add_option('-c', '--cfg_file',
                       action = 'store', type = 'string', dest = 'config',
                       help = 'config file in json fmt, for alg usage')
+    optpar.add_option('-g', '--group', default = '',
+                      action = 'store', type = 'string', dest = 'worker_group',
+                      help = 'mesos case: which group for worker to run')
+    optpar.add_option('--group_server',
+                      action = 'store', type = 'string', dest = 'server_group',
+                      help = 'mesos case: which group for server to run')
     (options, args) = optpar.parse_args()
 
     nsrv = 1
@@ -131,8 +139,16 @@ if __name__ == '__main__':
     if not options.hostfile_server:
         options.hostfile_server = options.hostfile
 
-    server_starter = init_starter(options.method_server, str(options.mem_limit_server), str(options.ppn_server), options.hostfile_server)
-    worker_starter = init_starter(options.method, str(options.mem_limit), str(options.ppn), options.hostfile)
+    server_starter = init_starter(options.method_server,
+                                  str(options.mem_limit_server),
+                                  str(options.ppn_server),
+                                  options.hostfile_server,
+                                  options.server_group)
+    worker_starter = init_starter(options.method,
+                                  str(options.mem_limit),
+                                  str(options.ppn),
+                                  options.hostfile,
+                                  options.worker_group)
 
     #initport = random.randint(30000, 65000)
     #initport = get_free_port()
