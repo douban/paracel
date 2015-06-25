@@ -21,6 +21,7 @@
 
 #include <cstring> // std::memcpy
 #include <memory>
+#include <future>
 #include <functional>
 
 #include "zmq.hpp"
@@ -179,8 +180,9 @@ public:
     auto scrip = paste(paracel::str_type("register_update"), 
                        file_name, 
                        func_name); 
-    push_send(*p_update_sock, scrip);
-    return true;
+    bool stat;
+    auto r = req_send_recv(*p_update_sock, scrip, stat);
+    return r && stat;
   }
   
   bool register_bupdate(const paracel::str_type & file_name,
@@ -244,19 +246,25 @@ public:
    
   template <class K, class V>
   void update(const K & key, 
-              const V & delta) {
+              const V & delta,
+              paracel::async_functor_type & update_future) {
     if(p_update_sock == nullptr) {
       p_update_sock.reset(create_push_sock(ports_lst[2]));
     }
     auto scrip = paste(paracel::str_type("update"), key, delta);
-    push_send(*p_update_sock, scrip);
+    auto update_lambda = [&] () -> bool {
+      V val;
+      return req_send_recv(*p_update_sock, scrip, val);
+    };
+    update_future = std::async(std::launch::async, update_lambda);
   }
 
   template <class K, class V>
   void update(const K & key, 
               const V & delta,
               const paracel::str_type & file_name, 
-              const paracel::str_type & func_name) {
+              const paracel::str_type & func_name,
+              paracel::async_functor_type & update_future) {
     if(p_update_sock == nullptr) {
       p_update_sock.reset(create_push_sock(ports_lst[2]));
     }
@@ -265,7 +273,11 @@ public:
                        delta,
                        file_name,
                        func_name);
-    push_send(*p_update_sock, scrip);
+    auto update_lambda = [&] () -> bool {
+      V val;
+      return req_send_recv(*p_update_sock, scrip, val);
+    };
+    update_future = std::async(std::launch::async, update_lambda);
   }
   
   template <class K, class V>
@@ -490,7 +502,8 @@ private:
 
   zmq::socket_t*
   create_push_sock(const paracel::str_type & port) {
-    zmq::socket_t *p_sock = new zmq::socket_t(context, ZMQ_PUSH);
+    zmq::socket_t *p_sock = new zmq::socket_t(context, ZMQ_REQ);
+    //zmq::socket_t *p_sock = new zmq::socket_t(context, ZMQ_PUSH);
     auto info = conn_prefix + port;
     p_sock->connect(info.c_str());
     return p_sock;
@@ -583,13 +596,6 @@ private:
         val.push_back(pk2.unpack(item));
       }
     }
-  }
-
-  void push_send(zmq::socket_t & sock,
-                 const paracel::str_type & scrip) {
-    zmq::message_t push_msg(scrip.size());
-    std::memcpy((void *)push_msg.data(), &scrip[0], scrip.size());
-    sock.send(push_msg);
   }
 
 private:

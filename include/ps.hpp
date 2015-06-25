@@ -24,6 +24,7 @@
 #include <queue>
 #include <fstream>
 #include <utility>
+#include <future>
 #include <algorithm>
 #include <functional>
 
@@ -659,6 +660,7 @@ class paralg {
   template <class V>
   void paracel_update(const paracel::str_type & key,
                       const V & delta,
+                      paracel::async_functor_type & update_future,
                       bool replica_flag = false) {
     if(ssp_switch) {
       if(!update_f) {
@@ -675,21 +677,23 @@ class paralg {
       V nval = pk1.unpack(nv);
       cached_para[key] = boost::any_cast<V>(nval);
     }
-    ps_obj->kvm[ps_obj->p_ring->get_server(key)].update(key, delta);
+    ps_obj->kvm[ps_obj->p_ring->get_server(key)].update(key, delta, update_future);
   }
 
   void paracel_update(const paracel::str_type & key,
                       const char* delta,
+                      paracel::async_functor_type & update_future,
                       bool replica_flag = false) {
     paracel::str_type d = delta;
-    paralg::paracel_update(key, d);
+    paralg::paracel_update(key, d, update_future);
   }
   
   template <class V>
   void paracel_update(const paracel::str_type & key,
                       const V & delta,
                       const paracel::str_type & file_name,
-                      const paracel::str_type & func_name) {
+                      const paracel::str_type & func_name,
+                      paracel::async_functor_type & update_future) {
     if(ssp_switch) {
       V val = boost::any_cast<V>(cached_para[key]);
       // pack<V> val to v & delta to d
@@ -703,15 +707,17 @@ class paralg {
     ps_obj->kvm[ps_obj->p_ring->get_server(key)].update(key,
                                                         delta,
                                                         file_name,
-                                                        func_name);
+                                                        func_name,
+                                                        update_future);
   }
 
   void paracel_update(const paracel::str_type & key,
                       const char* delta,
                       const paracel::str_type & file_name,
-                      const paracel::str_type & func_name) {
+                      const paracel::str_type & func_name,
+                      paracel::async_functor_type & update_future) {
     paracel::str_type d = delta;
-    paralg::paracel_update(key, d, file_name, func_name);
+    paralg::paracel_update(key, d, file_name, func_name, update_future);
   }
 
 

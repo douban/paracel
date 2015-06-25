@@ -28,6 +28,7 @@
 #include <queue>
 #include <tuple>
 #include <set>
+#include <future>
 
 #include <mpi.h>
 #include <msgpack.hpp>
@@ -229,6 +230,8 @@ using update_result = std::function<std::string(std::string, std::string)>;
 using filter_result = std::function<bool(std::string, std::string)>;
 
 using filter_with_key_result = std::function<bool(std::string)>;
+
+using async_functor_type = std::future<bool>;
 
 template<class T>
 using kernel_type = typename std::remove_cv<

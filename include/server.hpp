@@ -338,9 +338,7 @@ void thrd_exec(zmq::socket_t & sock) {
       }
       auto key = pk.unpack(msg[1]);
       std::string result = kv_update(key, msg[2], update_f);
-      if(indicator == "bupdate") {
-        rep_send(sock, result);
-      }
+      rep_send(sock, result);
     }
     if(indicator == "bupdate_multi") {
       if(msg.size() > 3) {
@@ -418,11 +416,7 @@ void init_thrds(const paracel::str_type & init_host,
   std::vector<zmq::socket_t *> sock_pt_lst;
   for(int i = 0; i < paracel::threads_num; ++i) {
     zmq::socket_t *tmp;
-    if(i == 2) {
-      tmp = new zmq::socket_t(context, ZMQ_PULL);
-    } else {
-      tmp = new zmq::socket_t(context, ZMQ_REP);
-    }
+    tmp = new zmq::socket_t(context, ZMQ_REP);
     sock_pt_lst.push_back(tmp);
     sock_pt_lst.back()->bind("tcp://*:*");
     sock_pt_lst.back()->getsockopt(ZMQ_LAST_ENDPOINT, &freeport, &size);
