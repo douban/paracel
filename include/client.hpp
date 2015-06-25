@@ -252,7 +252,7 @@ public:
       p_update_sock.reset(create_push_sock(ports_lst[2]));
     }
     auto scrip = paste(paracel::str_type("update"), key, delta);
-    auto update_lambda = [&] () -> bool {
+    auto update_lambda = [this, scrip] () -> bool {
       V val;
       return req_send_recv(*p_update_sock, scrip, val);
     };
@@ -273,7 +273,7 @@ public:
                        delta,
                        file_name,
                        func_name);
-    auto update_lambda = [&] () -> bool {
+    auto update_lambda = [this, scrip] () -> bool {
       V val;
       return req_send_recv(*p_update_sock, scrip, val);
     };

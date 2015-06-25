@@ -284,6 +284,10 @@ std::string cvt(paracel::default_id_type id) {
   return std::to_string(id);
 }
 
+bool wait(paracel::async_functor_type & _future) {
+  return _future.get();
+}
+
 } // namespace paracel
 
 #endif
