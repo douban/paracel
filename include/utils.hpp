@@ -284,6 +284,7 @@ std::string cvt(paracel::default_id_type id) {
   return std::to_string(id);
 }
 
+// you can also use _future.wait() instead
 bool wait(paracel::async_functor_type & _future) {
   return _future.get();
 }
