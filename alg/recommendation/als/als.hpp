@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include <stdexcept>
 #include <unordered_set>
 #include <unordered_map>
 
@@ -36,8 +37,8 @@
 namespace paracel {
 namespace alg {
 
-using node_t = std::string;
-//using node_t = paracel::default_id_type;
+//using node_t = std::string;
+using node_t = paracel::default_id_type;
 
 class alternating_least_square_standard : public paracel::paralg {
  
@@ -73,7 +74,7 @@ class alternating_least_square_standard : public paracel::paralg {
     std::vector<double> empty;
     auto traverse_lambda = [&] (const node_t & a, const node_t & b, double c) {
       W[a] = empty;
-      local_H_set.insert(b);
+      local_H_set.insert(paracel::cvt(b));
     };
     rating_graph.traverse(traverse_lambda);
     
@@ -88,22 +89,26 @@ class alternating_least_square_standard : public paracel::paralg {
           for(auto & vv : fac) {
             tmp.push_back(std::stod(vv));
           }
-          H[v[0]] = tmp;
+          H[paracel::cvt(v[0])] = tmp;
         } // if
       } // for
     };
     paracel_sequential_loadall(factor_input, local_parser_factor);
     
     learning();
-    paracel_sync();
   }
 
   void dump_result() {
-    paracel_dump_dict(W, "W_");
+    std::unordered_map<std::string, std::vector<double> > dump_W;
+    for(auto & kv : W) {
+      dump_W[std::to_string(kv.first)] = kv.second;
+    }
+    paracel_dump_dict(dump_W, "W_");
   }
 
- private:
+ public:
   void learning() {
+    int cnt = 0;
     for(auto & kv : W) {
       auto uid = kv.first;
       std::vector<double> ai_vec;
@@ -111,6 +116,10 @@ class alternating_least_square_standard : public paracel::paralg {
       auto local_lambda = [&] (const node_t & a,
                                const node_t & b,
                                double v) {
+        if(!H.count(b)) { 
+          std::cout << a << "," << b << "," << v << std::endl;
+          throw std::runtime_error("Data error: rating data and factor data is not consistent.\n"); 
+        }
         H_sub_vec.push_back(H[b]);
         ai_vec.push_back(v);
       };
@@ -127,6 +136,7 @@ class alternating_least_square_standard : public paracel::paralg {
       auto T1 = H_sub_T * H_sub + lambda * I;
       auto T2 = H_sub_T * ai;
       W[uid] = paracel::evec2vec(T1.inverse() * T2);
+      cnt += 1;
     } // for
   }
 
