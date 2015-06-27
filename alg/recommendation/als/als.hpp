@@ -105,8 +105,24 @@ class alternating_least_square_standard : public paracel::paralg {
     }
     paracel_dump_dict(dump_W, "W_");
   }
+  
+  double cal_rmse() {
+    auto worker_comm = get_comm();
+    double rmse = 0;
+    auto rmse_lambda = [&] (const node_t & uid,
+                            const node_t & iid,
+                            double rating) {
+      double e = rating - estimate(uid, iid);
+      rmse += e * e;
+    };
+    rating_graph.traverse(rmse_lambda);
+    worker_comm.allreduce(rmse);
+    long long sz_sum = rating_graph.e();
+    worker_comm.allreduce(sz_sum);
+    return sqrt(rmse / sz_sum);
+  }
 
- public:
+ private:
   void learning() {
     int cnt = 0;
     for(auto & kv : W) {
@@ -140,8 +156,9 @@ class alternating_least_square_standard : public paracel::paralg {
     } // for
   }
 
-  void validate() {
-    //
+  inline double estimate(const node_t & uid,
+                         const node_t & iid) {
+    return paracel::dot_product(W[uid], H[iid]);
   }
 
  private:

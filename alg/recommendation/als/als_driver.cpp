@@ -52,5 +52,6 @@ int main(int argc, char *argv[])
   H_solver.solve();
   std::cout << "train done" << std::endl;
   H_solver.dump_result();
+  //std::cout << "rmse: " << H_solver.cal_rmse() << std::endl;
   return 0;
 }
