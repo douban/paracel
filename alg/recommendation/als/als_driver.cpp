@@ -41,17 +41,20 @@ int main(int argc, char *argv[])
   paracel::json_parser pt(FLAGS_cfg_file);
   std::string rating_input = pt.check_parse<std::string>("rating_input");
   std::string factor_input = pt.check_parse<std::string>("factor_input");
+  std::string validate_input = pt.check_parse<std::string>("validate_input");
   std::string output = pt.parse<std::string>("output");
   std::string pattern = pt.parse<std::string>("pattern");
   double lambda = pt.parse<double>("lambda");
   
   paracel::alg::alternating_least_square_standard H_solver(comm, FLAGS_server_info,
-                                                           rating_input, factor_input,
+                                                           rating_input, factor_input, validate_input,
                                                            output,
                                                            pattern, lambda);
   H_solver.solve();
-  std::cout << "train done" << std::endl;
   H_solver.dump_result();
-  //std::cout << "rmse: " << H_solver.cal_rmse() << std::endl;
+  double train_err = H_solver.cal_rmse();
+  if(comm.get_rank() == 0) std::cout << "train error: " << train_err << std::endl;
+  double test_err = H_solver.validate();
+  if(comm.get_rank() == 0) std::cout << "test error:" << test_err << std::endl;
   return 0;
 }
