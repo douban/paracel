@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
   double lambda = pt.parse<double>("lambda");
   
   paracel::alg::alternating_least_square_standard H_solver(comm, FLAGS_server_info,
-                                                           rating_input, factor_input, validate_input,
+                                                           rating_input, factor_input,
                                                            output,
                                                            pattern, lambda);
   H_solver.solve();
