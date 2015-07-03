@@ -47,14 +47,14 @@ class alternating_least_square_standard : public paracel::paralg {
                                     std::string hosts_dct_str,
                                     std::string _rating_input,
                                     std::string _factor_input,
-                                    std::string _validate_input,
+                                    //std::string _validate_input,
                                     std::string _output,
                                     std::string _pattern,
                                     double _lambda)
   : paracel::paralg(hosts_dct_str, comm, _output),
     rating_input(_rating_input),
     factor_input(_factor_input),
-    validate_input(_validate_input),
+    //validate_input(_validate_input),
     pattern(_pattern),
     lambda(_lambda) {}
 
@@ -87,12 +87,12 @@ class alternating_least_square_standard : public paracel::paralg {
         auto fac = paracel::str_split(v[1], '|');
         kdim = fac.size();
         std::vector<double> tmp;
-        //if(local_H_set.count(v[0])) {
+        if(local_H_set.count(v[0])) {
           for(auto & vv : fac) {
             tmp.push_back(std::stod(vv));
           }
           H[paracel::cvt(v[0])] = tmp;
-        //} // if
+        } // if
       } // for
     };
     paracel_sequential_loadall(factor_input, local_parser_factor);
@@ -186,7 +186,8 @@ class alternating_least_square_standard : public paracel::paralg {
   }
 
  private:
-  std::string rating_input, factor_input, validate_input;
+  std::string rating_input, factor_input;
+  std::string validate_input;
   std::string pattern = "fmap"; // fmap(to train user factor) and smap(to train item factor)
   double lambda;
   int kdim = 100;
