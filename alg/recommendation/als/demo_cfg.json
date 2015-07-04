@@ -1,0 +1,7 @@
+{
+  "rating_input" : "/nfs/wuhong/paracel/data/als/netflix/train_fmt",
+  "factor_input" : "/nfs/wuhong/paracel/data/als/netflix/H",
+  "output" : "/nfs/wuhong/paracel/output/als_result/",
+  "pattern" : "fmap",
+  "lambda" : 0.001
+}

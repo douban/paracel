@@ -41,7 +41,6 @@ int main(int argc, char *argv[])
   paracel::json_parser pt(FLAGS_cfg_file);
   std::string rating_input = pt.check_parse<std::string>("rating_input");
   std::string factor_input = pt.check_parse<std::string>("factor_input");
-  //std::string validate_input = pt.check_parse<std::string>("validate_input");
   std::string output = pt.parse<std::string>("output");
   std::string pattern = pt.parse<std::string>("pattern");
   double lambda = pt.parse<double>("lambda");

@@ -47,14 +47,12 @@ class alternating_least_square_standard : public paracel::paralg {
                                     std::string hosts_dct_str,
                                     std::string _rating_input,
                                     std::string _factor_input,
-                                    //std::string _validate_input,
                                     std::string _output,
                                     std::string _pattern,
                                     double _lambda)
   : paracel::paralg(hosts_dct_str, comm, _output),
     rating_input(_rating_input),
     factor_input(_factor_input),
-    //validate_input(_validate_input),
     pattern(_pattern),
     lambda(_lambda) {}
 
@@ -124,28 +122,6 @@ class alternating_least_square_standard : public paracel::paralg {
     return sqrt(rmse / sz_sum);
   }
 
-  double validate() {
-    auto worker_comm = get_comm();
-    double rmse = 0.; 
-    long long sz = 0;
-    auto local_parser = [&] (const std::vector<std::string> & linelst) {
-      for(auto & line : linelst) {
-        auto v = paracel::str_split(line, ',');
-        auto uid = paracel::cvt(v[0]);
-        if(W.count(uid)) {
-          auto iid = paracel::cvt(v[1]);
-          double r = std::stod(v[2]);
-          rmse += pow(r - estimate(uid, iid), 2);
-          sz ++;
-        }
-      }
-    };
-    paracel_sequential_loadall(validate_input, local_parser);
-    worker_comm.allreduce(rmse);
-    worker_comm.allreduce(sz);
-    return sqrt(rmse / sz);
-  }
-
  private:
   void learning() {
     int cnt = 0;
@@ -187,7 +163,6 @@ class alternating_least_square_standard : public paracel::paralg {
 
  private:
   std::string rating_input, factor_input;
-  std::string validate_input;
   std::string pattern = "fmap"; // fmap(to train user factor) and smap(to train item factor)
   double lambda;
   int kdim = 100;
@@ -195,20 +170,152 @@ class alternating_least_square_standard : public paracel::paralg {
   std::unordered_map<node_t, std::vector<double> > W, H;
 }; // class alternating_least_square_standard
 
-/*
-class alternating_least_square_mem_opt : public paracel::paralg {
 
+class alternating_least_square_validate : public paracel::paralg {
+ 
  public:
-  alternating_least_square_mem_opt() {}
-  virtual void ~alternating_least_square_mem_opt () {}
-  virtual void solve() {}
-  void dump_result() {}
+  alternating_least_square_validate(paracel::Comm comm,
+                                    std::string hosts_dct_str,
+                                    std::string _rating_input,
+                                    std::string _factor_input,
+                                    std::string _validate_input,
+                                    std::string _output,
+                                    std::string _pattern)
+  : paracel::paralg(hosts_dct_str, comm, _output),
+    rating_input(_rating_input),
+    factor_input(_factor_input),
+    validate_input(_validate_input),
+    pattern(_pattern) {}
+
+  virtual ~alternating_least_square_validate() {}
+
+  virtual void init() {
+
+    // load rating_graph, partition with pattern
+    auto local_parser_rating = [] (const std::string & line) {
+      return paracel::str_split(line, ',');
+    };
+    auto rating_parser_func = paracel::gen_parser(local_parser_rating);
+    paracel_load_as_graph(rating_graph,
+                          rating_input,
+                          rating_parser_func,
+                          pattern);
+
+    std::vector<double> empty;
+    auto traverse_lambda = [&] (const node_t & a, const node_t & b, double c) {
+      W[a] = empty;
+    };
+    rating_graph.traverse(traverse_lambda);
+    
+    // load H 
+    auto local_parser_factor = [&] (const std::vector<std::string> & linelst) {
+      for(auto & line : linelst) {
+        auto v = paracel::str_split(line, '\t');
+        auto fac = paracel::str_split(v[1], '|');
+        kdim = fac.size();
+        std::vector<double> tmp;
+        for(auto & vv : fac) {
+          tmp.push_back(std::stod(vv));
+        }
+        H[paracel::cvt(v[0])] = tmp;
+      } // for
+    };
+    paracel_sequential_loadall(factor_input, local_parser_factor);
+  }
+
+  void dump_result() {
+    std::unordered_map<std::string, std::vector<double> > dump_W;
+    for(auto & kv : W) {
+      dump_W[std::to_string(kv.first)] = kv.second;
+    }
+    paracel_dump_dict(dump_W, "W_");
+  }
+  
+  double cal_rmse() {
+    auto worker_comm = get_comm();
+    double rmse = 0;
+    auto rmse_lambda = [&] (const node_t & uid,
+                            const node_t & iid,
+                            double rating) {
+      double e = rating - estimate(uid, iid);
+      rmse += e * e;
+    };
+    rating_graph.traverse(rmse_lambda);
+    worker_comm.allreduce(rmse);
+    long long sz_sum = rating_graph.e();
+    worker_comm.allreduce(sz_sum);
+    return sqrt(rmse / sz_sum);
+  }
+
+  double validate() {
+    auto worker_comm = get_comm();
+    double rmse = 0.; 
+    long long sz = 0;
+    auto local_parser = [&] (const std::vector<std::string> & linelst) {
+      for(auto & line : linelst) {
+        auto v = paracel::str_split(line, ',');
+        auto uid = paracel::cvt(v[0]);
+        if(W.count(uid)) {
+          auto iid = paracel::cvt(v[1]);
+          double r = std::stod(v[2]);
+          rmse += pow(r - estimate(uid, iid), 2);
+          sz ++;
+        }
+      }
+    };
+    paracel_sequential_loadall(validate_input, local_parser);
+    worker_comm.allreduce(rmse);
+    worker_comm.allreduce(sz);
+    return sqrt(rmse / sz);
+  }
+
+  void learning(double lambda) {
+    int cnt = 0;
+    for(auto & kv : W) {
+      auto uid = kv.first;
+      std::vector<double> ai_vec;
+      std::vector<std::vector<double> > H_sub_vec;
+      auto local_lambda = [&] (const node_t & a,
+                               const node_t & b,
+                               double v) {
+        if(!H.count(b)) { 
+          std::cout << a << "," << b << "," << v << std::endl;
+          throw std::runtime_error("Data error: rating data and factor data is not consistent.\n"); 
+        }
+        H_sub_vec.push_back(H[b]);
+        ai_vec.push_back(v);
+      };
+      rating_graph.traverse(uid, local_lambda);
+      Eigen::MatrixXd H_sub(H_sub_vec.size(), kdim);
+      auto ai = paracel::vec2evec(ai_vec);
+      // construct H_sub, ai
+      for(size_t i = 0; i < H_sub_vec.size(); ++i) {
+        H_sub.row(i) = Eigen::VectorXd::Map(&H_sub_vec[i][0], kdim);
+      }
+      // solve als by: inv(H_sub.transpose() * H_sub + lambda * I) * H_sub.transpose() * ai
+      auto H_sub_T = H_sub.transpose();
+      Eigen::MatrixXd I = Eigen::MatrixXd::Identity(kdim, kdim);
+      auto T1 = H_sub_T * H_sub + lambda * I;
+      auto T2 = H_sub_T * ai;
+      W[uid] = paracel::evec2vec(T1.inverse() * T2);
+      cnt += 1;
+    } // for
+  }
+
  private:
-  void learning() {}
+  inline double estimate(const node_t & uid,
+                         const node_t & iid) {
+    return paracel::dot_product(W[uid], H[iid]);
+  }
+
  private:
-  // TODO
-}; // class alternating_least_square_mem_opt 
-*/
+  std::string rating_input, factor_input;
+  std::string validate_input;
+  std::string pattern = "fmap"; // fmap(to train user factor) and smap(to train item factor)
+  int kdim = 100;
+  paracel::bigraph<node_t> rating_graph;
+  std::unordered_map<node_t, std::vector<double> > W, H;
+}; // class alternating_least_square_validate
 
 } // namespace alg
 } // namespace paracel
