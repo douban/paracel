@@ -31,6 +31,8 @@
 
 * [Decision Tree Recommendation](https://github.com/douban/paracel/tree/master/alg/recommendation/decision_tree_rec)
 
+* [Alternating Least Squares](https://github.com/douban/paracel/tree/master/alg/recommendation/als)
+
 ## Topic Modeling
 
 * [LDA](https://github.com/douban/paracel/tree/master/alg/topic_model)

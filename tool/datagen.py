@@ -36,6 +36,17 @@ def dump_data(output, sample, label, sep):
         f.write(str(label[i]) + '\n')
     f.close()
 
+def gen_als_data(output):
+    import os
+    import sys
+    if not os.path.isdir(output):
+        print 'You must specify a dictory name here.'
+        sys.exit(0)
+    cmd1 = 'wget http://paracel.io/data/als_rating.dat -O ' + os.path.join(output, 'als_rating.dat')
+    cmd2 = 'wget http://paracel.io/data/als_H.dat -O ' + os.path.join(output, 'als_H.dat')
+    os.system(cmd1)
+    os.system(cmd2)
+
 def gen_wc_data(output):
     import os
     cmd = 'wget http://paracel.io/data/kjv12.txt -O ' + output
@@ -137,8 +148,8 @@ def gen_lda_data(output, n_docs, n_topics = 10):
 
 if __name__ == '__main__':
     optpar = OptionParser()
-    optpar.add_option('-m', '--method', action = 'store', type = 'string', dest =
-                    'method', help = 'wc | classification | regression | pagerank | similarity | kmeans | lda | svd | mf...')
+    optpar.add_option('-m', '--method', action = 'store', type = 'string', dest = 'method',
+                      help = 'wc | classification | regression | pagerank | similarity | kmeans | lda | svd | mf | als...')
     optpar.add_option('-o', '--out', action = 'store', type = 'string', dest = 'output')
     optpar.add_option('-s', '--sep', action = 'store', type = 'string', dest =
                       'sep', help = "seperator, default : ','")
@@ -190,3 +201,5 @@ if __name__ == '__main__':
             gen_lda_data(options.output, options.size, options.k)
         else:
             gen_lda_data(options.output, options.size)
+    if options.method == 'als':
+        gen_als_data(options.output)

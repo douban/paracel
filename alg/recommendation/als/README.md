@@ -5,7 +5,7 @@ Alternating least square solver for user/item factors. The current version only 
 1. Enter Paracel's home directory  
 ```cd paracel;``` 
 2. Generate dataset   
-```python ./tool/datagen.py -m als -o als.dat```
+```python ./tool/datagen.py -m als -o ./data/```
 3. Set up link library path: 
 ```export LD_LIBRARY_PATH=your_paracel_install_path/lib``` 
 4. Create a json file named `cfg.json`, see example in [Parameters](#parameters) section below.
@@ -16,8 +16,8 @@ Alternating least square solver for user/item factors. The current version only 
 Default parameters are set in a JSON format file. For example, we create a cfg.json as below(modify `your_paracel_install_path`):
 
 {    
-    "rating_input" : "als_rating.dat",    
-    "factor_input" : "als_H.dat",
+    "rating_input" : "./data/als_rating.dat",    
+    "factor_input" : "./data/als_H.dat",    
     "output" : "./als_result/",   
     "pattern" : "fmap",    
     "lambda" : 0.1        
