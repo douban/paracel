@@ -132,12 +132,12 @@ class alternating_least_square_standard : public paracel::paralg {
       auto local_lambda = [&] (const node_t & a,
                                const node_t & b,
                                double v) {
-        if(!H.count(b)) { 
-          std::cout << a << "," << b << "," << v << std::endl;
-          throw std::runtime_error("Data error: rating data and factor data is not consistent.\n"); 
-        }
-        H_sub_vec.push_back(H[b]);
-        ai_vec.push_back(v);
+          if(!H.count(b)) { 
+            std::cout << a << "," << b << "," << v << std::endl;
+            throw std::runtime_error("Data error: rating data and factor data is not consistent.\n"); 
+          }
+          H_sub_vec.push_back(H[b]);
+          ai_vec.push_back(v);
       };
       rating_graph.traverse(uid, local_lambda);
       Eigen::MatrixXd H_sub(H_sub_vec.size(), kdim);
@@ -258,8 +258,10 @@ class alternating_least_square_validate : public paracel::paralg {
         if(W.count(uid)) {
           auto iid = paracel::cvt(v[1]);
           double r = std::stod(v[2]);
-          rmse += pow(r - estimate(uid, iid), 2);
-          sz ++;
+          if(H.count(iid)) {
+            rmse += pow(r - estimate(uid, iid), 2);
+            sz ++;
+          }
         }
       }
     };
