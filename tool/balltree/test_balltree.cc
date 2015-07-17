@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "balltree.h"
+#include "balltree.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -14,8 +14,8 @@ int main(int argc, char *argv[])
       {9.4, 6.8}, {9.2, 6.6}, {9.1, 6.1}, {7.9, 3.7},
       {8.8, 3.2}, {9.1, 2.7}, {8.7, 1.8}, {8.9, 1.5}
     };
-    plato::balltree<double> stree(items);
-    plato::balltree<double> stree2(items);
+    paracel::balltree<double> stree(items);
+    paracel::balltree<double> stree2(items);
     stree.build();
     std::cout << "stree built" << std::endl;
 
@@ -25,20 +25,20 @@ int main(int argc, char *argv[])
     std::cout << "load done" << std::endl;
 
     std::vector<double> tmp = {1., 2.};
-    plato::query q(tmp, 7);
+    paracel::query q(tmp, 7);
     std::vector<long> r;
-    plato::search(q, stree, r);
+    paracel::search(q, stree, r);
     for(auto & i : r) {
       std::cout << i << std::endl;
     }
     std::cout << "-------------------------------------" << std::endl;
-    plato::search(q, stree2, r);
+    paracel::search(q, stree2, r);
     for(auto & i : r) {
       std::cout << i << std::endl;
     }
     std::cout << "-------------------------------------" << std::endl;
     // linear search
-    plato::search(q, items, r);
+    paracel::search(q, items, r);
     for(auto & i : r) {
       std::cout << i << std::endl;
     }

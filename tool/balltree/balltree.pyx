@@ -6,7 +6,7 @@ from libcpp.pair cimport pair
 from libcpp.unordered_set cimport unordered_set
 from cython.operator cimport dereference as deref
 
-cdef extern from "balltree.h" namespace "plato":
+cdef extern from "balltree.hpp" namespace "paracel":
     cdef cppclass query:
         query(vector[double]) except +
         query(vector[double], int) except +
@@ -42,7 +42,7 @@ cdef class PyQuery:
     def get_whitelist(self):
         return self.thisptr.get_whitelist()
 
-cdef extern from "balltree.h" namespace "plato":
+cdef extern from "balltree.hpp" namespace "paracel":
     cdef cppclass balltree[double]:
         balltree(vector[vector[double]]) except +
         void build()
@@ -62,7 +62,7 @@ cdef class PyBalltree:
     def build_from_file(self, fn):
         self.thisptr.build_from_file(fn)
 
-cdef extern from "balltree.h" namespace "plato":
+cdef extern from "balltree.hpp" namespace "paracel":
     int search(query & q, balltree & stree, vector[long] & result)
     int search(query & q, const vector[vector[double]] & buf, vector[long] & result)
     int search(query & q, balltree & stree, vector[pair[long, double]] & result)

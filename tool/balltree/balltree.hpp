@@ -1,5 +1,19 @@
-#ifndef _PLATO_BALLTREE_H
-#define _PLATO_BALLTREE_H
+/**
+ * Copyright (c) 2014, Douban Inc. 
+ *   All rights reserved. 
+ *
+ * Distributed under the BSD License. Check out the LICENSE file for full text.
+ *
+ * Paracel - A distributed optimization framework with parameter server.
+ *
+ * Downloading
+ *   git clone https://github.com/douban/paracel.git 
+ *
+ * Authors: Hong Wu <xunzhangthu@gmail.com>
+ *
+ */
+#ifndef FILE_ea618c05_40e1_4878_b628_c33df8bffccd_HPP
+#define FILE_ea618c05_40e1_4878_b628_c33df8bffccd_HPP 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,24 +30,9 @@
 #include <fstream>
 #include <unordered_set>
 
-//#include <utils.hpp>
+#include "utils.hpp"
 
-namespace plato {
-
-std::vector<std::string>
-str_split(const std::string & str,
-          const char sep) {
-  std::vector<std::string> result;
-  size_t st = 0, en = 0;
-  while(1) {
-    en = str.find(sep, st);
-    auto s = str.substr(st, en - st);
-    if(s.size()) result.push_back(std::move(s));
-    if(en == std::string::npos) break;
-    st = en + 1;
-  }
-  return result;
-}
+namespace paracel {
 
 struct min_heap_cmp {
   inline bool operator() (const std::pair<long, double >& l,
@@ -77,7 +76,7 @@ struct query {
   query(std::vector<double> _item) : 
       lambda(std::numeric_limits<double>::lowest()), bm_indx(0), k(0) { 
     item = _item; 
-    norm = plato::norm(item);
+    norm = paracel::norm(item);
     whitelst.clear();
   }
 
@@ -85,7 +84,7 @@ struct query {
       lambda(std::numeric_limits<double>::lowest()), bm_indx(0) { 
     k = _k;
     item = _item; 
-    norm = plato::norm(item);  
+    norm = paracel::norm(item);  
     whitelst.clear();
   }
 
@@ -95,7 +94,7 @@ struct query {
     k = _k;
     item = _item;
     blacklst = _blacklst;
-    norm = plato::norm(item); 
+    norm = paracel::norm(item); 
     whitelst.clear();
   }
 
@@ -107,7 +106,7 @@ struct query {
     item = _item;
     whitelst = _whitelst;
     blacklst = _blacklst;
-    norm = plato::norm(item);
+    norm = paracel::norm(item);
   }
   int get_k() {
     return k;
@@ -242,10 +241,10 @@ struct balltree {
       std::getline(fin, indices_line);
       double radius = std::stod(line);
       std::vector<double> miu;
-      auto tmp = plato::str_split(miu_line, '|');
+      auto tmp = paracel::str_split(miu_line, '|');
       for(auto & v : tmp) miu.push_back(std::stod(v));
       std::vector<long> indices;
-      tmp = plato::str_split(indices_line, '|');
+      tmp = paracel::str_split(indices_line, '|');
       for(auto & v : tmp) indices.push_back(std::stol(v));
       p = new balltree_node(radius, miu, indices);
       load_vlr(p->left, fin);
@@ -636,6 +635,6 @@ int search(query & q,
   return static_cast<int>(result.size());
 }
 
-} // namespace plato
+} // namespace paracel 
 
 #endif
