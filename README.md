@@ -21,8 +21,8 @@ Paracel is originally motivated by Jeff Dean's [talk](http://infolab.stanford.ed
 
 More documents could be found below:
 
-Project Homepage: [paracel.io](http://paracel.io)
+[Project Homepage](http://paracel.io)
 
-20-Minutes' Tutorial: [paracel.io/docs/quick_tutorial.html](http://paracel.io/docs/quick_tutorial.html)
+[20-Minutes' Tutorial](http://paracel.io/docs/quick_tutorial.html)
 
-API Reference Page: [paracel.io/docs/api_reference.html](http://paracel.io/docs/api_reference.html)
+[API Reference Page](http://paracel.io/docs/api_reference.html)
