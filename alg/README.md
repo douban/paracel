@@ -2,7 +2,7 @@
 
 # Regression
 
-* [Ridge](https://github.com/douban/paracel/tree/master/alg/regression/ridge) : 
+* [Ridge](https://github.com/douban/paracel/tree/master/alg/regression/ridge) 
 * [Lasso(sequential)](https://github.com/douban/paracel/tree/master/tool#lasso)
 
 ## Classification
