@@ -212,6 +212,9 @@ class paralg {
                              const paracel::str_type & pattern = "fmap",
                              bool mix_flag = false) {
     // TODO: check pattern 
+    if(pattern == "fset") {
+      mix_flag = true;
+    }
     // load lines
     paracel::loader<T> ld(fn, worker_comm, parser, pattern, mix_flag);
     paracel::list_type<paracel::str_type> lines = ld.fixload();
@@ -229,6 +232,9 @@ class paralg {
                              parser_type & parser,
                              const paracel::str_type & pattern = "fmap",
                              bool mix_flag = false) {
+    if(pattern == "fset") {
+      mix_flag = true;
+    }
     // TODO: check pattern 
     // load lines
     paracel::loader<T> ld(fn, worker_comm, parser, pattern, mix_flag);
@@ -249,6 +255,9 @@ class paralg {
                              const paracel::str_type & pattern = "fmap",
                              bool mix_flag = false) {
     // TODO: check pattern 
+    if(pattern == "fset") {
+      mix_flag = true;
+    }
     // load lines
     paracel::loader<T> ld(fn, worker_comm, parser, pattern, mix_flag);
     paracel::list_type<paracel::str_type> lines = ld.fixload();
