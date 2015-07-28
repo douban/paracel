@@ -46,6 +46,6 @@ int main(int argc, char *argv[])
                                      sim_input,
                                      output);
   solver.solve();
-  //solver.dump_result();
+  solver.dump_result();
   return 0;
 }
