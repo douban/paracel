@@ -77,6 +77,7 @@ class adjust_ktop_s : public paracel::paralg {
       paracel_write(key, v);
     };
     sim_G.traverse(init_lambda);
+    paracel_sync();
 
     // learning
     cal_low_peak();
