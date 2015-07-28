@@ -68,6 +68,17 @@ class adjust_ktop_s : public paracel::paralg {
                           rating_input,
                           rating_parser_func,
                           "fmap");
+
+    // init sim_G
+    auto init_lambda = [&] (const node_t & uid,
+                            const node_t & iid,
+                            double v) {
+      std::string key = std::to_string(uid) + "_" + std::to_string(iid);
+      paracel_write(key, v);
+    };
+    sim_G.traverse(init_lambda);
+
+    // learning
     cal_low_peak();
   }
   
@@ -99,20 +110,28 @@ class adjust_ktop_s : public paracel::paralg {
     bool flag = false;
     for(size_t ktop_indx = 0; ktop_indx < ktop_list.size(); ++ktop_indx) {
       double residual = 0.;
+      //std::cout << "round: " << ktop_indx << std::endl;
       for(auto & kv : rating_G.adjacent(node)) {
         node_t i = kv.first;
         double aui = kv.second;
         node_t v = ktop_list[ktop_indx].first;
         double suv = ktop_list[ktop_indx].second;
-        if(rating_G.is_connected(v, i)) {
-          double avi = rating_G.get_wgt(v, i);
+        //std::cout << v << "!" << i << std::endl;
+        std::string key = std::to_string(v) + "_" + std::to_string(i);
+        //if(rating_G.is_connected(v, i)) {
+        if(paracel_contains(key)) {
+          //double avi = rating_G.get_wgt(v, i);
+          double avi = paracel_read<double>(key);
+          //std::cout << i << "|" << Ndict[i] << "before" << Ddict[i] << std::endl;
           Ndict[i] = Ndict[i] + avi * suv;
           Ddict[i] = Ddict[i] + suv;
+          //std::cout << i << "|" << Ndict[i] << "before" << Ddict[i] << std::endl;
         }
         if(Ndict.size() != 0 && Ddict[i] != 0) {
           residual += pow(aui - Ndict[i] / Ddict[i], 2.);
         } 
       } // for term
+      //std::cout << ktop_indx + 1 << "?" << residual << std::endl;
       if(flag == false || residual < res_min) {
         if(flag == false && residual == 0) continue;
         ktop = ktop_indx + 1;
@@ -124,6 +143,11 @@ class adjust_ktop_s : public paracel::paralg {
   }
 
   void cal_low_peak() {
+    /*
+    if(get_worker_id() == 0) {
+      std::cout << linear_search(0) << std::endl;
+    }
+    */
     auto uid_set = sim_G.left_vertex_set();
     for(auto & uid : uid_set) {
       ktop_result[uid] = linear_search(uid);
