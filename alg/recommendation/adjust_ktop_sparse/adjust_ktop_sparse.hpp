@@ -69,7 +69,7 @@ class adjust_ktop_s : public paracel::paralg {
                           rating_parser_func,
                           "fmap");
 
-    // init sim_G
+    // init rating_G 
     paracel::dict_type<std::string, double> tmp_msg;
     auto init_lambda = [&] (const node_t & uid,
                             const node_t & iid,
@@ -119,10 +119,9 @@ class adjust_ktop_s : public paracel::paralg {
         node_t v = ktop_list[ktop_indx].first;
         double suv = ktop_list[ktop_indx].second;
         std::string key = std::to_string(v) + "_" + std::to_string(i);
-        //if(rating_G.is_connected(v, i)) {
-        //  double avi = rating_G.get_wgt(v, i);
-        if(paracel_contains(key)) {
-          double avi = paracel_read<double>(key);
+        double avi = 0.;
+        bool exist = paracel_read<double>(key, avi);
+        if(exist) {
           Ndict[i] = Ndict[i] + avi * suv;
           Ddict[i] = Ddict[i] + suv;
         }
