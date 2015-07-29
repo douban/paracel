@@ -70,13 +70,15 @@ class adjust_ktop_s : public paracel::paralg {
                           "fmap");
 
     // init sim_G
+    paracel::dict_type<std::string, double> tmp_msg;
     auto init_lambda = [&] (const node_t & uid,
                             const node_t & iid,
                             double v) {
       std::string key = std::to_string(uid) + "_" + std::to_string(iid);
-      paracel_write(key, v);
+      tmp_msg[key] = v;
     };
-    sim_G.traverse(init_lambda);
+    rating_G.traverse(init_lambda);
+    paracel_write_multi(tmp_msg);
     paracel_sync();
 
     // learning
@@ -117,6 +119,8 @@ class adjust_ktop_s : public paracel::paralg {
         node_t v = ktop_list[ktop_indx].first;
         double suv = ktop_list[ktop_indx].second;
         std::string key = std::to_string(v) + "_" + std::to_string(i);
+        //if(rating_G.is_connected(v, i)) {
+        //  double avi = rating_G.get_wgt(v, i);
         if(paracel_contains(key)) {
           double avi = paracel_read<double>(key);
           Ndict[i] = Ndict[i] + avi * suv;
