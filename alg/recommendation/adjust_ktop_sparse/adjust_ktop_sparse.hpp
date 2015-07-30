@@ -111,17 +111,28 @@ class adjust_ktop_s : public paracel::paralg {
     double res_min = DBL_MAX;
     paracel::dict_type<node_t, double> Ndict, Ddict;
     bool flag = false;
+    
     for(size_t ktop_indx = 0; ktop_indx < ktop_list.size(); ++ktop_indx) {
+
       double residual = 0.;
+      node_t v = ktop_list[ktop_indx].first;
+      double suv = ktop_list[ktop_indx].second;
+      
+      std::vector<std::string> keys;
+      std::string key = std::to_string(v) + "_";
+      for(auto & kv : rating_G.adjacent(node)) {
+        keys.push_back(key + std::to_string(kv.first));
+      }
+      paracel::dict_type<std::string, double> vals;
+      paracel_read_multi(keys, vals);
+      
       for(auto & kv : rating_G.adjacent(node)) {
         node_t i = kv.first;
         double aui = kv.second;
-        node_t v = ktop_list[ktop_indx].first;
-        double suv = ktop_list[ktop_indx].second;
-        std::string key = std::to_string(v) + "_" + std::to_string(i);
         double avi = 0.;
-        bool exist = paracel_read<double>(key, avi);
-        if(exist) {
+        auto it = vals.find(key + std::to_string(i));
+        if(it != vals.end()) {
+          avi = it->second;
           Ndict[i] = Ndict[i] + avi * suv;
           Ddict[i] = Ddict[i] + suv;
         }
@@ -129,6 +140,7 @@ class adjust_ktop_s : public paracel::paralg {
           residual += pow(aui - Ndict[i] / Ddict[i], 2.);
         } 
       } // for term
+
       if(flag == false || residual < res_min) {
         if(flag == false && residual == 0) continue;
         ktop = ktop_indx + 1;

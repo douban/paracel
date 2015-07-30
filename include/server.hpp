@@ -251,6 +251,13 @@ void thrd_exec(zmq::socket_t & sock) {
       auto result = paracel::tbl_store.get_multi(key_lst);
       rep_pack_send(sock, result);
     }
+    if(indicator == "pull_multi_check") {
+      paracel::packer<paracel::list_type<paracel::str_type> > pk_l;
+      auto key_lst = pk_l.unpack(msg[1]);
+      paracel::dict_type<paracel::str_type, paracel::str_type> dct;
+      paracel::tbl_store.get_multi(key_lst, dct);
+      rep_pack_send(sock, dct);
+    }
     if(indicator == "pullall") {
       auto dct = paracel::tbl_store.getall();
       rep_pack_send(sock, dct);

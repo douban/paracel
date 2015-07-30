@@ -459,6 +459,24 @@ class paralg {
     return ps_obj->kvm[ps_obj->p_ring->get_server(key)].pull<V>(key);
   }
 
+  template <class V>
+  void paracel_read_multi(const paracel::list_type<paracel::str_type> & keys,
+                          paracel::dict_type<paracel::str_type, V> & vals) {
+    vals.clear();
+    paracel::list_type<paracel::list_type<paracel::str_type> > lst_lst(ps_obj->srv_sz);
+    for(size_t k = 0; k < keys.size(); ++k) {
+      lst_lst[ps_obj->p_ring->get_server(keys[k])].push_back(keys[k]);
+    }
+    if(ssp_switch) {
+      // TODO
+    }
+    for(size_t k = 0; k < lst_lst.size(); ++k) {
+      paracel::dict_type<paracel::str_type, V> dct;
+      ps_obj->kvm[k].pull_multi<V>(lst_lst[k], dct);
+      vals.insert(dct.begin(), dct.end());
+    }
+  }
+
   template<class V>
   paracel::list_type<V> 
   paracel_read_multi(const paracel::list_type<paracel::str_type> & keys) {

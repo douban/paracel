@@ -100,6 +100,17 @@ public:
       //}
     }
   }
+
+  void get_multi(const paracel::list_type<K> & keylst,
+                 paracel::dict_type<K, V> & valdct) {
+    valdct.clear();
+    for(auto & key : keylst) {
+      auto it = kvdct.find(key);
+      if(it != kvdct.end()) {
+        valdct[key] = it->second;
+      }
+    }
+  }
   
   // tricky: T is equal to V actually, but SFINAE works here. so use template 
   template <class T> 

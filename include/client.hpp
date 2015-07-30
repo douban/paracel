@@ -89,6 +89,16 @@ public:
     return val;
   }
 
+  template <class V, class K>
+  void pull_multi(const K & key_lst,
+                  paracel::dict_type<paracel::str_type, V> & val) {
+    if(p_pull_multi_sock == nullptr) {
+      p_pull_multi_sock.reset(create_req_sock(ports_lst[0]));
+    }
+    auto scrip = paste(paracel::str_type("pull_multi_check"), key_lst);
+    req_send_recv_dct(*p_pull_multi_sock, scrip, val);
+  }
+
   // pull all V-type-vals
   template <class V>
   paracel::dict_type<paracel::str_type, V> pullall() {
