@@ -79,12 +79,7 @@ public:
   get_multi(const paracel::list_type<K> & keylst) {
     paracel::list_type<V> valst;
     for(auto & key : keylst) {
-      //try {
       valst.push_back(kvdct.at(key));
-      //} catch (std::out_of_range& oor) {
-      //  ERROR_PRINT(oor, "get_multi error is caught");
-      //  throw oor;
-      //}
     }
     return valst;
   }
@@ -92,12 +87,7 @@ public:
   void get_multi(const paracel::list_type<K> & keylst,
                  paracel::list_type<V> & valst) {
     for(auto & key : keylst) {
-      //try {
       valst.push_back(kvdct.at(key));
-      //} catch (std::out_of_range& oor) {
-      //  ERROR_PRINT(oor, "get_multi error is caught");
-      //  throw oor;
-      //}
     }
   }
 

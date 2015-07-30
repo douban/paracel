@@ -472,7 +472,7 @@ class paralg {
     }
     for(size_t k = 0; k < lst_lst.size(); ++k) {
       paracel::dict_type<paracel::str_type, V> dct;
-      ps_obj->kvm[k].pull_multi<V>(lst_lst[k], dct);
+      ps_obj->kvm[k].pull_multi(lst_lst[k], dct);
       vals.insert(dct.begin(), dct.end());
     }
   }
