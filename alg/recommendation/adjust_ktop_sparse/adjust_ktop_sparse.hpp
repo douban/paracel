@@ -36,10 +36,12 @@ class adjust_ktop_s : public paracel::paralg {
                 std::string hosts_dct_str,
                 std::string _rating_input,
                 std::string _sim_input,
+                int _low_limit,
                 std::string _output) : 
       paracel::paralg(hosts_dct_str, comm, _output),
       rating_input(_rating_input),
-      sim_input(_sim_input) {}
+      sim_input(_sim_input),
+      low_limit(_low_limit) {}
 
   virtual ~adjust_ktop_s() {}
 
@@ -112,7 +114,7 @@ class adjust_ktop_s : public paracel::paralg {
     paracel::dict_type<node_t, double> Ndict, Ddict;
     bool flag = false;
     
-    for(size_t ktop_indx = 0; ktop_indx < ktop_list.size(); ++ktop_indx) {
+    for(size_t ktop_indx = low_limit - 1; ktop_indx < ktop_list.size(); ++ktop_indx) {
 
       double residual = 0.;
       node_t v = ktop_list[ktop_indx].first;
@@ -162,6 +164,7 @@ class adjust_ktop_s : public paracel::paralg {
  private:
   std::string rating_input;
   std::string sim_input;
+  int low_limit = 1;
   paracel::bigraph<node_t> sim_G;
   paracel::bigraph<node_t> rating_G;
   paracel::dict_type<node_t, int> ktop_result;
