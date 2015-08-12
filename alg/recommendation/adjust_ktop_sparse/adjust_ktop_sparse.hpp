@@ -67,7 +67,15 @@ class adjust_ktop_s : public paracel::paralg {
     auto local_parser_rating = [] (const std::string & line) {
       return paracel::str_split(line, ',');
     };
+    auto local_parser_rating_sfv = [] (const std::string & line) {
+      std::vector<std::string> tmp = paracel::str_split(line, ',');
+      std::vector<std::string> r({tmp[1], tmp[0], tmp[2]});
+      return r;
+    };
     auto rating_parser_func = paracel::gen_parser(local_parser_rating);
+    if(fmt == "sfv") {
+      rating_parser_func = paracel::gen_parser(local_parser_rating_sfv);
+    }
     paracel_load_as_graph(rating_G,
                           rating_input,
                           rating_parser_func,
@@ -93,12 +101,14 @@ class adjust_ktop_s : public paracel::paralg {
     auto worker_comm = get_comm();
     long long sz_sum = rating_G.e();
     worker_comm.allreduce(sz_sum);
+    worker_comm.allreduce(training_rmse);
     return sqrt(training_rmse / sz_sum);
   }
 
   double cal_original_rmse() {
     auto worker_comm = get_comm();
     long long sz_sum = rating_G.e();
+    worker_comm.allreduce(original_rmse);
     worker_comm.allreduce(sz_sum);
     return sqrt(original_rmse / sz_sum);
   }
