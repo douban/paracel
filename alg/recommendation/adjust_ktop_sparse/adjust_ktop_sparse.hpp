@@ -35,11 +35,13 @@ class adjust_ktop_s : public paracel::paralg {
   adjust_ktop_s(paracel::Comm comm,
                 std::string hosts_dct_str,
                 std::string _rating_input,
+                std::string _fmt,
                 std::string _sim_input,
                 int _low_limit,
                 std::string _output) : 
       paracel::paralg(hosts_dct_str, comm, _output),
       rating_input(_rating_input),
+      fmt(_fmt),
       sim_input(_sim_input),
       low_limit(_low_limit) {}
 
@@ -69,7 +71,7 @@ class adjust_ktop_s : public paracel::paralg {
     paracel_load_as_graph(rating_G,
                           rating_input,
                           rating_parser_func,
-                          "fmap");
+                          fmt);
 
     // init rating_G 
     paracel::dict_type<std::string, double> tmp_msg;
@@ -170,7 +172,7 @@ class adjust_ktop_s : public paracel::paralg {
   }
 
  private:
-  std::string rating_input;
+  std::string rating_input, fmt;
   std::string sim_input;
   int low_limit = 1;
   paracel::bigraph<node_t> sim_G;

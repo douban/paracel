@@ -38,12 +38,14 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   paracel::json_parser pt(FLAGS_cfg_file);
   std::string rating_input = pt.check_parse<std::string>("rating_input");
+  std::string fmt = pt.parse<std::string>("fmt");
   std::string sim_input = pt.check_parse<std::string>("sim_input");
   int low_limit = pt.parse<int>("lower bound");
   std::string output = pt.parse<std::string>("output");
   paracel::alg::adjust_ktop_s solver(comm, 
                                      FLAGS_server_info,
                                      rating_input,
+                                     fmt,
                                      sim_input,
                                      low_limit,
                                      output);
