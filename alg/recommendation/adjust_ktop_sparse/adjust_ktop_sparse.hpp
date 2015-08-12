@@ -177,6 +177,8 @@ class adjust_ktop_s : public paracel::paralg {
         flag = true;
       }
     }
+    if(res_min == DBL_MAX) res_min = 0.;
+    if(ktop == -1) return ktop_list.size();
     training_rmse += res_min;
     return ktop;
   }
