@@ -86,6 +86,13 @@ class adjust_ktop_s : public paracel::paralg {
     // learning
     cal_low_peak();
   }
+
+  double cal_rmse() {
+    auto worker_comm = get_comm();
+    long long sz_sum = rating_G.e();
+    worker_comm.allreduce(sz_sum);
+    return sqrt(training_rmse / sz_sum);
+  }
   
   void dump_result() {
     paracel::dict_type<std::string, int> dump_result;
@@ -150,6 +157,7 @@ class adjust_ktop_s : public paracel::paralg {
         flag = true;
       }
     }
+    training_rmse += res_min;
     return ktop;
   }
 
@@ -168,7 +176,7 @@ class adjust_ktop_s : public paracel::paralg {
   paracel::bigraph<node_t> sim_G;
   paracel::bigraph<node_t> rating_G;
   paracel::dict_type<node_t, int> ktop_result;
-
+  double training_rmse = 0.;
 }; // class adjust_ktop_s
 
 } // namespace alg

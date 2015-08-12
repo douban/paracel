@@ -50,5 +50,6 @@ int main(int argc, char *argv[])
                                      output);
   solver.solve();
   solver.dump_result();
+  solver.cal_rmse();
   return 0;
 }
