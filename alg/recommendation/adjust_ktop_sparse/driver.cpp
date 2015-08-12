@@ -51,6 +51,11 @@ int main(int argc, char *argv[])
                                      output);
   solver.solve();
   solver.dump_result();
-  solver.cal_rmse();
+  double base_rmse = solver.cal_original_rmse();
+  double rmse = solver.cal_rmse();
+  if(comm.get_rank() == 0) {
+    std::cout << "base rmse: " << base_rmse << std::endl;
+    std::cout << "adjust rmse: " << rmse << std::endl;
+  }
   return 0;
 }
