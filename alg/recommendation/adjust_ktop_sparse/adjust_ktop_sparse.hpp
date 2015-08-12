@@ -165,7 +165,7 @@ class adjust_ktop_s : public paracel::paralg {
     auto uid_set = sim_G.left_vertex_set();
     for(auto & uid : uid_set) {
       ktop_result[uid] = linear_search(uid);
-      std::cout << uid << ": " << ktop_result[uid] << std::endl;
+      //std::cout << uid << ": " << ktop_result[uid] << std::endl;
     }
   }
 
