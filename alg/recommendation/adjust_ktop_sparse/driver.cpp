@@ -40,7 +40,6 @@ int main(int argc, char *argv[])
   std::string rating_input = pt.check_parse<std::string>("rating_input");
   std::string sim_input = pt.check_parse<std::string>("sim_input");
   int low_limit = pt.parse<int>("lower bound");
-  std::cout << low_limit << std::endl;
   std::string output = pt.parse<std::string>("output");
   paracel::alg::adjust_ktop_s solver(comm, 
                                      FLAGS_server_info,
