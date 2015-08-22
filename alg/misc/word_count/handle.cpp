@@ -38,10 +38,11 @@ local_update(const std::unordered_map<std::string, int> & a,
   std::unordered_map<std::string, int> r(a);
   for(auto & kv : b) {
     auto key = kv.first;
-    if(r.count(key)) {
-      r[key] += kv.second;
+    auto finder = r.find(key);
+    if(finder != r.end()) {
+      finder->second += kv.second;
     } else {
-      r[key] = kv.second;
+      finder->second = kv.second;
     }
   }
   return r;

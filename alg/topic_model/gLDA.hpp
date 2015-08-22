@@ -193,9 +193,11 @@ private:
 			std::vector<int> tmp;
 			if(split(line, sep, res)){
 				for(auto it = res.begin(); it != res.end(); it++){
-					if(!word2id.count(*it)){
-						word2id[*it] = V; 
-						V++;}
+          auto finder = word2id.find(*it);
+          if(finder == word2id.end()) {
+            finder->second = V;
+						V++;
+          }
 				}
 			}
 		};
@@ -219,7 +221,8 @@ private:
 				for(auto it = res.begin(); it != res.end(); it++) {
 					auto idx = word2id[*it];
 					tmp.push_back(idx);
-					if(!local_dict.count(idx)) local_dict[idx] = 1;
+          auto finder = local_dict.find(idx);
+          if(finder == local_dict.end()) finder->second = 1;
 					T++;
 				}
 			}

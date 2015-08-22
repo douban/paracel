@@ -132,7 +132,8 @@ class alternating_least_square_standard : public paracel::paralg {
       auto local_lambda = [&] (const node_t & a,
                                const node_t & b,
                                double v) {
-          if(!H.count(b)) { 
+          auto finder = H.find(b);
+          if(finder == H.end()) {
             std::cout << a << "," << b << "," << v << std::endl;
             throw std::runtime_error("Data error: rating data and factor data is not consistent.\n"); 
           }
@@ -280,7 +281,8 @@ class alternating_least_square_validate : public paracel::paralg {
       auto local_lambda = [&] (const node_t & a,
                                const node_t & b,
                                double v) {
-        if(!H.count(b)) { 
+        auto finder = H.find(b);
+        if(finder == H.end()) {
           std::cout << a << "," << b << "," << v << std::endl;
           throw std::runtime_error("Data error: rating data and factor data is not consistent.\n"); 
         }

@@ -62,10 +62,11 @@ class pagerank : public paracel::paralg {
     auto cnt_lambda = [&] (const node_t & a,
                            const node_t & b,
                            double c) {
-      if(!kvmap.count(a)) {
-        kvmap[a] = 1.;
+      auto it = kvmap.find(a);
+      if(it == kvmap.end()) {
+        it->second = 1.;
       } else {
-        kvmap[a] += 1.;
+        it->second += 1.;
       }
     };
     local_graph.traverse(cnt_lambda);
@@ -123,9 +124,10 @@ class pagerank : public paracel::paralg {
     std::unordered_map<node_t, double> kvmap_stale;
     for(auto & kv : klstmap) {
       for(auto & kkv : kv.second) {
-        if(!kvmap_stale.count(kkv.first)) {
+        auto it = kvmap_stale.find(kkv.first);
+        if(it == kvmap_stale.end()) {
           //if(klstmap[kkv.first].size() == 0) continue;
-          kvmap_stale[kkv.first] = paracel_read<double>(paracel::cvt(kkv.first) + "_pr");
+          it->second = paracel_read<double>(paracel::cvt(kkv.first) + "_pr");
         }
       }
     }

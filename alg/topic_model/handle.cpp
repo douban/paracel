@@ -33,8 +33,9 @@ dict_update(std::unordered_map<std::string, int> & a,
 	int V = a.size();
 	for(auto it = b.begin(); it != b.end(); it++) {
 		auto word = it -> first;
-		if(!a.count(word)){
-			a[word] = V;
+    auto finder = a.find(word);
+    if(finder == a.end()) {
+			finder->second = V;
 			V++;
 		}
 	}
