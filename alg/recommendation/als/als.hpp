@@ -137,7 +137,7 @@ class alternating_least_square_standard : public paracel::paralg {
             std::cout << a << "," << b << "," << v << std::endl;
             throw std::runtime_error("Data error: rating data and factor data is not consistent.\n"); 
           }
-          H_sub_vec.push_back(H[b]);
+          H_sub_vec.push_back(finder->second);
           ai_vec.push_back(v);
       };
       rating_graph.traverse(uid, local_lambda);
@@ -286,7 +286,7 @@ class alternating_least_square_validate : public paracel::paralg {
           std::cout << a << "," << b << "," << v << std::endl;
           throw std::runtime_error("Data error: rating data and factor data is not consistent.\n"); 
         }
-        H_sub_vec.push_back(H[b]);
+        H_sub_vec.push_back(finder->second);
         ai_vec.push_back(v);
       };
       rating_graph.traverse(uid, local_lambda);
