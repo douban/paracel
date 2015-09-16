@@ -84,3 +84,8 @@ add_executable(test_packer test_packer.cpp)
 target_link_libraries(test_packer ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 add_test(NAME test_packer COMMAND test_packer)
 install(TARGETS test_packer RUNTIME DESTINATION bin/test)
+
+add_executable(test_glog test_glog.cpp)
+target_link_libraries(test_glog comm ${CMAKE_DL_LIBS})
+add_test(NAME test_glog COMMAND test_glog)
+install(TARGETS test_glog RUNTIME DESTINATION bin/test)
