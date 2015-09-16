@@ -62,9 +62,11 @@ find_package(MsgpackC REQUIRED)
 include_directories(${MsgpackC_INCLUDE_DIR})
 find_package(ZeroMQ REQUIRED)
 include_directories(${ZermMQ_INCLUDE_DIR})
+find_package(Glog REQUIRED)
+include_directories(${Glog_INCLUDE_DIR})
 
 link_libraries(${Boost_LIBRARIES} ${GFlags_LIBRARIES} ${MsgpackC_LIBRARIES}
-               ${ZeroMQ_LIBRARIES} ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES})
+               ${ZeroMQ_LIBRARIES} ${Glog_LIBRARIES} ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES})
 ##############################--make-output--###################################
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
 set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
