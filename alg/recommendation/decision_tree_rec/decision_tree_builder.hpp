@@ -305,8 +305,7 @@ class decision_tree_builder_factor : public paracel::paralg {
       return partition_id;
     }
     std::vector<double> p_i(kdim, 0.);
-    auto it = ifac.find(partition_id);
-    if(it != ifac.end()) {
+    if(ifac.count(partition_id)) {
       p_i = ifac[partition_id];
     } else {
       p_i = paracel_read<std::vector<double> >("ifac_" + std::to_string(partition_id));

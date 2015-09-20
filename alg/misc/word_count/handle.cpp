@@ -42,7 +42,7 @@ local_update(const std::unordered_map<std::string, int> & a,
     if(finder != r.end()) {
       finder->second += kv.second;
     } else {
-      finder->second = kv.second;
+      r[kv.first] = kv.second;
     }
   }
   return r;

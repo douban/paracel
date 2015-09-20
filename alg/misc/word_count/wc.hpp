@@ -24,6 +24,8 @@
 #include <algorithm>
 #include <unordered_map>
 
+#include <glog/logging.h>
+
 #include <boost/regex.hpp>
 #include <boost/algorithm/string/regex.hpp>
 
@@ -108,10 +110,12 @@ class word_count : public paracel::paralg {
     }
     paracel_sync();
     for(int k = 0; k < dct_sz; ++k) {
-      paracel_bupdate("key_" + std::to_string(k),
-                      local_vd[k],
-                      handle_file,
-                      update_function);
+      if(local_vd[k].size()) {
+        paracel_bupdate("key_" + std::to_string(k),
+                        local_vd[k],
+                        handle_file,
+                        update_function);
+      }
     }
     paracel_sync();
 
@@ -145,6 +149,19 @@ class word_count : public paracel::paralg {
       tmplst.pop();
     }   
     std::reverse(result.begin(), result.end());
+  }
+  
+  void debug() {  
+    std::vector<std::unordered_map<std::string, int> > local_vd(2);
+    if(get_worker_id() == 0) {
+      local_vd[0]["ca"] = 1;
+    } else {
+      local_vd[0]["and"] = 1;
+    }
+    paracel_sync();
+
+    paracel_bupdate("key_" + std::to_string(0), local_vd[0], handle_file, update_function);
+    paracel_sync();
   }
 
   virtual void solve() {

@@ -195,7 +195,7 @@ private:
 				for(auto it = res.begin(); it != res.end(); it++){
           auto finder = word2id.find(*it);
           if(finder == word2id.end()) {
-            finder->second = V;
+            word2id[*it] = V;
 						V++;
           }
 				}
@@ -222,7 +222,7 @@ private:
 					auto idx = word2id[*it];
 					tmp.push_back(idx);
           auto finder = local_dict.find(idx);
-          if(finder == local_dict.end()) finder->second = 1;
+          if(finder == local_dict.end()) local_dict[idx] = 1;
 					T++;
 				}
 			}

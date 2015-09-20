@@ -18,6 +18,7 @@
 
 #include <mpi.h>
 #include <google/gflags.h>
+#include <glog/logging.h>
 
 #include "wc.hpp"
 #include "utils.hpp"
@@ -32,6 +33,8 @@ int main(int argc, char *argv[])
 {
   paracel::main_env comm_main_env(argc, argv);
   paracel::Comm comm(MPI_COMM_WORLD);
+
+  google::InitGoogleLogging(argv[0]);
 
   google::SetUsageMessage("[options]\n\t--server_info\n\t--cfg_file\n");
   google::ParseCommandLineFlags(&argc, &argv, true);

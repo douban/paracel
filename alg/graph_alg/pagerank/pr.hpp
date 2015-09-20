@@ -64,7 +64,7 @@ class pagerank : public paracel::paralg {
                            double c) {
       auto it = kvmap.find(a);
       if(it == kvmap.end()) {
-        it->second = 1.;
+        kvmap[a] = 1.;
       } else {
         it->second += 1.;
       }
@@ -127,7 +127,7 @@ class pagerank : public paracel::paralg {
         auto it = kvmap_stale.find(kkv.first);
         if(it == kvmap_stale.end()) {
           //if(klstmap[kkv.first].size() == 0) continue;
-          it->second = paracel_read<double>(paracel::cvt(kkv.first) + "_pr");
+          kvmap_stale[kkv.first] = paracel_read<double>(paracel::cvt(kkv.first) + "_pr");
         }
       }
     }
