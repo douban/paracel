@@ -151,19 +151,6 @@ class word_count : public paracel::paralg {
     std::reverse(result.begin(), result.end());
   }
   
-  void debug() {  
-    std::vector<std::unordered_map<std::string, int> > local_vd(2);
-    if(get_worker_id() == 0) {
-      local_vd[0]["ca"] = 1;
-    } else {
-      local_vd[0]["and"] = 1;
-    }
-    paracel_sync();
-
-    paracel_bupdate("key_" + std::to_string(0), local_vd[0], handle_file, update_function);
-    paracel_sync();
-  }
-
   virtual void solve() {
     auto lines = paracel_load(input);
     paracel_sync();
