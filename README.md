@@ -23,6 +23,8 @@ More documents could be found below:
 
 [Project Homepage](http://paracel.io)
 
+[Quick Install](http://paracel.io/docs/api_reference.html#deployment)
+
 [20-Minutes' Tutorial](http://paracel.io/docs/quick_tutorial.html)
 
 [API Reference Page](http://paracel.io/docs/api_reference.html)
