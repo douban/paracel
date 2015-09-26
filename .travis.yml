@@ -31,6 +31,7 @@ install:
     libboost-test1.54-dev
     libzmq3-dev
     libgflags-dev
+    libgoogle-glog-dev
     mpich2
     ruby automake libtool
   - cd /tmp
