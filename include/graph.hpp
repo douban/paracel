@@ -621,6 +621,8 @@ class DFS {
  public:
   DFS(G graph, T src, F lambda) {
     dfs(graph, src, lambda);
+    std::reverse(topological_order.begin(),
+                 topological_order.end());
   }
   
   inline bool visited(const T & v) { return marked.count(v); }
@@ -629,16 +631,28 @@ class DFS {
   void dfs(G & graph, const T & v, F & func) {
     marked[v] = true;
     func(v);
+    start_time[v] = ++timer;
     for(auto & kv : graph.adjacent(v)) {
       auto w = kv.first;
       if(!marked.count(w)) {
         dfs(graph, w, func);
       }
     }
+    end_time[v] = ++timer;
+    topological_order.push_back(v);
   } // dfs
+
+  paracel::dict_type<T, int> start() { return start_time; }
+  
+  paracel::dict_type<T, int> end() { return end_time; }
+
+  std::vector<T> torder() { return topological_order; }
  
  private:
   paracel::dict_type<T, bool> marked;
+  paracel::dict_type<T, int> start_time, end_time;
+  std::vector<T> topological_order;
+  int timer = 0;
 }; // class DFS
 
 template <class G, class T, class F>
@@ -665,11 +679,9 @@ class BFS {
     while(!q.empty()) {
       T node = q.front();
       q.pop();
-      bool has_unmarked = false;
       for(auto & kv : grp.adjacent(node)) {
         auto w = kv.first;
         if(!marked.count(w)) {
-          has_unmarked = true;
           q.push(w);
           marked[w] = true;
           func(w);
