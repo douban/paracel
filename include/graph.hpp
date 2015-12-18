@@ -21,6 +21,7 @@
 #include <queue>
 #include <algorithm>
 #include <fstream>
+#include <stdexcept>
 
 #include "paracel_types.hpp"
 #include "utils.hpp"

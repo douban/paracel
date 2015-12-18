@@ -27,6 +27,8 @@
 #include <future>
 #include <algorithm>
 #include <functional>
+#include <stdexcept>
+#include <string>
 
 #include <boost/any.hpp>
 #include <boost/filesystem.hpp>
@@ -923,6 +925,16 @@ class paralg {
     // TODO
     return true;
   }
+
+  template <class T>
+  void pkl_dat(const T & m, std::string prefix = "tmp") {
+    paracel::pkl_dat_sequential(m,
+                                prefix + std::to_string(worker_comm.get_rank()) + ".pkl");
+  }
+
+  // TODO
+  template <class T, class DAT>
+  void unpkl_dat(const T & fn, DAT & dat) {}
 
   // TODO
   template <class V>

@@ -26,6 +26,7 @@
 #include <boost/test/unit_test.hpp>
 #include "utils.hpp"
 #include "test.hpp"
+#include "graph.hpp"
 #include "paracel_types.hpp"
 
 BOOST_AUTO_TEST_CASE (paracel_str_extra_test) {
@@ -70,7 +71,7 @@ BOOST_AUTO_TEST_CASE (paracel_random_test) {
     if(x * x + y * y < 1.)  incycle_cnt += 1;
   }
   std::cout << 4 * static_cast<double>(incycle_cnt) / 10000000. << std::endl;
-  
+
   for(int i = 0; i < 1000000; ++i) auto r = paracel::random_double_list(100);
 
   auto r = paracel::random_double_list(1000000);
@@ -128,7 +129,7 @@ BOOST_AUTO_TEST_CASE (eigen_common_usage_test) {
     BOOST_CHECK_EQUAL(m.row(2)[1], 6);
     BOOST_CHECK_EQUAL(m.row(2)[2], 1);
     BOOST_CHECK_EQUAL(m.IsRowMajor, true);
-    
+
     auto v = paracel::mat2vec(m);
     std::vector<double> check_v = {1, 0, 0, 4, 5, 6, 0, 0, 1};
     BOOST_CHECK_EQUAL_V(v, check_v);
@@ -142,7 +143,7 @@ BOOST_AUTO_TEST_CASE (eigen_common_usage_test) {
     Eigen::Vector3d vec(1, 2, 3);
     auto r = m.row(2) * vec;
     BOOST_CHECK_EQUAL(r, 15);
-    
+
     srand( (unsigned)time(NULL) );
     Eigen::Matrix3d mm = Eigen::Matrix3d::Random();
     std::cout << "matrix mm:" << std::endl << mm << std::endl;
@@ -170,23 +171,23 @@ BOOST_AUTO_TEST_CASE (eigen_common_usage_test) {
     BOOST_CHECK_EQUAL(mtx.col(1)[0], 0.8);
     BOOST_CHECK_EQUAL(mtx.col(1)[1], 2);
     BOOST_CHECK_EQUAL(mtx.col(1)[2], 0.5);
-    
+
     Eigen::MatrixXd::Index indx;
     (mtx.rowwise() - vech.transpose()).rowwise().squaredNorm().minCoeff(&indx);
     BOOST_CHECK_EQUAL(indx, 2);
-    
+
     auto result = mtx * vech; 
     BOOST_CHECK_EQUAL(result.row(0)[0], 1.3350000000000002);
     BOOST_CHECK_EQUAL(result.row(1)[0], 2.58);
     BOOST_CHECK_EQUAL(result.row(2)[0], 1.15);
-    
+
     mtx.row(0) *= 10;
     BOOST_CHECK_EQUAL(mtx.row(0)[0], 11);
     BOOST_CHECK_EQUAL(mtx.row(0)[1], 8);
-    
+
     Eigen::Matrix2d mmat;
     mmat << 1, 2, 
-            3, 4; 
+         3, 4; 
     Eigen::VectorXd vvec(2);
     int rr = -1, cc = -1;
     vvec << 1.1, 2.2;
@@ -198,19 +199,19 @@ BOOST_AUTO_TEST_CASE (eigen_common_usage_test) {
 }
 
 BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
-  
+
   Eigen::MatrixXd HH_global = Eigen::MatrixXd::Random(3, 3);
   std::cout << HH_global << std::endl;
   Eigen::MatrixXd HH_blk = HH_global.block(0, 0, 2, 2);
   std::cout << HH_blk << std::endl;
   std::vector<double> tHt = paracel::mat2vec(HH_blk);
   std::cout << paracel::vec2mat(tHt, 2) << std::endl;
-  
+
   Eigen::MatrixXd mtx(4, 3);
   mtx << 1., 2., 3.,
-        4., 5., 6.,
-        7., 8., 9.,
-        10., 11., 12.;
+      4., 5., 6.,
+      7., 8., 9.,
+      10., 11., 12.;
   Eigen::MatrixXd clusters_mtx(2, 3);
   std::vector<double> c1 = {2.5, 3.5, 4.5}, c2 = {8.5, 9.5, 10.5};
   clusters_mtx.row(0) = paracel::vec2evec(c1);
@@ -248,12 +249,21 @@ BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
   Eigen::SparseMatrix<double, Eigen::RowMajor> A;
   A.resize(10, 5);
   A.setFromTriplets(tpls.begin(), tpls.end());
+
+  auto vecA = paracel::mat2vec(A);
+  BOOST_CHECK_EQUAL(vecA.size(), 23);
+  auto Arev = paracel::vec2mat(vecA);
+  auto checker = [] (int ii, int jj, double ww) {
+    std::cout << ii << "|" << jj << "|" << ww << std::endl;
+  };
+  paracel::traverse_matrix(Arev, checker);
+
   Eigen::MatrixXd H(5, 3); // 5 * 3
   H << 1., 2., 3.,
-      4., 5., 6.,
-      7., 8., 9.,
-      10., 11., 12.,
-      13., 14., 15.;
+    4., 5., 6.,
+    7., 8., 9.,
+    10., 11., 12.,
+    13., 14., 15.;
   Eigen::MatrixXd W(1,1);
   W.resize(10, 3);
   W = A * H;
@@ -269,12 +279,12 @@ BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
 
   Eigen::MatrixXd AA(3, 3);
   AA <<  0.872871, -0.574833, -0.304016,
-      -0.574833, 0.827987, 0.120067,
-      -0.304016, 0.120067, 0.297787;
+     -0.574833, 0.827987, 0.120067,
+     -0.304016, 0.120067, 0.297787;
   std::cout << "The matrix AA is" << std::endl << AA << std::endl;
   Eigen::LLT<Eigen::MatrixXd> lltOfA(AA); // compute the Cholesky decomposition of A
   Eigen::MatrixXd L = lltOfA.matrixL(); // retrieve factor L  in the decomposition
-  
+
   // The previous two lines can also be written as "L = A.llt().matrixL()"
   std::cout << "The Cholesky factor L is" << std::endl << -L << std::endl;
   std::cout << "To check this, let us compute L * L.transpose()" << std::endl;
@@ -288,7 +298,7 @@ BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
   Eigen::MatrixXf U = svd.matrixU();
   Eigen::MatrixXf V = svd.matrixV();
   std::cout << SIGMA.rows() << SIGMA.cols() << U.rows() << U.cols()
-            << V.rows() << V.cols() << std::endl;
+      << V.rows() << V.cols() << std::endl;
   Eigen::MatrixXf sigmaMat = Eigen::MatrixXf::Zero(ma.rows(), ma.cols());
   sigmaMat.diagonal() = SIGMA;
 
@@ -310,17 +320,172 @@ BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
   auto kk2 = H_blk.block(2, 0, 2, 3).transpose() * H_blk.block(2, 0, 2, 3);
   Eigen::MatrixXd tt(3, 3);
   tt << 
-    kk.row(0)[0] + kk2.row(0)[0],
-    kk.row(0)[1] + kk2.row(0)[1],
-    kk.row(0)[2] + kk2.row(0)[2],
-    kk.row(1)[0] + kk2.row(1)[0],
-    kk.row(1)[1] + kk2.row(1)[1],
-    kk.row(1)[2] + kk2.row(1)[2],
-    kk.row(2)[0] + kk2.row(2)[0],
-    kk.row(2)[1] + kk2.row(2)[1],
-    kk.row(2)[2] + kk2.row(2)[2];
-                            
+      kk.row(0)[0] + kk2.row(0)[0],
+      kk.row(0)[1] + kk2.row(0)[1],
+      kk.row(0)[2] + kk2.row(0)[2],
+      kk.row(1)[0] + kk2.row(1)[0],
+      kk.row(1)[1] + kk2.row(1)[1],
+      kk.row(1)[2] + kk2.row(1)[2],
+      kk.row(2)[0] + kk2.row(2)[0],
+      kk.row(2)[1] + kk2.row(2)[1],
+      kk.row(2)[2] + kk2.row(2)[2];
+
   std::cout << tt << std::endl;
   std::cout << tt.inverse() << std::endl;
   std::cout << (H_blk.transpose() * H_blk).inverse() << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
+  { // sparse mastrix
+    typedef Eigen::Triplet<double> eigen_triple;
+    std::vector<eigen_triple> tpls;
+    tpls.push_back(eigen_triple(0, 0, 0.6));
+    tpls.push_back(eigen_triple(0, 2, 0.7));
+    tpls.push_back(eigen_triple(0, 4, 0.4));
+    tpls.push_back(eigen_triple(1, 2, 0.6));
+    tpls.push_back(eigen_triple(1, 3, 0.5));
+    tpls.push_back(eigen_triple(1, 4, 0.3));
+    tpls.push_back(eigen_triple(2, 0, 0.3));
+    tpls.push_back(eigen_triple(2, 1, 0.1));
+    tpls.push_back(eigen_triple(3, 3, 0.1));
+    tpls.push_back(eigen_triple(3, 4, 0.7));
+    tpls.push_back(eigen_triple(4, 1, 0.3));
+    tpls.push_back(eigen_triple(5, 0, 0.1));
+    tpls.push_back(eigen_triple(5, 4, 0.7));
+    tpls.push_back(eigen_triple(6, 0, 0.2));
+    tpls.push_back(eigen_triple(6, 2, 0.8));
+    tpls.push_back(eigen_triple(7, 0, 0.3));
+    tpls.push_back(eigen_triple(8, 1, 0.1));
+    tpls.push_back(eigen_triple(8, 2, 0.2));
+    tpls.push_back(eigen_triple(8, 3, 0.3));
+    tpls.push_back(eigen_triple(8, 4, 0.4));
+    tpls.push_back(eigen_triple(9, 0, 0.9));
+    tpls.push_back(eigen_triple(9, 3, 0.1));
+    tpls.push_back(eigen_triple(9, 4, 0.2));
+    Eigen::SparseMatrix<double, Eigen::RowMajor> A, Arev;
+    A.resize(10, 5);
+    A.setFromTriplets(tpls.begin(), tpls.end());
+    paracel::pkl_dat_sequential(A, "tmp.pkl");
+    paracel::unpkl_dat_sequential("tmp.pkl", Arev);
+    auto checker = [] (int ii, int jj, double ww) {
+      std::cout << ii << "|" << jj << "|" << ww << std::endl;
+    };
+    paracel::traverse_matrix(Arev, checker);
+  }
+  { // dense matrix
+    Eigen::MatrixXd H(5, 3); // 5 * 3
+    H << 1., 2., 3.,
+      4., 5., 6.,
+      7., 8., 9.,
+      10., 11., 12.,
+      13., 14., 15.;
+    paracel::pkl_dat_sequential(H, "tmp.pkl");
+    Eigen::MatrixXd Hrev;
+    paracel::unpkl_dat_sequential("tmp.pkl", Hrev, 3);
+    std::cout << H << std::endl;
+  }
+  { // undirected_graph
+    paracel::list_type<std::tuple<size_t, size_t> > edges;
+    edges.emplace_back(std::make_tuple(0, 1));
+    edges.emplace_back(std::make_tuple(0, 2));
+    edges.emplace_back(std::make_tuple(0, 5));
+    edges.emplace_back(std::make_tuple(0, 6));
+    edges.emplace_back(std::make_tuple(3, 4));
+    edges.emplace_back(std::make_tuple(3, 5));
+    edges.emplace_back(std::make_tuple(4, 5));
+    edges.emplace_back(std::make_tuple(4, 6));
+    edges.emplace_back(std::make_tuple(9, 10));
+    edges.emplace_back(std::make_tuple(9, 11));
+    edges.emplace_back(std::make_tuple(9, 12));
+    edges.emplace_back(std::make_tuple(11, 12));
+    paracel::undirected_graph<size_t> grp(edges), grp2;
+    paracel::pkl_dat_sequential(grp, "tmp.pkl");
+    paracel::unpkl_dat_sequential("tmp.pkl", grp2);
+    BOOST_CHECK_EQUAL(grp2.v(), 11);
+    BOOST_CHECK_EQUAL(grp2.e(), 12);
+    BOOST_CHECK_EQUAL(grp2.avg_degree(), 24. / 11.);
+    BOOST_CHECK_EQUAL(grp2.max_degree(), 4); 
+    BOOST_CHECK_EQUAL(grp2.selfloops(), 0); 
+  }
+  { // digraph
+    paracel::list_type<std::tuple<size_t, size_t, double> > tpls;
+    tpls.emplace_back(std::make_tuple(0, 0, 3.));
+    tpls.emplace_back(std::make_tuple(0, 2, 5.));
+    tpls.emplace_back(std::make_tuple(1, 0, 4.));
+    tpls.emplace_back(std::make_tuple(1, 1, 3.));
+    tpls.emplace_back(std::make_tuple(1, 2, 1.));
+    tpls.emplace_back(std::make_tuple(2, 0, 2.));
+    tpls.emplace_back(std::make_tuple(2, 3, 1.));
+    tpls.emplace_back(std::make_tuple(3, 1, 3.));
+    tpls.emplace_back(std::make_tuple(3, 3, 1.));
+    paracel::digraph<size_t> grp(tpls), grp2;
+    grp.add_edge(3, 4, 5.);
+    paracel::pkl_dat_sequential(grp, "tmp.pkl");
+    paracel::unpkl_dat_sequential("tmp.pkl", grp2);
+    BOOST_CHECK_EQUAL(grp2.v(), 5);
+    BOOST_CHECK_EQUAL(grp2.e(), 10);
+    BOOST_CHECK_EQUAL(grp2.outdegree(0), 2);
+    BOOST_CHECK_EQUAL(grp2.indegree(0), 3);
+    BOOST_CHECK_EQUAL(grp2.avg_degree(), 2.);
+    BOOST_CHECK_EQUAL(grp2.selfloops(), 3);
+  }
+  { // bigraph_continuous_test
+    paracel::bigraph_continuous G, G2;
+    G.add_edge(0, 1, 3.);
+    G.add_edge(0, 2, 4.);
+    G.add_edge(0, 4, 2.);
+    G.add_edge(1, 3, 5.);
+    G.add_edge(1, 4, 4.);
+    G.add_edge(1, 5, 5.);
+    G.add_edge(2, 4, 3.);
+    G.add_edge(2, 5, 1.);
+    G.add_edge(2, 6, 2.);
+    G.add_edge(3, 3, 3.);
+    paracel::pkl_dat_sequential(G, "tmp.pkl");
+    paracel::unpkl_dat_sequential("tmp.pkl", G2);
+
+    auto print_lambda = [] (paracel::default_id_type u,
+                            paracel::default_id_type v,
+                            double wgt) {
+      std::cout << u << "|" << v << "|" << wgt <<
+          std::endl;
+    };  
+    G2.traverse(print_lambda);
+    G2.traverse(0, print_lambda);
+
+    BOOST_CHECK_EQUAL(G2.v(), 4); 
+    BOOST_CHECK_EQUAL(G2.e(), 10);
+    BOOST_CHECK_EQUAL(G2.outdegree(0), 3); 
+    BOOST_CHECK_EQUAL(G2.indegree(5), 2);
+  }
+  { // bigraph
+    paracel::list_type<std::tuple<std::string, std::string, double> > tpls;
+    tpls.emplace_back(std::make_tuple("a", "A", 3.));
+    tpls.emplace_back(std::make_tuple("a", "B", 4.));
+    tpls.emplace_back(std::make_tuple("a", "D", 2.));
+    tpls.emplace_back(std::make_tuple("b", "C", 5.));
+    tpls.emplace_back(std::make_tuple("b", "D", 4.));
+    tpls.emplace_back(std::make_tuple("c", "D", 3.));
+    tpls.emplace_back(std::make_tuple("b", "E", 5.));
+    tpls.emplace_back(std::make_tuple("c", "E", 1.));
+    tpls.emplace_back(std::make_tuple("c", "F", 2.));
+    tpls.emplace_back(std::make_tuple("d", "C", 3.));
+    paracel::bigraph<std::string> grp(tpls), grp2;
+    grp.add_edge("c", "G", 3.6);
+
+    paracel::pkl_dat_sequential(grp, "tmp.pkl");
+    paracel::unpkl_dat_sequential("tmp.pkl", grp2);
+    auto print_lambda = [] (std::string u,
+                            std::string v, double
+                            wgt) {
+      std::cout << u << "|" << v << "|" << wgt
+          << std::endl;
+    };
+    grp2.traverse(print_lambda);
+    grp2.traverse("c", print_lambda);
+    BOOST_CHECK_EQUAL(grp2.v(), 4);
+    BOOST_CHECK_EQUAL(grp2.e(), 11);
+    BOOST_CHECK_EQUAL(grp2.outdegree("a"), 3);
+    BOOST_CHECK_EQUAL(grp2.indegree("E"), 2);
+  }
 }

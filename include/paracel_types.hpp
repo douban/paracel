@@ -30,6 +30,8 @@
 #include <set>
 #include <future>
 
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Sparse>
 #include <mpi.h>
 #include <msgpack.hpp>
 //#include <msgpack/type/tr1/unordered_map.hpp>
@@ -70,6 +72,9 @@ struct is_comm_builtin : std::false_type {};
 template <class T>
 struct is_comm_container : std::false_type {};
 
+template <class T>
+struct is_matrix : std::false_type {};
+
 #define PARACEL_REGISTER_ATOM(T)  \
   template <>  \
   struct is_atomic<T> : std::true_type {  \
@@ -95,6 +100,11 @@ struct is_comm_container : std::false_type {};
     static MPI_Datatype datatype() {  \
       return Dtype;  \
     }  \
+  }  \
+
+#define PARACEL_REGISTER_MATRIX(T)  \
+  template <>  \
+  struct is_matrix<T> : std::true_type {  \
   }  \
 
 template <class T>
@@ -159,6 +169,11 @@ PARACEL_REGISTER_COMM_CONTAINER(std::vector< std::vector<double> >, MPI_DOUBLE);
 PARACEL_REGISTER_COMM_CONTAINER(std::vector< std::vector<unsigned> >, MPI_UNSIGNED);
 PARACEL_REGISTER_COMM_CONTAINER(std::vector< std::vector<unsigned long> >, MPI_UNSIGNED_LONG);
 PARACEL_REGISTER_COMM_CONTAINER(std::vector< std::vector<unsigned long long> >, MPI_UNSIGNED_LONG_LONG);
+
+// for pickle usage
+PARACEL_REGISTER_MATRIX(Eigen::MatrixXd);
+using SMTX = Eigen::SparseMatrix<double, Eigen::RowMajor>;
+PARACEL_REGISTER_MATRIX(SMTX);
 
 // paracel use the portable uint64_t type for default node id, you can substitute here
 // using default_id_type = unsigned long long;

@@ -48,6 +48,8 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     obj.pack(s);
     auto r = obj.unpack(s);
     BOOST_CHECK_EQUAL(r, 1);
+    paracel::packer<bool> obj2;
+    BOOST_CHECK_EQUAL(obj2.unpack(s), 1);
   }
   {
     paracel::packer<bool> obj(false);
