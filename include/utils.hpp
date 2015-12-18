@@ -361,7 +361,6 @@ pkl_dat_sequential(const DAT & dat, std::string file) {
   paracel::packer<DAT> pk(dat);
   pk.pack(buff);
   os << buff;
-  std::cout << buff.size() << std::endl;
   os.close();
 }
 
