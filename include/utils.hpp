@@ -23,6 +23,8 @@
 #include <queue>
 #include <fstream>
 #include <stdexcept>
+#include <algorithm>
+#include <streambuf>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -37,6 +39,7 @@
 #include "utils/ext_utility.hpp"
 #include "utils/func_utility.hpp"
 
+#include "packer.hpp"
 #include "paracel_types.hpp"
 
 #define ERROR_PRINT(ERR, INFO) {  \
@@ -128,9 +131,9 @@ random_double_list(size_t len, double upper_bnd = 1.) {
 }
 
 struct json_parser {
-private:
+ private:
   boost::property_tree::ptree *pt;
-public:
+ public:
   json_parser(paracel::str_type fn) {
     pt = new boost::property_tree::ptree;
     boost::property_tree::json_parser::read_json(fn, *pt);
@@ -139,45 +142,72 @@ public:
     delete pt;
   }
   template <class T>
-  T parse(const paracel::str_type & key) {
-    return pt->get<T>(key);
+T parse(const paracel::str_type & key) {
+  return pt->get<T>(key);
+}
+template <class T>
+T check_parse(const paracel::str_type & key) {
+  auto rr = pt->get<T>(key);
+  T r = paracel::expand(rr).back();
+  if(paracel::isfile(r) || paracel::isdir(r)) {
+    return rr;
+  } else {
+    std::cerr << r << ": not exist as a file or directory." << std::endl;
+    throw std::invalid_argument("file or directory not exist.\n");
   }
-  template <class T>
-  T check_parse(const paracel::str_type & key) {
-    auto rr = pt->get<T>(key);
-    T r = paracel::expand(rr).back();
-    if(paracel::isfile(r) || paracel::isdir(r)) {
-      return rr;
+}
+template <class T>
+paracel::list_type<T> parse_v(const paracel::str_type & key) {
+  paracel::list_type<T> r;
+  for(auto & v : pt->get_child(key)) {
+    auto tmp = v.second.get_value<T>();
+    r.push_back(tmp);
+  }
+  return r;
+}
+template <class T>
+paracel::list_type<T> check_parse_v(const paracel::str_type & key) {
+  paracel::list_type<T> r;
+  for(auto & v : pt->get_child(key)) {
+    T tmp1 = v.second.get_value<T>();
+    T tmp2 = paracel::expand(tmp1).back();
+    if(paracel::isfile(tmp2) || paracel::isdir(tmp2)) {
+      r.push_back(tmp1);
     } else {
-      std::cerr << r << ": not exist as a file or directory." << std::endl;
+      std::cerr << tmp1 << ": not exist as a file or directory." << std::endl;
       throw std::invalid_argument("file or directory not exist.\n");
     }
-  }
-  template <class T>
-  paracel::list_type<T> parse_v(const paracel::str_type & key) {
-    paracel::list_type<T> r;
-    for(auto & v : pt->get_child(key)) {
-      auto tmp = v.second.get_value<T>();
-      r.push_back(tmp);
-    }
-    return r;
-  }
-  template <class T>
-  paracel::list_type<T> check_parse_v(const paracel::str_type & key) {
-    paracel::list_type<T> r;
-    for(auto & v : pt->get_child(key)) {
-      T tmp1 = v.second.get_value<T>();
-      T tmp2 = paracel::expand(tmp1).back();
-      if(paracel::isfile(tmp2) || paracel::isdir(tmp2)) {
-        r.push_back(tmp1);
-      } else {
-        std::cerr << tmp1 << ": not exist as a file or directory." << std::endl;
-        throw std::invalid_argument("file or directory not exist.\n");
-      }
-    } // for
-    return r;
-  }
+  } // for
+  return r;
+}
 };
+
+template <class F>
+void traverse_matrix(Eigen::SparseMatrix<double, Eigen::RowMajor> & m, 
+                     F & func) {
+  for(int k = 0; k < m.outerSize(); ++k) {
+    for(Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(m, k); it; ++it) {
+      func(it.row(), it.col(), it.valueRef());
+    }
+  }
+}
+
+template <class F>
+void traverse_matrix(const Eigen::SparseMatrix<double, Eigen::RowMajor> & m, 
+                     F & func) {
+  for(int k = 0; k < m.outerSize(); ++k) {
+    for(Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(m, k); it; ++it) {
+      func(it.row(), it.col(), it.value());
+    }
+  }
+}
+
+template <class F>
+void traverse_vector(Eigen::SparseVector<double> & v, F & func) {
+  for(Eigen::SparseVector<double>::InnerIterator it(v); it; ++it) {
+    func(it.index(), it.value());
+  }
+}
 
 // std::vector to Eigen::VectorXd
 Eigen::VectorXd vec2evec(const std::vector<double> & v) {
@@ -209,22 +239,32 @@ Eigen::MatrixXd vec2mat(const std::vector<double> & v,
   return Eigen::MatrixXd::Map(&v[0], rows, cols);
 }
 
-template <class F>
-void traverse_matrix(Eigen::SparseMatrix<double, Eigen::RowMajor> & m, 
-                     F & func) {
-  for(int k = 0; k < m.outerSize(); ++k) {
-    for(Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(m, k); it; ++it) {
-      //func(it.row(), it.col(), it.value());
-      func(it.row(), it.col(), it.valueRef());
-    }
-  }
+std::vector<std::pair<std::pair<int, int>, double> > 
+mat2vec(const Eigen::SparseMatrix<double, Eigen::RowMajor> & m) {
+  std::vector<std::pair<std::pair<int, int>, double> > v;
+  auto f = [&] (int r, int c, double w) {
+    v.push_back(std::make_pair(std::make_pair(r, c), w));
+  };
+  traverse_matrix(m, f);
+  return v;
 }
 
-template <class F>
-void traverse_vector(Eigen::SparseVector<double> & v, F & func) {
-  for(Eigen::SparseVector<double>::InnerIterator it(v); it; ++it) {
-    func(it.index(), it.value());
+Eigen::SparseMatrix<double, Eigen::RowMajor>
+vec2mat(std::vector<std::pair<std::pair<int, int>, double> > & v) {
+  typedef Eigen::Triplet<double> eigen_triple;
+  std::vector<eigen_triple> tpls;
+  int rows = INT_MIN, cols = INT_MIN;
+  for(auto & tpl : v) {
+    rows = std::max(rows, tpl.first.first + 1);
+    cols = std::max(cols, tpl.first.second + 1);
+    tpls.push_back(eigen_triple(tpl.first.first,
+                                tpl.first.second,
+                                tpl.second));
   }
+  Eigen::SparseMatrix<double, Eigen::RowMajor> m;
+  m.resize(rows, cols);
+  m.setFromTriplets(tpls.begin(), tpls.end());
+  return m;
 }
 
 template <class K, class V>
@@ -264,6 +304,10 @@ std::vector<T> tail(const std::string & filename,
   buffer.resize(k);
   int cur = 0;
   std::ifstream f(filename);
+  if(!f) {
+    throw std::runtime_error("open file error in paracel::tail");
+  }
+
   std::string line;
   while(std::getline(f, line)) {
     if(cur == k) cur = 0;
@@ -287,6 +331,79 @@ std::string cvt(paracel::default_id_type id) {
 bool wait(paracel::async_functor_type & _future) {
   _future.wait();
   return _future.get();
+}
+
+template <class DAT> 
+paracel::Enable_if<paracel::is_matrix<DAT>::value>
+pkl_dat_sequential(const DAT & m, std::string file) {
+  std::ofstream os;  
+  os.open(file);
+  if(os.fail()) {
+    throw std::runtime_error("open pkl dst file error.\n");
+  }    
+  std::string buff; buff.resize(0);
+  auto vdat = paracel::mat2vec(m);
+  paracel::packer<decltype(vdat)> pk(vdat);
+  pk.pack(buff);
+  os << buff;
+  os.close();
+}
+
+template <class DAT> 
+paracel::Enable_if<!paracel::is_matrix<DAT>::value>
+pkl_dat_sequential(const DAT & dat, std::string file) {
+  std::ofstream os;  
+  os.open(file);
+  if(os.fail()) {
+    throw std::runtime_error("open pkl dst file error.\n");
+  }    
+  std::string buff; buff.resize(0);
+  paracel::packer<DAT> pk(dat);
+  pk.pack(buff);
+  os << buff;
+  os.close();
+}
+
+void unpkl_dat_sequential(std::string file,
+                          Eigen::MatrixXd & dat,
+                          size_t cols) {
+  std::ifstream fs(file);
+  if(!fs) {
+    throw std::runtime_error("open pkl src file error.\n");
+  }
+  std::string buff((std::istreambuf_iterator<char>(fs)),
+                   std::istreambuf_iterator<char>());
+  fs.close();
+  paracel::packer<std::vector<double>> pk;
+  auto tmp = pk.unpack(buff);
+  dat = paracel::vec2mat(tmp, cols);
+}
+
+void unpkl_dat_sequential(std::string file,
+                          Eigen::SparseMatrix<double, Eigen::RowMajor> & dat) {
+  std::ifstream fs(file);
+  if(!fs) {
+    throw std::runtime_error("open pkl src file error.\n");
+  }
+  std::string buff((std::istreambuf_iterator<char>(fs)),
+                   std::istreambuf_iterator<char>());
+  fs.close();
+  paracel::packer<std::vector<std::pair<std::pair<int, int>, double>>> pk;
+  auto tmp = pk.unpack(buff);
+  dat = paracel::vec2mat(tmp);
+}
+
+template <class DAT>
+void unpkl_dat_sequential(std::string file, DAT & dat) {
+  std::ifstream fs(file);
+  if(!fs) {
+    throw std::runtime_error("open pkl src file error.\n");
+  }
+  std::string buff((std::istreambuf_iterator<char>(fs)),
+                   std::istreambuf_iterator<char>());
+  fs.close();
+  paracel::packer<DAT> pk;
+  dat = pk.unpack(buff);
 }
 
 } // namespace paracel
