@@ -249,12 +249,8 @@ BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
   Eigen::SparseMatrix<double, Eigen::RowMajor> A;
   A.resize(10, 5);
   A.setFromTriplets(tpls.begin(), tpls.end());
-
   auto vecA = paracel::mat2vec(A);
-  BOOST_CHECK_EQUAL(vecA.size(), 23);
-  auto Arev = paracel::vec2mat(vecA);
-  BOOST_CHECK_EQUAL_M(A, Arev);
-
+  BOOST_CHECK_EQUAL_M(A, paracel::vec2mat(vecA));
   Eigen::MatrixXd H(5, 3); // 5 * 3
   H << 1., 2., 3.,
     4., 5., 6.,
@@ -317,6 +313,7 @@ BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
   auto kk2 = H_blk.block(2, 0, 2, 3).transpose() * H_blk.block(2, 0, 2, 3);
   Eigen::MatrixXd tt(3, 3);
   tt << 
+      kk.row(0)[1] + kk2.row(0)[1],
       kk.row(0)[1] + kk2.row(0)[1],
       kk.row(0)[2] + kk2.row(0)[2],
       kk.row(1)[0] + kk2.row(1)[0],
