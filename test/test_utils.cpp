@@ -253,10 +253,7 @@ BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
   auto vecA = paracel::mat2vec(A);
   BOOST_CHECK_EQUAL(vecA.size(), 23);
   auto Arev = paracel::vec2mat(vecA);
-  auto checker = [] (int ii, int jj, double ww) {
-    std::cout << ii << "|" << jj << "|" << ww << std::endl;
-  };
-  paracel::traverse_matrix(Arev, checker);
+  BOOST_CHECK_EQUAL_M(A, Arev);
 
   Eigen::MatrixXd H(5, 3); // 5 * 3
   H << 1., 2., 3.,
@@ -320,7 +317,6 @@ BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
   auto kk2 = H_blk.block(2, 0, 2, 3).transpose() * H_blk.block(2, 0, 2, 3);
   Eigen::MatrixXd tt(3, 3);
   tt << 
-      kk.row(0)[0] + kk2.row(0)[0],
       kk.row(0)[1] + kk2.row(0)[1],
       kk.row(0)[2] + kk2.row(0)[2],
       kk.row(1)[0] + kk2.row(1)[0],
@@ -336,7 +332,7 @@ BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
 }
 
 BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
-  { // sparse mastrix
+  { // sparse matrix
     typedef Eigen::Triplet<double> eigen_triple;
     std::vector<eigen_triple> tpls;
     tpls.push_back(eigen_triple(0, 0, 0.6));
@@ -365,12 +361,9 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     Eigen::SparseMatrix<double, Eigen::RowMajor> A, Arev;
     A.resize(10, 5);
     A.setFromTriplets(tpls.begin(), tpls.end());
-    paracel::pkl_dat_sequential(A, "tmp.pkl");
-    paracel::unpkl_dat_sequential("tmp.pkl", Arev);
-    auto checker = [] (int ii, int jj, double ww) {
-      std::cout << ii << "|" << jj << "|" << ww << std::endl;
-    };
-    paracel::traverse_matrix(Arev, checker);
+    paracel::pkl_dat_sequential(A, "/var/tmp/test.pkl");
+    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", Arev);
+    BOOST_CHECK_EQUAL_M(A, Arev);
   }
   { // dense matrix
     Eigen::MatrixXd H(5, 3); // 5 * 3
@@ -379,10 +372,10 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
       7., 8., 9.,
       10., 11., 12.,
       13., 14., 15.;
-    paracel::pkl_dat_sequential(H, "tmp.pkl");
+    paracel::pkl_dat_sequential(H, "/var/tmp/test.pkl");
     Eigen::MatrixXd Hrev;
-    paracel::unpkl_dat_sequential("tmp.pkl", Hrev, 3);
-    std::cout << H << std::endl;
+    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", Hrev, 3);
+    BOOST_CHECK_EQUAL_M(H, Hrev);
   }
   { // undirected_graph
     paracel::list_type<std::tuple<size_t, size_t> > edges;
@@ -399,8 +392,8 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     edges.emplace_back(std::make_tuple(9, 12));
     edges.emplace_back(std::make_tuple(11, 12));
     paracel::undirected_graph<size_t> grp(edges), grp2;
-    paracel::pkl_dat_sequential(grp, "tmp.pkl");
-    paracel::unpkl_dat_sequential("tmp.pkl", grp2);
+    paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
+    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
     BOOST_CHECK_EQUAL(grp2.v(), 11);
     BOOST_CHECK_EQUAL(grp2.e(), 12);
     BOOST_CHECK_EQUAL(grp2.avg_degree(), 24. / 11.);
@@ -420,8 +413,8 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     tpls.emplace_back(std::make_tuple(3, 3, 1.));
     paracel::digraph<size_t> grp(tpls), grp2;
     grp.add_edge(3, 4, 5.);
-    paracel::pkl_dat_sequential(grp, "tmp.pkl");
-    paracel::unpkl_dat_sequential("tmp.pkl", grp2);
+    paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
+    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
     BOOST_CHECK_EQUAL(grp2.v(), 5);
     BOOST_CHECK_EQUAL(grp2.e(), 10);
     BOOST_CHECK_EQUAL(grp2.outdegree(0), 2);
@@ -441,18 +434,8 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     G.add_edge(2, 5, 1.);
     G.add_edge(2, 6, 2.);
     G.add_edge(3, 3, 3.);
-    paracel::pkl_dat_sequential(G, "tmp.pkl");
-    paracel::unpkl_dat_sequential("tmp.pkl", G2);
-
-    auto print_lambda = [] (paracel::default_id_type u,
-                            paracel::default_id_type v,
-                            double wgt) {
-      std::cout << u << "|" << v << "|" << wgt <<
-          std::endl;
-    };  
-    G2.traverse(print_lambda);
-    G2.traverse(0, print_lambda);
-
+    paracel::pkl_dat_sequential(G, "/var/tmp/test.pkl");
+    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", G2);
     BOOST_CHECK_EQUAL(G2.v(), 4); 
     BOOST_CHECK_EQUAL(G2.e(), 10);
     BOOST_CHECK_EQUAL(G2.outdegree(0), 3); 
@@ -473,16 +456,8 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     paracel::bigraph<std::string> grp(tpls), grp2;
     grp.add_edge("c", "G", 3.6);
 
-    paracel::pkl_dat_sequential(grp, "tmp.pkl");
-    paracel::unpkl_dat_sequential("tmp.pkl", grp2);
-    auto print_lambda = [] (std::string u,
-                            std::string v, double
-                            wgt) {
-      std::cout << u << "|" << v << "|" << wgt
-          << std::endl;
-    };
-    grp2.traverse(print_lambda);
-    grp2.traverse("c", print_lambda);
+    paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
+    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
     BOOST_CHECK_EQUAL(grp2.v(), 4);
     BOOST_CHECK_EQUAL(grp2.e(), 11);
     BOOST_CHECK_EQUAL(grp2.outdegree("a"), 3);
