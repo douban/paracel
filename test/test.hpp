@@ -22,20 +22,23 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
 #include <boost/test/unit_test.hpp>
+
 #include "utils.hpp"
+#include "graph.hpp"
 
 #define TOL 1e-7
 
-#define BOOST_CHECK_EQUAL_V(a, b) equal_check_v(a, b)
-#define BOOST_CHECK_EQUAL_D(a, b) equal_check_d(a, b)
-#define BOOST_CHECK_EQUAL_M(a, b) equal_check_m(a, b)
+#define PARACEL_CHECK_EQUAL(a, b) equal_check(a, b)
+#define PARACEL_CHECK_CLOSE(a, b) close_check(a, b)
 
-#define BOOST_CHECK_CLOSE_V(a, b) close_check_v(a, b)
-#define BOOST_CHECK_CLOSE_M(a, b) close_check_m(a, b)
+template <class T, class U>
+void equal_check(T a, U b) {
+  BOOST_CHECK_EQUAL(a, b);
+}
 
 template <class V>
-void equal_check_v(std::vector<V> a,
-                   std::vector<V> b) {
+void equal_check(std::vector<V> a,
+                 std::vector<V> b) {
   BOOST_CHECK_EQUAL(a.size(), b.size());
   for(size_t i = 0; i < a.size(); ++i) {
     BOOST_CHECK_EQUAL(a[i], b[i]);
@@ -43,8 +46,8 @@ void equal_check_v(std::vector<V> a,
 }
 
 template <class K, class V>
-void equal_check_d(std::unordered_map<K, V> a,
-                   std::unordered_map<K, V> b) {
+void equal_check(std::unordered_map<K, V> a,
+                 std::unordered_map<K, V> b) {
   BOOST_CHECK_EQUAL(a.size(), b.size());
   for(auto & kv : a) {
     BOOST_CHECK(b.count(kv.first));
@@ -52,12 +55,13 @@ void equal_check_d(std::unordered_map<K, V> a,
   }
 }
 
-void equal_check_m(Eigen::MatrixXd a, Eigen::MatrixXd b) {
-  equal_check_v(paracel::mat2vec(a), paracel::mat2vec(b));
+void equal_check(Eigen::MatrixXd a,
+                 Eigen::MatrixXd b) {
+  equal_check(paracel::mat2vec(a), paracel::mat2vec(b));
 }
 
-void equal_check_m(Eigen::SparseMatrix<double, Eigen::RowMajor> a,
-                   Eigen::SparseMatrix<double, Eigen::RowMajor> b) {
+void equal_check(Eigen::SparseMatrix<double, Eigen::RowMajor> a,
+                 Eigen::SparseMatrix<double, Eigen::RowMajor> b) {
   BOOST_CHECK_EQUAL(a.rows(), b.rows());
   BOOST_CHECK_EQUAL(a.cols(), b.cols());
   std::vector<std::tuple<int, int, double>> d;
@@ -75,21 +79,68 @@ void equal_check_m(Eigen::SparseMatrix<double, Eigen::RowMajor> a,
   paracel::traverse_matrix(b, checker);
 }
 
+template <class T>
+void equal_check(paracel::undirected_graph<T> a,
+                 paracel::undirected_graph<T> b) {
+  BOOST_CHECK_EQUAL(a.v(), b.v());
+  BOOST_CHECK_EQUAL(a.e(), b.e());
+  BOOST_CHECK_EQUAL(a.degree(), b.degree());
+  BOOST_CHECK_EQUAL(a.avg_degree(), b.avg_degree());
+  BOOST_CHECK_EQUAL(a.max_degree(), b.max_degree());
+  BOOST_CHECK_EQUAL(a.selfloops(), b.selfloops());
+  PARACEL_CHECK_EQUAL(a.get_data(), b.get_data());
+}
+
+template <class T>
+void equal_check(paracel::digraph<T> a,
+                 paracel::digraph<T> b) {
+  BOOST_CHECK_EQUAL(a.v(), b.v());
+  BOOST_CHECK_EQUAL(a.e(), b.e());
+  BOOST_CHECK_EQUAL(a.outdegree(), b.outdegree());
+  BOOST_CHECK_EQUAL(a.indegree(), b.indegree());
+  BOOST_CHECK_EQUAL(a.avg_degree(), b.avg_degree());
+  BOOST_CHECK_EQUAL(a.selfloops(), b.selfloops());
+  PARACEL_CHECK_EQUAL(a.get_data(), b.get_data());
+}
+
+template <class T>
+void equal_check(paracel::bigraph<T> a,
+                 paracel::bigraph<T> b) {
+  BOOST_CHECK_EQUAL(a.v(), b.v());
+  BOOST_CHECK_EQUAL(a.e(), b.e());
+  BOOST_CHECK_EQUAL(a.avg_degree(), b.avg_degree());
+  BOOST_CHECK_EQUAL(a.outdegree(), b.outdegree());
+  BOOST_CHECK_EQUAL(a.indegree(), b.indegree());
+  PARACEL_CHECK_EQUAL(a.get_data(), b.get_data());
+}
+
+void equal_check(paracel::bigraph_continuous a,
+                 paracel::bigraph_continuous b) {
+  BOOST_CHECK_EQUAL(a.v(), b.v());
+  BOOST_CHECK_EQUAL(a.e(), b.e());
+}
+
+template <class T>
+void close_check(T a, T b) {
+  BOOST_CHECK_CLOSE(a, b, TOL);  
+}
+
 template <class V>
-void close_check_v(std::vector<V> a,
-                   std::vector<V> b) {
+void close_check(std::vector<V> a,
+                 std::vector<V> b) {
   BOOST_CHECK_EQUAL(a.size(), b.size());
   for(size_t i = 0; i < a.size(); ++i) {
     BOOST_CHECK_CLOSE(a[i], b[i], TOL);
   }
 }
 
-void close_check_m(Eigen::MatrixXd a, Eigen::MatrixXd b) {
-  close_check_v(paracel::mat2vec(a), paracel::mat2vec(b));
+void close_check(Eigen::MatrixXd a,
+                 Eigen::MatrixXd b) {
+  close_check(paracel::mat2vec(a), paracel::mat2vec(b));
 }
 
-void close_check_m(Eigen::SparseMatrix<double, Eigen::RowMajor> a,
-                   Eigen::SparseMatrix<double, Eigen::RowMajor> b) {
+void close_check(Eigen::SparseMatrix<double, Eigen::RowMajor> a,
+                 Eigen::SparseMatrix<double, Eigen::RowMajor> b) {
   BOOST_CHECK_EQUAL(a.rows(), b.rows());
   BOOST_CHECK_EQUAL(a.cols(), b.cols());
   std::vector<std::tuple<int, int, double>> d;

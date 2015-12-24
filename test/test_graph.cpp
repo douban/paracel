@@ -23,6 +23,7 @@
 #include <boost/test/unit_test.hpp>
 #include "graph.hpp"
 #include "paracel_types.hpp"
+#include "test.hpp"
 
 BOOST_AUTO_TEST_CASE (bigraph_test) {
   
@@ -59,10 +60,10 @@ BOOST_AUTO_TEST_CASE (bigraph_test) {
   paracel::dict_type<std::string, paracel::dict_type<std::string, double> > dump_dict;
   grp.dump2dict(dump_dict);
 
-  BOOST_CHECK_EQUAL(grp.v(), 4);
-  BOOST_CHECK_EQUAL(grp.e(), 11);
-  BOOST_CHECK_EQUAL(grp.outdegree("a"), 3);
-  BOOST_CHECK_EQUAL(grp.indegree("E"), 2);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.v()), 4);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.e()), 11);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.outdegree("a")), 3);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.indegree("E")), 2);
 
   auto adj_info = grp.adjacent("c");
 }
@@ -87,10 +88,10 @@ BOOST_AUTO_TEST_CASE (bigraph_continuous_test) {
   G.traverse(print_lambda);
   G.traverse(0, print_lambda);
 
-  BOOST_CHECK_EQUAL(G.v(), 4);
-  BOOST_CHECK_EQUAL(G.e(), 10);
-  BOOST_CHECK_EQUAL(G.outdegree(0), 3);
-  BOOST_CHECK_EQUAL(G.indegree(5), 2);
+  PARACEL_CHECK_EQUAL(static_cast<int>(G.v()), 4);
+  PARACEL_CHECK_EQUAL(static_cast<int>(G.e()), 10);
+  PARACEL_CHECK_EQUAL(static_cast<int>(G.outdegree(0)), 3);
+  PARACEL_CHECK_EQUAL(static_cast<int>(G.indegree(5)), 2);
 
   auto adj_info = G.adjacent(2);
 
@@ -109,9 +110,9 @@ BOOST_AUTO_TEST_CASE (digraph_test) {
   tpls.emplace_back(std::make_tuple(3, 3, 1.));
   paracel::digraph<size_t> grp(tpls);
   paracel::digraph<size_t> grp2;
-  BOOST_CHECK_EQUAL(grp2.v(), 0);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp2.v()), 0);
   grp2.construct_from_triples(tpls);
-  BOOST_CHECK_EQUAL(grp2.v(), 4);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp2.v()), 4);
 
   grp.add_edge(3, 4, 5.);
 
@@ -134,20 +135,20 @@ BOOST_AUTO_TEST_CASE (digraph_test) {
   paracel::dict_type<size_t, paracel::dict_type<size_t, double> > dump_dict;
   grp.dump2dict(dump_dict);
 
-  BOOST_CHECK_EQUAL(grp.v(), 5);
-  BOOST_CHECK_EQUAL(grp.e(), 10);
-  BOOST_CHECK_EQUAL(grp.outdegree(0), 2);
-  BOOST_CHECK_EQUAL(grp.indegree(0), 3);
-  BOOST_CHECK_EQUAL(grp.avg_degree(), 2.);
-  BOOST_CHECK_EQUAL(grp.selfloops(), 3);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.v()), 5);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.e()), 10);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.outdegree(0)), 2);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.indegree(0)), 3);
+  PARACEL_CHECK_EQUAL(grp.avg_degree(), 2.);
+  PARACEL_CHECK_EQUAL(grp.selfloops(), 3);
 
   grp.reverse();
-  BOOST_CHECK_EQUAL(grp.v(), 5);
-  BOOST_CHECK_EQUAL(grp.e(), 10);
-  BOOST_CHECK_EQUAL(grp.outdegree(0), 3);
-  BOOST_CHECK_EQUAL(grp.indegree(0), 2);
-  BOOST_CHECK_EQUAL(grp.avg_degree(), 2.);
-  BOOST_CHECK_EQUAL(grp.selfloops(), 3);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.v()), 5);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.e()), 10);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.outdegree(0)), 3);
+  PARACEL_CHECK_EQUAL(static_cast<int>(grp.indegree(0)), 2);
+  PARACEL_CHECK_EQUAL(grp.avg_degree(), 2.);
+  PARACEL_CHECK_EQUAL(grp.selfloops(), 3);
 }
 
 BOOST_AUTO_TEST_CASE (undirected_graph_test) {
@@ -165,10 +166,10 @@ BOOST_AUTO_TEST_CASE (undirected_graph_test) {
     edges.emplace_back(std::make_tuple(9, 12));
     edges.emplace_back(std::make_tuple(11, 12));
     paracel::undirected_graph<size_t> grp(edges);
-    BOOST_CHECK_EQUAL(grp.v(), 11);
-    BOOST_CHECK_EQUAL(grp.e(), 12);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp.v()), 11);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp.e()), 12);
     auto adj = grp.adjacent(5); // {0: 1.0, 4: 1.0}
-    BOOST_CHECK_EQUAL(grp.avg_degree(), 24. / 11.);
-    BOOST_CHECK_EQUAL(grp.max_degree(), 4);
-    BOOST_CHECK_EQUAL(grp.selfloops(), 0);
+    PARACEL_CHECK_EQUAL(grp.avg_degree(), 24. / 11.);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp.max_degree()), 4);
+    PARACEL_CHECK_EQUAL(grp.selfloops(), 0);
 }

@@ -52,10 +52,10 @@ BOOST_AUTO_TEST_CASE (files_partition_test) {
       std::vector<long> ss_check = obj.get_start_list();
       std::vector<long> ee_check = obj.get_end_list();
       
-      BOOST_CHECK_EQUAL_V(ss, ss_check);
-      BOOST_CHECK_EQUAL_V(ee, ee_check);
-      BOOST_CHECK_EQUAL(ss.size(), ee.size());
-      BOOST_CHECK_EQUAL(ss_check.size(), ee_check.size());
+      PARACEL_CHECK_EQUAL(ss, ss_check);
+      PARACEL_CHECK_EQUAL(ee, ee_check);
+      PARACEL_CHECK_EQUAL(ss.size(), ee.size());
+      PARACEL_CHECK_EQUAL(ss_check.size(), ee_check.size());
       
       for(size_t i = 0; i < ss.size(); ++i) {
         auto lines = obj.file_load_lines_impl(fname, ss[i], ee[i]);
@@ -65,10 +65,10 @@ BOOST_AUTO_TEST_CASE (files_partition_test) {
           if(k1 == 0 && k2 == 9) {
             continue;
           } else {
-            BOOST_CHECK_EQUAL(k1 - k2, 1);
+            PARACEL_CHECK_EQUAL(k1 - k2, 1);
           }
         }
-        BOOST_CHECK_EQUAL_V(lines, lines_check);
+        PARACEL_CHECK_EQUAL(lines, lines_check);
       }
 
     } // np
