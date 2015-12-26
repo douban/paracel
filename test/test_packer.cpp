@@ -27,6 +27,7 @@
 #include "paracel_types.hpp"
 #include "packer.hpp"
 #include "graph.hpp"
+#include "test.hpp"
 
 struct AA {
  public:
@@ -47,16 +48,16 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     std::string s;
     obj.pack(s);
     auto r = obj.unpack(s);
-    BOOST_CHECK_EQUAL(r, 1);
+    PARACEL_CHECK_EQUAL(r, true);
     paracel::packer<bool> obj2;
-    BOOST_CHECK_EQUAL(obj2.unpack(s), 1);
+    PARACEL_CHECK_EQUAL(obj2.unpack(s), true);
   }
   {
     paracel::packer<bool> obj(false);
     std::string s;
     obj.pack(s);
     auto r = obj.unpack(s);
-    BOOST_CHECK_EQUAL(r, 0);
+    PARACEL_CHECK_EQUAL(r, false);
   }
   {
     paracel::packer<int> obj(54);
@@ -64,14 +65,14 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     obj.pack(s);
     std::cout << s << std::endl;
     auto r = obj.unpack(s);
-    BOOST_CHECK_EQUAL(r, 54);
+    PARACEL_CHECK_EQUAL(r, 54);
   }
   {
     paracel::packer<int> obj(51);
     msgpack::sbuffer s;
     obj.pack(s);
     auto r = obj.unpack(s);
-    BOOST_CHECK_EQUAL(r, 51);
+    PARACEL_CHECK_EQUAL(r, 51);
   }
   {
     paracel::list_type<paracel::str_type> target = {"hello", "world"};
@@ -79,15 +80,15 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     msgpack::sbuffer s;
     obj.pack(s);
     auto r = obj.unpack(s);
-    BOOST_CHECK_EQUAL("hello", r[0]);
-    BOOST_CHECK_EQUAL("world", r[1]);
+    PARACEL_CHECK_EQUAL("hello", r[0]);
+    PARACEL_CHECK_EQUAL("world", r[1]);
   }
   {
     paracel::str_type target = "PARACEL";
     paracel::packer<paracel::str_type> obj(target);
     msgpack::sbuffer s;
     obj.pack(s);
-    BOOST_CHECK_EQUAL("PARACEL", obj.unpack(s));
+    PARACEL_CHECK_EQUAL("PARACEL", obj.unpack(s));
   }
   {
     paracel::list_type<paracel::str_type> target = {"hello", "world"};
@@ -95,8 +96,8 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     std::string s;
     obj.pack(s);
     auto r = obj.unpack(s);
-    BOOST_CHECK_EQUAL("hello", r[0]);
-    BOOST_CHECK_EQUAL("world", r[1]);
+    PARACEL_CHECK_EQUAL("hello", r[0]);
+    PARACEL_CHECK_EQUAL("world", r[1]);
   }
   {
     paracel::str_type target("test,data");
@@ -104,7 +105,7 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     std::string s;
     obj.pack(s);
     auto r = obj.unpack(s);
-    BOOST_CHECK_EQUAL(r, "test,data");
+    PARACEL_CHECK_EQUAL(r, "test,data");
   }
   {
     double target = 3.14;
@@ -112,7 +113,7 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     std::string s;
     obj.pack(s);
     auto r = obj.unpack(s);
-    BOOST_CHECK_EQUAL(r, 3.14);
+    PARACEL_CHECK_EQUAL(r, 3.14);
   }
   {
     paracel::list_type<int> target = {77, 88};
@@ -121,8 +122,8 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     obj.pack(s);
     std::cout << s << std::endl;
     auto r = obj.unpack(s);
-    BOOST_CHECK_EQUAL(77, r[0]);
-    BOOST_CHECK_EQUAL(88, r[1]);
+    PARACEL_CHECK_EQUAL(77, r[0]);
+    PARACEL_CHECK_EQUAL(88, r[1]);
   }
   {
     paracel::list_type<double> target = {1., 2., 3.};
@@ -188,9 +189,7 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     std::string s;
     obj.pack(s);
     auto r = obj.unpack(s);
-    for(auto & v : r) {
-        std::cout << "#" << v.first << ":" << v.second << "#" << std::endl;
-    }
+    PARACEL_CHECK_EQUAL(d, r);
   }
   {
     std::unordered_map<paracel::str_type, paracel::list_type<float> > d;
@@ -260,20 +259,20 @@ BOOST_AUTO_TEST_CASE (packer_test) {
     tpls.emplace_back(std::make_tuple(3, 1, 3.));
     tpls.emplace_back(std::make_tuple(3, 3, 1.));
     paracel::digraph<size_t> bgrp(tpls);
-    BOOST_CHECK_EQUAL(4, bgrp.v());
-    BOOST_CHECK_EQUAL(9, bgrp.e());
-    BOOST_CHECK_EQUAL(2, bgrp.avg_degree());
+    PARACEL_CHECK_EQUAL(4, static_cast<int>(bgrp.v()));
+    PARACEL_CHECK_EQUAL(9, static_cast<int>(bgrp.e()));
+    PARACEL_CHECK_EQUAL(2, static_cast<int>(bgrp.avg_degree()));
     auto kk = bgrp.adjacent(0);
-    BOOST_CHECK_EQUAL(2, kk.size());
+    PARACEL_CHECK_EQUAL(2, static_cast<int>(kk.size()));
 
     paracel::packer<paracel::digraph<size_t> > obj(bgrp);
     std::string s;
     obj.pack(s);
     paracel::digraph<size_t> r = obj.unpack(s);
-    BOOST_CHECK_EQUAL(4, r.v());
-    BOOST_CHECK_EQUAL(9, r.e());
-    BOOST_CHECK_EQUAL(2, r.avg_degree());
+    PARACEL_CHECK_EQUAL(4, static_cast<int>(r.v()));
+    PARACEL_CHECK_EQUAL(9, static_cast<int>(r.e()));
+    PARACEL_CHECK_EQUAL(2, static_cast<int>(r.avg_degree()));
     auto kkk = r.adjacent(0);
-    BOOST_CHECK_EQUAL(kkk.size(), 2);
+    PARACEL_CHECK_EQUAL(static_cast<int>(kkk.size()), 2);
   }
 }

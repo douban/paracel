@@ -34,22 +34,22 @@ BOOST_AUTO_TEST_CASE (paracel_str_extra_test) {
     std::vector<std::string> init_lst = {"hello", "world", "happy", "new", "year", "2015"};
     std::string seps = "orz";
     auto together = paracel::str_join(init_lst, seps);
-    BOOST_CHECK_EQUAL(together, "helloorzworldorzhappyorzneworzyearorz2015");
+    PARACEL_CHECK_EQUAL(together, "helloorzworldorzhappyorzneworzyearorz2015");
     auto res1 = paracel::str_split_by_word(together, seps);
     std::string tmp = together;
     auto res2 = paracel::str_split_by_word(std::move(tmp), seps);
-    BOOST_CHECK_EQUAL_V(res1, init_lst);
-    BOOST_CHECK_EQUAL_V(res2, init_lst);
-    BOOST_CHECK_EQUAL(paracel::startswith(together, "hello"), true);
-    BOOST_CHECK_EQUAL(paracel::startswith(together, "helo"), false);
-    BOOST_CHECK_EQUAL(paracel::startswith(together, "helloorzworldorzhappyorzneworzyearorz2015"), true);
-    BOOST_CHECK_EQUAL(paracel::startswith(together, "helloorzworldorzhappyorzneworzyearorz20157"), false);
-    BOOST_CHECK_EQUAL(paracel::startswith(together, ""), true);
-    BOOST_CHECK_EQUAL(paracel::endswith(together, "2015"), true);
-    BOOST_CHECK_EQUAL(paracel::endswith(together, "2014"), false);
-    BOOST_CHECK_EQUAL(paracel::endswith(together, "helloorzworldorzhappyorzneworzyearorz2015"), true);
-    BOOST_CHECK_EQUAL(paracel::endswith(together, "7helloorzworldorzhappyorzneworzyearorz2015"), false);
-    BOOST_CHECK_EQUAL(paracel::endswith(together, ""), true);
+    PARACEL_CHECK_EQUAL(res1, init_lst);
+    PARACEL_CHECK_EQUAL(res2, init_lst);
+    PARACEL_CHECK_EQUAL(paracel::startswith(together, "hello"), true);
+    PARACEL_CHECK_EQUAL(paracel::startswith(together, "helo"), false);
+    PARACEL_CHECK_EQUAL(paracel::startswith(together, "helloorzworldorzhappyorzneworzyearorz2015"), true);
+    PARACEL_CHECK_EQUAL(paracel::startswith(together, "helloorzworldorzhappyorzneworzyearorz20157"), false);
+    PARACEL_CHECK_EQUAL(paracel::startswith(together, ""), true);
+    PARACEL_CHECK_EQUAL(paracel::endswith(together, "2015"), true);
+    PARACEL_CHECK_EQUAL(paracel::endswith(together, "2014"), false);
+    PARACEL_CHECK_EQUAL(paracel::endswith(together, "helloorzworldorzhappyorzneworzyearorz2015"), true);
+    PARACEL_CHECK_EQUAL(paracel::endswith(together, "7helloorzworldorzhappyorzneworzyearorz2015"), false);
+    PARACEL_CHECK_EQUAL(paracel::endswith(together, ""), true);
   }
   {
     std::string tmp = "a|b|c|d|e";
@@ -57,9 +57,9 @@ BOOST_AUTO_TEST_CASE (paracel_str_extra_test) {
     auto r1 = paracel::str_split(tmp, '|');
     auto r2 = paracel::str_split(tmp, "|");
     auto r3 = paracel::str_split(tmp, "?|?");
-    BOOST_CHECK_EQUAL_V(r1, r);
-    BOOST_CHECK_EQUAL_V(r2, r);
-    BOOST_CHECK_EQUAL_V(r3, r);
+    PARACEL_CHECK_EQUAL(r1, r);
+    PARACEL_CHECK_EQUAL(r2, r);
+    PARACEL_CHECK_EQUAL(r3, r);
   }
 }
 
@@ -81,37 +81,37 @@ BOOST_AUTO_TEST_CASE (paracel_json_parser_test) {
   paracel::json_parser pt("../../test/test.json");
   std::string r = "hong";
 
-  BOOST_CHECK_EQUAL(pt.parse<std::string>("wu"), r);
-  BOOST_CHECK_EQUAL(pt.parse<int>("hong"), 7);
-  BOOST_CHECK_EQUAL(pt.parse<bool>("changsheng"), true);
-  BOOST_CHECK_EQUAL(pt.parse<double>("jiang"), 3.141592653);
+  PARACEL_CHECK_EQUAL(pt.parse<std::string>("wu"), r);
+  PARACEL_CHECK_EQUAL(pt.parse<int>("hong"), 7);
+  PARACEL_CHECK_EQUAL(pt.parse<bool>("changsheng"), true);
+  PARACEL_CHECK_EQUAL(pt.parse<double>("jiang"), 3.141592653);
   std::vector<std::string> vl1 = {"hong", "xun", "zhang"};
-  BOOST_CHECK_EQUAL_V(pt.parse_v<std::string>("wul"), vl1);
+  PARACEL_CHECK_EQUAL(pt.parse_v<std::string>("wul"), vl1);
   std::vector<int> vl2 = {1, 2, 3, 4, 5, 6, 7};
-  BOOST_CHECK_EQUAL_V(pt.parse_v<int>("hongl"), vl2);
+  PARACEL_CHECK_EQUAL(pt.parse_v<int>("hongl"), vl2);
   std::vector<bool> vl3 = {true, false, false, true, true};
-  BOOST_CHECK_EQUAL_V(pt.parse_v<bool>("changshengl"), vl3);
+  PARACEL_CHECK_EQUAL(pt.parse_v<bool>("changshengl"), vl3);
   std::vector<double> vl4 = {1.23, 2.34, 3.45, 4.56, 5.67, 6.78, 7.89};
-  BOOST_CHECK_EQUAL_V(pt.parse_v<double>("jiangl"), vl4);
+  PARACEL_CHECK_EQUAL(pt.parse_v<double>("jiangl"), vl4);
 }
 
 BOOST_AUTO_TEST_CASE (utils_hash_test) {
   paracel::hash_type<paracel::default_id_type> hfunc;
   paracel::default_id_type a = 0, b = 1, c = 2, d = 3;
-  BOOST_CHECK_EQUAL(hfunc(a), 0);
-  BOOST_CHECK_EQUAL(hfunc(b), 1);
-  BOOST_CHECK_EQUAL(hfunc(c), 2);
-  BOOST_CHECK_EQUAL(hfunc(d), 3);
+  PARACEL_CHECK_EQUAL(hfunc(a), 0);
+  PARACEL_CHECK_EQUAL(hfunc(b), 1);
+  PARACEL_CHECK_EQUAL(hfunc(c), 2);
+  PARACEL_CHECK_EQUAL(hfunc(d), 3);
   paracel::hash_type<std::string> hfunc2;
   std::string x = "0", y = "1", z = "2", t = "3";
   a = 2297668033614959926ULL;
   b = 10159970873491820195ULL;
   c = 4551451650890805270ULL;
   d = 8248777770799913213ULL;
-  BOOST_CHECK_EQUAL(hfunc2(x), a);
-  BOOST_CHECK_EQUAL(hfunc2(y), b);
-  BOOST_CHECK_EQUAL(hfunc2(z), c);
-  BOOST_CHECK_EQUAL(hfunc2(t), d);
+  PARACEL_CHECK_EQUAL(hfunc2(x), a);
+  PARACEL_CHECK_EQUAL(hfunc2(y), b);
+  PARACEL_CHECK_EQUAL(hfunc2(z), c);
+  PARACEL_CHECK_EQUAL(hfunc2(t), d);
 }
 
 BOOST_AUTO_TEST_CASE (eigen_common_usage_test) {
@@ -119,30 +119,30 @@ BOOST_AUTO_TEST_CASE (eigen_common_usage_test) {
     // Eigen::Matrix is static type while Eigen::MatrixXd is dynamic
     Eigen::Matrix<double, 3, 3, Eigen::RowMajor> m = Eigen::Matrix3d::Identity();
     m.col(1) = Eigen::Vector3d(4, 5, 6);
-    BOOST_CHECK_EQUAL(m.row(0)[0], 1);
-    BOOST_CHECK_EQUAL(m.row(0)[1], 4);
-    BOOST_CHECK_EQUAL(m.row(0)[2], 0);
-    BOOST_CHECK_EQUAL(m.row(1)[0], 0);
-    BOOST_CHECK_EQUAL(m.row(1)[1], 5);
-    BOOST_CHECK_EQUAL(m.row(1)[2], 0);
-    BOOST_CHECK_EQUAL(m.row(2)[0], 0);
-    BOOST_CHECK_EQUAL(m.row(2)[1], 6);
-    BOOST_CHECK_EQUAL(m.row(2)[2], 1);
-    BOOST_CHECK_EQUAL(m.IsRowMajor, true);
+    PARACEL_CHECK_EQUAL(m.row(0)[0], 1);
+    PARACEL_CHECK_EQUAL(m.row(0)[1], 4);
+    PARACEL_CHECK_EQUAL(m.row(0)[2], 0);
+    PARACEL_CHECK_EQUAL(m.row(1)[0], 0);
+    PARACEL_CHECK_EQUAL(m.row(1)[1], 5);
+    PARACEL_CHECK_EQUAL(m.row(1)[2], 0);
+    PARACEL_CHECK_EQUAL(m.row(2)[0], 0);
+    PARACEL_CHECK_EQUAL(m.row(2)[1], 6);
+    PARACEL_CHECK_EQUAL(m.row(2)[2], 1);
+    PARACEL_CHECK_EQUAL(m.IsRowMajor, true);
 
     auto v = paracel::mat2vec(m);
     std::vector<double> check_v = {1, 0, 0, 4, 5, 6, 0, 0, 1};
-    BOOST_CHECK_EQUAL_V(v, check_v);
+    PARACEL_CHECK_EQUAL(v, check_v);
     Eigen::MatrixXd check_mat = paracel::vec2mat(v, 3);
     Eigen::VectorXd vv = m.col(1);
     auto vvv = paracel::evec2vec(vv);
     std::vector<double> check_vvv = {4, 5, 6};
-    BOOST_CHECK_EQUAL_V(vvv, check_vvv);
+    PARACEL_CHECK_EQUAL(vvv, check_vvv);
     Eigen::VectorXd vvvv = paracel::vec2evec(vvv);
 
     Eigen::Vector3d vec(1, 2, 3);
     auto r = m.row(2) * vec;
-    BOOST_CHECK_EQUAL(r, 15);
+    PARACEL_CHECK_EQUAL(r, 15);
 
     srand( (unsigned)time(NULL) );
     Eigen::Matrix3d mm = Eigen::Matrix3d::Random();
@@ -163,27 +163,27 @@ BOOST_AUTO_TEST_CASE (eigen_common_usage_test) {
     vech[0] = 1.; vech[1] = 0.5;
     mtx.row(2) = vech;
     vech[0] = 1.01; vech[1] = 0.28;
-    BOOST_CHECK_EQUAL(vech[0], 1.01);
-    BOOST_CHECK_EQUAL(vech[1], 0.28);
-    BOOST_CHECK_EQUAL(mtx.col(0)[0], 1.1);
-    BOOST_CHECK_EQUAL(mtx.col(0)[1], 2);
-    BOOST_CHECK_EQUAL(mtx.col(0)[2], 1);
-    BOOST_CHECK_EQUAL(mtx.col(1)[0], 0.8);
-    BOOST_CHECK_EQUAL(mtx.col(1)[1], 2);
-    BOOST_CHECK_EQUAL(mtx.col(1)[2], 0.5);
+    PARACEL_CHECK_EQUAL(vech[0], 1.01);
+    PARACEL_CHECK_EQUAL(vech[1], 0.28);
+    PARACEL_CHECK_EQUAL(mtx.col(0)[0], 1.1);
+    PARACEL_CHECK_EQUAL(mtx.col(0)[1], 2);
+    PARACEL_CHECK_EQUAL(mtx.col(0)[2], 1);
+    PARACEL_CHECK_EQUAL(mtx.col(1)[0], 0.8);
+    PARACEL_CHECK_EQUAL(mtx.col(1)[1], 2);
+    PARACEL_CHECK_EQUAL(mtx.col(1)[2], 0.5);
 
     Eigen::MatrixXd::Index indx;
     (mtx.rowwise() - vech.transpose()).rowwise().squaredNorm().minCoeff(&indx);
-    BOOST_CHECK_EQUAL(indx, 2);
+    PARACEL_CHECK_EQUAL(indx, 2);
 
     auto result = mtx * vech; 
-    BOOST_CHECK_EQUAL(result.row(0)[0], 1.3350000000000002);
-    BOOST_CHECK_EQUAL(result.row(1)[0], 2.58);
-    BOOST_CHECK_EQUAL(result.row(2)[0], 1.15);
+    PARACEL_CHECK_EQUAL(result.row(0)[0], 1.3350000000000002);
+    PARACEL_CHECK_EQUAL(result.row(1)[0], 2.58);
+    PARACEL_CHECK_EQUAL(result.row(2)[0], 1.15);
 
     mtx.row(0) *= 10;
-    BOOST_CHECK_EQUAL(mtx.row(0)[0], 11);
-    BOOST_CHECK_EQUAL(mtx.row(0)[1], 8);
+    PARACEL_CHECK_EQUAL(mtx.row(0)[0], 11);
+    PARACEL_CHECK_EQUAL(mtx.row(0)[1], 8);
 
     Eigen::Matrix2d mmat;
     mmat << 1, 2, 
@@ -191,10 +191,10 @@ BOOST_AUTO_TEST_CASE (eigen_common_usage_test) {
     Eigen::VectorXd vvec(2);
     int rr = -1, cc = -1;
     vvec << 1.1, 2.2;
-    BOOST_CHECK_EQUAL(mmat.maxCoeff(&rr, &cc), 4);
-    BOOST_CHECK_EQUAL(rr, 1);
-    BOOST_CHECK_EQUAL(cc, 1);
-    BOOST_CHECK_EQUAL(mmat.row(1).sum(), 7);
+    PARACEL_CHECK_EQUAL(mmat.maxCoeff(&rr, &cc), 4);
+    PARACEL_CHECK_EQUAL(rr, 1);
+    PARACEL_CHECK_EQUAL(cc, 1);
+    PARACEL_CHECK_EQUAL(mmat.row(1).sum(), 7);
   }
 }
 
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE (eigen_matrix_usage_test) {
   A.resize(10, 5);
   A.setFromTriplets(tpls.begin(), tpls.end());
   auto vecA = paracel::mat2vec(A);
-  BOOST_CHECK_EQUAL_M(A, paracel::vec2mat(vecA));
+  PARACEL_CHECK_EQUAL(A, paracel::vec2mat(vecA));
   Eigen::MatrixXd H(5, 3); // 5 * 3
   H << 1., 2., 3.,
     4., 5., 6.,
@@ -360,7 +360,7 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     A.setFromTriplets(tpls.begin(), tpls.end());
     paracel::pkl_dat_sequential(A, "/var/tmp/test.pkl");
     paracel::unpkl_dat_sequential("/var/tmp/test.pkl", Arev);
-    BOOST_CHECK_EQUAL_M(A, Arev);
+    PARACEL_CHECK_EQUAL(A, Arev);
   }
   { // dense matrix
     Eigen::MatrixXd H(5, 3); // 5 * 3
@@ -372,7 +372,7 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     paracel::pkl_dat_sequential(H, "/var/tmp/test.pkl");
     Eigen::MatrixXd Hrev;
     paracel::unpkl_dat_sequential("/var/tmp/test.pkl", Hrev, 3);
-    BOOST_CHECK_EQUAL_M(H, Hrev);
+    PARACEL_CHECK_EQUAL(H, Hrev);
   }
   { // undirected_graph
     paracel::list_type<std::tuple<size_t, size_t> > edges;
@@ -391,11 +391,11 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     paracel::undirected_graph<size_t> grp(edges), grp2;
     paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
     paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
-    BOOST_CHECK_EQUAL(grp2.v(), 11);
-    BOOST_CHECK_EQUAL(grp2.e(), 12);
-    BOOST_CHECK_EQUAL(grp2.avg_degree(), 24. / 11.);
-    BOOST_CHECK_EQUAL(grp2.max_degree(), 4); 
-    BOOST_CHECK_EQUAL(grp2.selfloops(), 0); 
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.v()), 11);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.e()), 12);
+    PARACEL_CHECK_EQUAL(grp2.avg_degree(), 24. / 11.);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.max_degree()), 4); 
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.selfloops()), 0); 
   }
   { // digraph
     paracel::list_type<std::tuple<size_t, size_t, double> > tpls;
@@ -412,12 +412,12 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     grp.add_edge(3, 4, 5.);
     paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
     paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
-    BOOST_CHECK_EQUAL(grp2.v(), 5);
-    BOOST_CHECK_EQUAL(grp2.e(), 10);
-    BOOST_CHECK_EQUAL(grp2.outdegree(0), 2);
-    BOOST_CHECK_EQUAL(grp2.indegree(0), 3);
-    BOOST_CHECK_EQUAL(grp2.avg_degree(), 2.);
-    BOOST_CHECK_EQUAL(grp2.selfloops(), 3);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.v()), 5);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.e()), 10);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.outdegree(0)), 2);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.indegree(0)), 3);
+    PARACEL_CHECK_EQUAL(grp2.avg_degree(), 2.);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.selfloops()), 3);
   }
   { // bigraph_continuous_test
     paracel::bigraph_continuous G, G2;
@@ -433,10 +433,10 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     G.add_edge(3, 3, 3.);
     paracel::pkl_dat_sequential(G, "/var/tmp/test.pkl");
     paracel::unpkl_dat_sequential("/var/tmp/test.pkl", G2);
-    BOOST_CHECK_EQUAL(G2.v(), 4); 
-    BOOST_CHECK_EQUAL(G2.e(), 10);
-    BOOST_CHECK_EQUAL(G2.outdegree(0), 3); 
-    BOOST_CHECK_EQUAL(G2.indegree(5), 2);
+    PARACEL_CHECK_EQUAL(static_cast<int>(G2.v()), 4); 
+    PARACEL_CHECK_EQUAL(static_cast<int>(G2.e()), 10);
+    PARACEL_CHECK_EQUAL(static_cast<int>(G2.outdegree(0)), 3); 
+    PARACEL_CHECK_EQUAL(static_cast<int>(G2.indegree(5)), 2);
   }
   { // bigraph
     paracel::list_type<std::tuple<std::string, std::string, double> > tpls;
@@ -455,9 +455,9 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
 
     paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
     paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
-    BOOST_CHECK_EQUAL(grp2.v(), 4);
-    BOOST_CHECK_EQUAL(grp2.e(), 11);
-    BOOST_CHECK_EQUAL(grp2.outdegree("a"), 3);
-    BOOST_CHECK_EQUAL(grp2.indegree("E"), 2);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.v()), 4);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.e()), 11);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.outdegree("a")), 3);
+    PARACEL_CHECK_EQUAL(static_cast<int>(grp2.indegree("E")), 2);
   }
 }

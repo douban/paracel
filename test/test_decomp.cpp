@@ -17,28 +17,29 @@
 #define BOOST_TEST_MODULE DECOMP_TEST 
 #include <boost/test/unit_test.hpp>
 #include "utils/decomp.hpp"
+#include "test.hpp"
 using namespace paracel;
 BOOST_AUTO_TEST_CASE (decomp_test) {
   int x, y; 
   npfact2d(10, x, y);
-  BOOST_CHECK_EQUAL(x, 2);
-  BOOST_CHECK_EQUAL(y, 5);
+  PARACEL_CHECK_EQUAL(x, 2);
+  PARACEL_CHECK_EQUAL(y, 5);
   npfact2d(10, x, y, false);
-  BOOST_CHECK_EQUAL(x, 5);
-  BOOST_CHECK_EQUAL(y, 2);
+  PARACEL_CHECK_EQUAL(x, 5);
+  PARACEL_CHECK_EQUAL(y, 2);
   npfact2d(7, x, y);
-  BOOST_CHECK_EQUAL(x, 7);
-  BOOST_CHECK_EQUAL(y, 1);
+  PARACEL_CHECK_EQUAL(x, 7);
+  PARACEL_CHECK_EQUAL(y, 1);
   npfact2d(7, x, y, false);
-  BOOST_CHECK_EQUAL(x, 1);
-  BOOST_CHECK_EQUAL(y, 7);
+  PARACEL_CHECK_EQUAL(x, 1);
+  PARACEL_CHECK_EQUAL(y, 7);
   npfact2d(2, x, y);
-  BOOST_CHECK_EQUAL(x, 2);
-  BOOST_CHECK_EQUAL(y, 1);
+  PARACEL_CHECK_EQUAL(x, 2);
+  PARACEL_CHECK_EQUAL(y, 1);
   npfact2d(6, x, y);
-  BOOST_CHECK_EQUAL(x, 2);
-  BOOST_CHECK_EQUAL(y, 3);
+  PARACEL_CHECK_EQUAL(x, 2);
+  PARACEL_CHECK_EQUAL(y, 3);
   npfact2d(8, x, y);
-  BOOST_CHECK_EQUAL(x, 2);
-  BOOST_CHECK_EQUAL(y, 4);
+  PARACEL_CHECK_EQUAL(x, 2);
+  PARACEL_CHECK_EQUAL(y, 4);
 }

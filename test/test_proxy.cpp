@@ -22,6 +22,7 @@
 #include <functional>
 #include "proxy.hpp"
 #include "paracel_types.hpp"
+#include "test.hpp"
 
 double local_incr(double v, double d) {
  return v + d;
@@ -49,5 +50,5 @@ BOOST_AUTO_TEST_CASE (proxy_test) {
   std::string delta;
   pk.pack(delta);
   double r = update(key, delta, update_func);
-  BOOST_CHECK_EQUAL(r, 1.23 + 3.21);
+  PARACEL_CHECK_EQUAL(r, 1.23 + 3.21);
 }
