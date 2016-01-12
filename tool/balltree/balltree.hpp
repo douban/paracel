@@ -25,15 +25,28 @@
 #include <queue>
 #include <vector>
 #include <limits>
+#include <string>
 #include <numeric>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <unordered_set>
 
-#include "utils.hpp"
-
 namespace paracel {
+
+std::vector<std::string> str_split(const std::string & str, 
+                              const char sep) {
+  std::vector<std::string> result;
+  size_t st = 0, en = 0;
+  while(1) {
+    en = str.find(sep, st);
+    auto s = str.substr(st, en - st);
+    if(s.size()) result.push_back(std::move(s));
+    if(en == std::string::npos) break;
+    st = en + 1;
+  }
+  return result;
+}
 
 struct min_heap_cmp {
   inline bool operator() (const std::pair<long, double >& l,
