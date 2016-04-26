@@ -15,7 +15,7 @@ find_path(MsgpackC_INCLUDE_DIR msgpack.hpp
 find_library(MsgpackC_LIBRARY
   NAMES msgpack libmsgpack
   HINTS 
-  "/user/local/lib"
+  "/usr/local/lib"
   "/usr/lib")
 
 message(STATUS "Find Mespack-C include path: ${MsgpackC_INCLUDE_DIR}")
