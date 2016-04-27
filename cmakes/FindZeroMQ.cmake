@@ -15,7 +15,7 @@ find_path(ZeroMQ_INCLUDE_DIR zmq.h
 find_library(ZeroMQ_LIBRARY
   NAMES zmq libzmq
   HINTS
-  "/user/local/lib"
+  "/usr/local/lib"
   "/usr/lib")
 
 message(STATUS "Find ZeroMQ include path: ${ZeroMQ_INCLUDE_DIR}")

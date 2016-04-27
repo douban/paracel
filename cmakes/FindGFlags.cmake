@@ -13,7 +13,7 @@ find_path(GFlags_INCLUDE_DIR google/gflags.h
 find_library(GFlags_LIBRARY
   NAMES gflags libgflags
   HINTS 
-  "/user/local/lib"
+  "/usr/local/lib"
   "/usr/lib")
 
 message(STATUS "Find GFlags include path: ${GFlags_INCLUDE_DIR}")
