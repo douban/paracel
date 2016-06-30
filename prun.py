@@ -30,9 +30,7 @@ import logging
 logging.basicConfig(filename='paracelrun_log', format = '%(asctime)s : %(levelname)s : %(message)s', level = logging.INFO)
 logger = logging.getLogger(__name__)
 
-PARACEL_INSTALL_PREFIX='./local/'
-#PARACEL_INSTALL_PREFIX='/nfs/xxx/paracel/local'
-#PARACEL_INSTALL_PREFIX='/usr/local'
+PARACEL_INSTALL_PREFIX = os.path.dirname(os.path.abspath(__file__))
 
 def paracelrun_cpp_proxy(nsrv, initport):
     from subprocess import Popen, PIPE
@@ -68,15 +66,15 @@ def init_starter(method, mem_limit, ppn, hostfile, group):
         hostfile = '~/.mpi/large.18'
     if method == 'mesos':
         if group:
-            starter = './mrun -m ' + mem_limit + ' -p ' + ppn + ' -g ' + group + ' -n'
+            starter = '%s/mrun -m %s -p %s -g %s -n ' % (PARACEL_INSTALL_PREFIX, mem_limit, ppn, group)
         else:
-            starter = './mrun -m ' + mem_limit + ' -p ' + ppn + ' -n'
+            starter = '%s/mrun -m %s -p %s -n ' % (PARACEL_INSTALL_PREFIX, mem_limit, ppn)
     elif method == 'mpi':
-        starter = 'mpirun --hostfile ' + hostfile + ' -n'
+        starter = 'mpirun --hostfile %s -n ' % hostfile
     elif method == 'local':
-        starter = 'mpirun -n'
+        starter = 'mpirun -n '
     else:
-        print 'method ', method, ' not supported.'
+        print 'method %s not supported.' % method
         sys.exit(1)
     return starter
 

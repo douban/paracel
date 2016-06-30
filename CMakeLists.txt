@@ -42,7 +42,10 @@ link_libraries(${Boost_LIBRARIES} ${GFlags_LIBRARIES} ${MsgpackC_LIBRARIES}
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
 set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
 ############################--install-path--####################################
-install(PROGRAMS prun.py DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+install(PROGRAMS prun.py DESTINATION "${CMAKE_INSTALL_PREFIX}")
+install(PROGRAMS mrun DESTINATION "${CMAKE_INSTALL_PREFIX}")
+install(PROGRAMS mesos_executor.py DESTINATION "${CMAKE_INSTALL_PREFIX}")
+install(PROGRAMS mesos_scheduler.py DESTINATION "${CMAKE_INSTALL_PREFIX}")
 install(DIRECTORY include DESTINATION "${CMAKE_INSTALL_PREFIX}")
 ################################################################################
 add_subdirectory(src)
