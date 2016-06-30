@@ -1,48 +1,19 @@
 ##############################--CMakeLists.txt--################################
 cmake_minimum_required(VERSION 2.8.9)
 ################################################################################
-execute_process(
-  COMMAND uname -s
-  OUTPUT_VARIABLE PARACEL_SYSTEM_NAME
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-##############################--g++4.7-plus--###################################
-if(EXISTS "gentoo_rules.cmake")
-  find_program(CXX NAMES g++-4.9 g++-4.8.1 g++-4.8 g++-4.7.2 g++-4.7.1 g++-4.7 g++)
-  execute_process(COMMAND sed -i 
-                  "s|CMAKE_CXX_COMPILER [^ ]*|CMAKE_CXX_COMPILER ${CXX}|g" 
-                  "gentoo_rules.cmake")
-  find_program(CC NAMES gcc-4.9 gcc-4.8.1 gcc-4.8 gcc-4.7.2 gcc-4.7.1 gcc-4.7 gcc)
-  execute_process(COMMAND sed -i 
-                  "s|CMAKE_C_COMPILER [^ ]*|CMAKE_C_COMPILER ${CC}|g"
-                  "gentoo_rules.cmake")
-elseif(NOT "${PARACEL_SYSTEM_NAME}" MATCHES "Darwin")
-  find_program(CMAKE_CXX_COMPILER NAMES g++-4.9 g++-4.8.1 g++-4.8 g++-4.7.2 g++-4.7.1 g++-4.7 g++)
-  find_program(CMAKE_C_COMPILER NAMES gcc-4.9 gcc-4.8.1 gcc-4.8 gcc-4.7.2 gcc-4.7.1 gcc-4.7 gcc)
-endif()
-################################################################################
 project(paracel CXX C)
 include(CTest)
 ##############################--flags--#########################################
-if(CMAKE_COMPILER_IS_GNUCXX)
-  set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2")
-  set(CMAKE_CXX_FLAGS_DEBUG "-Wall -std=c++11 -O0 -g -fno-inline")
-  set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O3 -DNDEBUG -march=native -ffast-math")
-  #set(CMAKE_SHARED_LINKER_FLAGS "-static-libstdc++")
-  #set(CMAKE_EXE_LINKER_FLAGS "-static-libstdc++")
-endif()
-
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -stdlib=libc++ -O2")
-  set(CMAKE_CXX_FLAGS_DEBUG "-Wall -std=c++11 -stdlib=libc++ -O0 -g -fno-inline")
-  set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -stdlib=libc++ -O3 -DNDEBUG -march=native -ffast-math")
-endif()
-
-if(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG")
-endif()
-
 include_directories("${PROJECT_SOURCE_DIR}/include")
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAG} -O0 -g -fno-inline")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -stdlib=libc++")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -g -fno-inline")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG")
+endif()
 ##############################--extern-libraries--##############################
 find_package(MPI REQUIRED)
 include_directories(${MPI_CXX_INCLUDE_PATH})
@@ -72,6 +43,7 @@ set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
 set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
 ############################--install-path--####################################
 install(PROGRAMS prun.py DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+install(DIRECTORY include DESTINATION "${CMAKE_INSTALL_PREFIX}")
 ################################################################################
 add_subdirectory(src)
 add_subdirectory(alg/regression/ridge)
