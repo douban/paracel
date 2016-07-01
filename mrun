@@ -1,3 +1,2 @@
 #! /bin/sh
-
-exec python "mesos_scheduler.py" --mpi "$@"
+exec python "$(dirname $0)/mesos_scheduler.py" --mpi "$@"
