@@ -1,0 +1,4 @@
+{
+  "registery_file" : "registery.so",
+  "filter_function" : "demo_filter"
+}
