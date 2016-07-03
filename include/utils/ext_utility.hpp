@@ -24,6 +24,8 @@
 #include <vector>
 #include <numeric>
 #include <utility>
+#include <fstream>
+#include <unordered_map>
 
 #include <boost/algorithm/string/regex.hpp>
 
@@ -189,6 +191,33 @@ std::string add_folder_suffix_with_date(const std::string & folder) {
     new_folder = folder + suffix + "/";
   }
   return new_folder;
+}
+
+void file_replace(const std::string & src_file,
+                  const std::string & dst_file,
+                  const std::unordered_map<std::string, std::string> & rep_map) {
+  auto replace_all = [] (std::string l,
+                         const std::string & before,
+                         const std::string & after) {
+    size_t start_indx = 0;
+    while((start_indx = l.find(before, start_indx)) != std::string::npos) {
+      l.replace(start_indx, before.size(), after);
+      start_indx += after.size();
+    }
+    return l;
+  };
+  std::ifstream fin(src_file);
+  std::ofstream fout(dst_file);
+  std::string line;
+  while(std::getline(fin, line)) {
+    if(startswith(line, "#")) continue;
+    for(auto & kv : rep_map) {
+      line = replace_all(line, kv.first, kv.second);
+    }
+    fout << line << std::endl;
+  }
+  fin.close();
+  fout.close();
 }
 
 } // namespace paracel

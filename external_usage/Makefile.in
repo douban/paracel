@@ -1,0 +1,43 @@
+# makefile template for configuration or runtime replace 
+PARACEL_INSTALL_PREFIX = @PARACEL_INSTALL_PREFIX@
+
+CXX = @CXX@
+CXXFLAGS = -Wall -O3 -std=c++11
+
+CPPFLAGS = -I$(PARACEL_INSTALL_PREFIX)/include
+
+LDFLAGS =  -L$(PARACEL_INSTALL_PREFIX)/lib
+
+LIBS = -lcomm -lscheduler
+LIBS += -lzmq -lmsgpack -lgflags -lglog
+LIBS += -lboost_regex -lboost_filesystem -lboost_system
+
+REGISTERY_SOURCE = @REGISTERY_SOURCE@
+OBJECT = *.o
+DRIVER_SOURCE = @DRIVER_SOURCE@
+TARGET = @REGISTERY_TARGET@
+DRIVER = @DRIVER@
+
+RM = rm -rf
+
+OS = $(shell uname)
+
+all: OBJS $(TARGET) $(DRIVER)
+
+OBJS:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -fpic -c $(REGISTERY_SOURCE)
+
+$(TARGET):
+ifeq ($(OS), Darwin)
+	$(CXX) $(CXXFLAGS) -bundle $(OBJECT) $(LDFLAGS) $(LIBS) -o $@
+else
+	$(CXX) $(CXXFLAGS) -shared $(OBJECT) $(LDFLAGS) $(LIBS) -o $@
+endif
+
+$(DRIVER):
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LIBS) $(DRIVER_SOURCE) -o $@
+
+.PHONY: clean
+
+clean:
+	$(RM) $(OBJECT) $(TARGET) $(DRIVER)
