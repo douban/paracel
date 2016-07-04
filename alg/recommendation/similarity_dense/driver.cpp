@@ -14,7 +14,7 @@
  */
 
 #include <string>
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 #include "sim_dense.hpp"
 #include "utils.hpp"
 

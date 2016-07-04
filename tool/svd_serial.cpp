@@ -24,7 +24,7 @@
 #include <eigen3/Eigen/Cholesky>
 #include <eigen3/Eigen/SVD>
 
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 
 #include "ps.hpp"
 #include "load.hpp"

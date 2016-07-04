@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <unordered_map>
 
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 
 #include "ps.hpp"
 #include "load.hpp"

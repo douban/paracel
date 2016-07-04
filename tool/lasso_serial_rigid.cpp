@@ -19,7 +19,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 #include "ps.hpp"
 #include "utils.hpp"
 

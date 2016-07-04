@@ -13,7 +13,7 @@
  *
  */
 
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 
 #include "server.hpp"
 

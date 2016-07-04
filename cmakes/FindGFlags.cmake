@@ -4,7 +4,7 @@
 #  GFlags_INCLUDE_DIR - include to use gflags in paracel
 #  GFlags_LIBRARIES - link to use gflags in paracel
 
-find_path(GFlags_INCLUDE_DIR google/gflags.h
+find_path(GFlags_INCLUDE_DIR gflags/gflags.h
   NO_DEFAULT_PATH
   PATHS
   "/usr/local/include"

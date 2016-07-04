@@ -504,7 +504,7 @@ Since Paracel do not support Eigen::MatrixXd for communication between worker an
 ## Initialize
 
 ```cpp
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 #include "ps.hpp"
 #include "utils.hpp"
 
@@ -559,7 +559,7 @@ Remember
 ## Load
 
 ```cpp
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 #include "ps.hpp"
 #include "utils.hpp"
 #include "graph.hpp"
@@ -764,7 +764,7 @@ Remember
 
 #include <string>
 #include <unordered_map>
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 #include "ps.hpp"
 #include "utils.hpp"
 
@@ -1006,7 +1006,7 @@ Remember
 
 #include <string>
 #include <unordered_map>
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 #include "ps.hpp"
 #include "utils.hpp"
 

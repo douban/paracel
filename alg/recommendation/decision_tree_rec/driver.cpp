@@ -15,7 +15,7 @@
 
 #include <string>
 #include <mpi.h>
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 #include "decision_tree_builder.hpp"
 #include "utils.hpp"
 

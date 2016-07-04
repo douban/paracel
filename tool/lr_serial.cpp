@@ -21,7 +21,7 @@
 #include <string>
 #include <fstream>
 
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 
 #include "ps.hpp"
 #include "utils.hpp"

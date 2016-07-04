@@ -17,7 +17,7 @@
 #include <iostream>
 
 #include <mpi.h>
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 #include <glog/logging.h>
 
 #include "wc.hpp"

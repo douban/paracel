@@ -14,7 +14,7 @@
  */
 
 #include <string>
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 #include "sim_sparse_row.hpp"
 #include "utils.hpp"
 

@@ -1,7 +1,7 @@
 language: cpp
 
 env:
-  - EIGEN_VERSION=3.1.0 EIGEN_HASH=ca142d0540d3 MSGPACK_C_VERSION="0.5.8-patched"
+  - EIGEN_VERSION=3.1.0 EIGEN_HASH=ca142d0540d3 MSGPACK_C_VERSION="1.4.2"
 
 compiler:
   - gcc
@@ -15,9 +15,9 @@ before_install:
   - sudo add-apt-repository -y ppa:boost-latest/ppa
   - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
   - sudo apt-get update -yqq
-  - if [ "$CXX" == "g++" ]; then sudo apt-get install -yqq g++-4.7; fi
+  - if [ "$CXX" == "g++" ]; then sudo apt-get install -yqq g++-4.8; fi
   - if [ "$CXX" == "g++" ]; then sudo update-alternatives --install /usr/bin/g++ g++
-    /usr/bin/g++-4.7 50; fi
+    /usr/bin/g++-4.8 50; fi
 
 install:
   - sudo apt-get update -yqq
@@ -36,9 +36,9 @@ install:
     ruby automake libtool
   - cd /tmp
   - wget -O "/tmp/msgpack-c-${MSGPACK_C_VERSION}.tar.gz"
-    "https://github.com/xunzhang/msgpack-c/archive/${MSGPACK_C_VERSION}.tar.gz"
-  - tar -zxvf "/tmp/msgpack-c-${MSGPACK_C_VERSION}.tar.gz" "msgpack-c-${MSGPACK_C_VERSION}"
-  - cd "/tmp/msgpack-c-${MSGPACK_C_VERSION}"
+    "https://github.com/msgpack/msgpack-c/archive/cpp-${MSGPACK_C_VERSION}.tar.gz"
+  - tar -zxvf "/tmp/msgpack-c-${MSGPACK_C_VERSION}.tar.gz" "msgpack-c-cpp-${MSGPACK_C_VERSION}"
+  - cd "/tmp/msgpack-c-cpp-${MSGPACK_C_VERSION}"
   - ./bootstrap
   - ./configure
   - make
@@ -58,6 +58,8 @@ before_script:
   - mkdir build
   - cd build
   - cmake ..
+
+after_failure: "cat /home/travis/build/douban/paracel/build/CMakeFiles/CMakeError.log"
 
 script:
   - make -j2

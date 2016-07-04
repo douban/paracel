@@ -2,7 +2,6 @@
 # - Try to find Msgpack-C
 # Once done, this will be defined:
 #  MsgpackC_INCLUDE_DIR - include to use Msgpack-C in paracel
-#  MsgpackC_LIBRARIES - link to use Message-C in paracel
 
 include(CheckCXXSourceRuns)
 
@@ -12,17 +11,9 @@ find_path(MsgpackC_INCLUDE_DIR msgpack.hpp
   "/usr/local/include"
   "/usr/include")
 
-find_library(MsgpackC_LIBRARY
-  NAMES msgpack libmsgpack
-  HINTS 
-  "/usr/local/lib"
-  "/usr/lib")
-
 message(STATUS "Find Mespack-C include path: ${MsgpackC_INCLUDE_DIR}")
-message(STATUS "Find Mespack-C lib path: ${MsgpackC_LIBRARY}")
 
 set(CMAKE_REQUIRED_INCLUDES ${MsgpackC_INCLUDE_DIR})
-set(CMAKE_REQUIRED_LIBRARIES ${MsgpackC_LIBRARY})
 set(CMAKE_REQUIRED_FLAGS)
 check_cxx_source_runs("
 #include <vector>
@@ -48,12 +39,8 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
   MsgpackC
   REQUIRED_VARS
-  MsgpackC_LIBRARY
   MsgpackC_INCLUDE_DIR
   MsgpackC_CHECK_FINE)
 
-set(MsgpackC_LIBRARIES ${MsgpackC_LIBRARY})
-
 mark_as_advanced(
-  MsgpackC_LIBRARIES
   MsgpackC_INCLUDE_DIR)

@@ -16,7 +16,7 @@
 #include <string>
 #include <iostream>
 
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 
 #include "utils.hpp"
 

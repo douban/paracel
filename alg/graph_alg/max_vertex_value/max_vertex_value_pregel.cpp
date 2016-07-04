@@ -15,7 +15,7 @@
 
 #include <string>
 #include <functional>
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 
 #include "ps.hpp"
 #include "pregel.hpp"

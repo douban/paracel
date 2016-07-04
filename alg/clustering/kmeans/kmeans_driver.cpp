@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <google/gflags.h>
+#include <gflags/gflags.h>
 
 #include "kmeans.hpp"
 //#include "sc.hpp"
