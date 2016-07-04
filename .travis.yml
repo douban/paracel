@@ -56,14 +56,22 @@ install:
 before_script:
   - cd $TRAVIS_BUILD_DIR
   - mkdir build
+  - sudo mkdir -p "/opt/paracel"
   - cd build
-  - cmake ..
+  - cmake -DCMAKE_INSTALL_PREFIX=/opt/paracel ..
 
-after_failure: "cat /home/travis/build/douban/paracel/build/CMakeFiles/CMakeError.log"
+after_failure:
+  - "cat /home/travis/build/douban/paracel/build/CMakeFiles/CMakeError.log"
 
 script:
-  - make -j2
+  - make -j$(nproc)
   - make test
+  - sudo make install
+  - cd /tmp
+  - wget "paracel.io/data/kjv12.txt" -O "data.txt"
+  - wget "paracel.io/data/travis_demo.json"
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/paracel/lib
+  - /opt/paracel/prun.py -p 2 -w 2 -c travis_demo.json -m local /opt/paracel/bin/wc
 
 branches:
   except:
