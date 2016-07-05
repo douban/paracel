@@ -31,3 +31,5 @@ target_link_libraries(steady_state_inversion_serial ${Boost_LIBRARIES} comm sche
 install(TARGETS steady_state_inversion_serial RUNTIME DESTINATION bin/tool)
 
 install(FILES datagen.py DESTINATION bin/tool)
+
+install(DIRECTORY balltree DESTINATION bin/tool)
