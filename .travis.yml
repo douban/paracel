@@ -1,34 +1,49 @@
 language: cpp
 
-compiler:
-  - gcc
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      env: CXX=g++-4.8 CC=gcc-4.8 EIGEN_VERSION=3.1.0 EIGEN_HASH=ca142d0540d3 MSGPACK_C_VERSION="1.4.2"
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - boost-latest
+          packages:
+            - wget
+            - automake
+            - libtool
+            - mpich2
+            - gcc-4.8
+            - g++-4.8
+            - libboost1.54-all-dev
+            - libzmq3-dev
+            - libgflags-dev
+            - libgoogle-glog-dev
 
-env:
-  - EIGEN_VERSION=3.1.0 EIGEN_HASH=ca142d0540d3 MSGPACK_C_VERSION="1.4.2"
-
-dist: trusty
-
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - boost-latest
-    packages:
-      - wget
-      - automake
-      - libtool
-      - mpich2
-      - g++-4.8
-      - gcc-4.8
-      - libboost1.54-all-dev
-      - libzmq3-dev
-      - libgflags-dev
-      - libgoogle-glog-dev
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+      env: EIGEN_VERSION=3.1.0 EIGEN_HASH=ca142d0540d3 MSGPACK_C_VERSION="1.4.2"
 
 before_install:
-  - sudo add-apt-repository -y ppa:andykimpe/cmake
-  - sudo apt-get install -yqq cmake
-  - export CXX="g++-4.8" CC="gcc-4.8"
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then
+      sudo add-apt-repository -y ppa:andykimpe/cmake;
+      sudo apt-get install -yqq cmake;
+    fi
+  - if [[ $TRAVIS_OS_NAME == "osx" ]]; then
+      brew update 2>&1 > /tmp/brew-update.txt || (cat /tmp/brew-update.txt && false);
+      brew uninstall libtool && brew install libtool;
+      brew install gnu-sed;
+      brew install mpich;
+      brew install boost;
+      brew install zmq;
+      brew install gflags;
+      brew install glog;
+    fi
 
 install:
   - cd /tmp
@@ -61,12 +76,14 @@ after_failure:
   - "cat /home/travis/build/douban/paracel/build/CMakeFiles/CMakeError.log"
 
 script:
-  - make -j$(nproc)
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then make -j$(nproc); fi
+  - if [[ $TRAVIS_OS_NAME == "osx" ]]; then make -j$(sysctl -n hw.ncpu); fi
   - make test
   - sudo make install
   - cd /tmp
   - wget "paracel.io/data/kjv12.txt" -O "data.txt"
   - wget "paracel.io/data/travis_demo.json"
+  - export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/paracel/lib
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/paracel/lib
   - /opt/paracel/prun.py -p 2 -w 2 -c travis_demo.json -m local /opt/paracel/bin/wc
 
