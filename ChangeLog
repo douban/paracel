@@ -1,4 +1,14 @@
+2016-08-04 0.3.0
+	* Feature: add tools such as Balltree search and L1-normalized regression.
+	* Feature: add lots of production-level algorithms in alg folder.
+	* Feature: running outside | building outside.
+	* Document update: fix typo, more friendly to read, easier to install.
+	* Improve CI: both osx and linux.
+	* Refactor and Bugfix.
+	* First github release: since 0.3.0 contains so many commits, please checkout more release details in the commit log.
+
 2015-03-27 0.2.0
-	* First public release.
+	* First public commit.
+
 2014-03-31 0.1.0
 	* First internal release
