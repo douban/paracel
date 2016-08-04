@@ -1,9 +1,6 @@
-![logo](/logo.png)
+![logo](/logo.png) [![https://travis-ci.org/douban/paracel.png](https://travis-ci.org/douban/paracel.png)](https://travis-ci.org/douban/paracel) [![Join the chat at https://gitter.im/douban/paracel](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/douban/paracel?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Coverity Scan Build](https://scan.coverity.com/projects/douban-paracel/badge.svg)](https://scan.coverity.com/projects/douban-paracel)
 
-# Paracel Overview [![https://travis-ci.org/douban/paracel.png](https://travis-ci.org/douban/paracel.png)](https://travis-ci.org/douban/paracel)
-
-[![Join the chat at https://gitter.im/douban/paracel](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/douban/paracel?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+# Paracel Overview
 Paracel is a distributed computational framework, designed for many machine learning problems: Logistic Regression, SVD, Matrix Factorization(BFGS, sgd, als, cg), LDA, Lasso...
 
 Firstly, paracel splits both massive dataset and massive parameter space. Unlike Mapreduce-Like Systems, paracel offers a simple communication model, allowing you to work with a global and distributed key-value storage, which is called parameter server.
