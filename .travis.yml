@@ -25,7 +25,6 @@ matrix:
             - libgoogle-glog-dev
 
     - os: osx
-      osx_image: xcode7.3
       compiler: clang
       env: EIGEN_VERSION=3.1.0 EIGEN_HASH=ca142d0540d3 MSGPACK_C_VERSION="1.4.2"
 
@@ -38,7 +37,7 @@ before_install:
       brew update 2>&1 > /tmp/brew-update.txt || (cat /tmp/brew-update.txt && false);
       brew uninstall libtool && brew install libtool;
       brew install gnu-sed;
-      brew install mpich;
+      brew install open-mpi;
       brew install boost;
       brew install zmq;
       brew install gflags;
@@ -82,10 +81,16 @@ script:
   - sudo make install
   - cd /tmp
   - wget "paracel.io/data/kjv12.txt" -O "data.txt"
-  - wget "paracel.io/data/travis_demo.json"
-  - export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/paracel/lib
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/paracel/lib
-  - /opt/paracel/prun.py -p 2 -w 2 -c travis_demo.json -m local /opt/paracel/bin/wc
+  - if [[ $TRAVIS_OS_NAME == "osx" ]]; then
+      wget "paracel.io/data/travis_demo_osx.json";
+      export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/paracel/lib;
+      /opt/paracel/prun.py -p 2 -w 2 -c travis_demo_osx.json -m local /opt/paracel/bin/wc;
+    fi
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then
+      wget "paracel.io/data/travis_demo.json";
+      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/paracel/lib;
+      /opt/paracel/prun.py -p 2 -w 2 -c travis_demo.json -m local /opt/paracel/bin/wc;
+    fi
 
 branches:
   except:
