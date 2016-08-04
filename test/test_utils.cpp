@@ -104,10 +104,17 @@ BOOST_AUTO_TEST_CASE (utils_hash_test) {
   PARACEL_CHECK_EQUAL(hfunc(d), 3);
   paracel::hash_type<std::string> hfunc2;
   std::string x = "0", y = "1", z = "2", t = "3";
+#if (defined __APPLE__)
+  a = 10408321403207385874ULL;
+  b = 11413460447292444913ULL;
+  c = 17472595041006102391ULL;
+  d = 11275350073939794026ULL;
+#else
   a = 2297668033614959926ULL;
   b = 10159970873491820195ULL;
   c = 4551451650890805270ULL;
   d = 8248777770799913213ULL;
+#endif
   PARACEL_CHECK_EQUAL(hfunc2(x), a);
   PARACEL_CHECK_EQUAL(hfunc2(y), b);
   PARACEL_CHECK_EQUAL(hfunc2(z), c);
