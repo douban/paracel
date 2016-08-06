@@ -498,7 +498,7 @@ class matrix_factorization : public paracel::paralg {
   inline void local_fmt(string id, paracel::default_id_type & r) { r = paracel::cvt(id); }
 
  private:
-  int id;
+  int id = 0;
   string input, predict_input;
   string update_file;
   vector<string> update_funcs;

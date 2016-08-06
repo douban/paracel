@@ -32,7 +32,7 @@ struct packer {
 public:
 
   // for unpack usage
-  packer() {}
+  packer() : val() {}
 
   packer(T v) : val(v) {}
 
