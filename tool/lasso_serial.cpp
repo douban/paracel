@@ -132,8 +132,8 @@ class lasso {
   paralg *pt;
   std::vector<std::vector<double> > X;
   std::vector<double> rW, W, Z, Y;
-  int kdim;
-  int nsamples;
+  int kdim = 0;
+  int nsamples = 0;
 }; // class lasso
 
 } // namespace tool
