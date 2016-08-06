@@ -271,6 +271,7 @@ public:
 	std::get<1>(triple) + paracel::seperator_inner + 
 	std::to_string(std::get<2>(triple))
 	);
+	  pt_enqueue(str_pt);
     auto v_req = isend(*str_pt, dest, tag);
     return v_req;
   }
