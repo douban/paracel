@@ -436,7 +436,7 @@ public:
     int sz;
     K tmp_key;
     V tmp_val;
-    MPI_Status stat;
+    MPI_Status stat{};
     recv(sz, src, tag);
     for(int i = 0; i < sz; ++i) {
       recv(tmp_key, src, tag);
@@ -692,7 +692,7 @@ public:
       }
       num = num / 2 + is_odd;
     }
-    T r;
+    T r{};
     // last reduce at rk 0
     if(m_rk == 0) {
       r = data;
