@@ -365,8 +365,12 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     Eigen::SparseMatrix<double, Eigen::RowMajor> A, Arev;
     A.resize(10, 5);
     A.setFromTriplets(tpls.begin(), tpls.end());
-    paracel::pkl_dat_sequential(A, "/var/tmp/test.pkl");
-    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", Arev);
+    try {
+      paracel::pkl_dat_sequential(A, "/var/tmp/test.pkl");
+      paracel::unpkl_dat_sequential("/var/tmp/test.pkl", Arev);
+    } catch (const std::runtime_error & e) {
+      std::cerr << e.what();
+    }
     PARACEL_CHECK_EQUAL(A, Arev);
   }
   { // dense matrix
@@ -376,9 +380,13 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
       7., 8., 9.,
       10., 11., 12.,
       13., 14., 15.;
-    paracel::pkl_dat_sequential(H, "/var/tmp/test.pkl");
     Eigen::MatrixXd Hrev;
-    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", Hrev, 3);
+    try {
+      paracel::pkl_dat_sequential(H, "/var/tmp/test.pkl");
+      paracel::unpkl_dat_sequential("/var/tmp/test.pkl", Hrev, 3);
+    } catch (const std::runtime_error & e) {
+      std::cerr << e.what();
+    }
     PARACEL_CHECK_EQUAL(H, Hrev);
   }
   { // undirected_graph
@@ -396,8 +404,12 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     edges.emplace_back(std::make_tuple(9, 12));
     edges.emplace_back(std::make_tuple(11, 12));
     paracel::undirected_graph<size_t> grp(edges), grp2;
-    paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
-    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
+    try {
+      paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
+      paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
+    } catch (const std::runtime_error & e) {
+      std::cerr << e.what();
+    }
     PARACEL_CHECK_EQUAL(static_cast<int>(grp2.v()), 11);
     PARACEL_CHECK_EQUAL(static_cast<int>(grp2.e()), 12);
     PARACEL_CHECK_EQUAL(grp2.avg_degree(), 24. / 11.);
@@ -417,8 +429,12 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     tpls.emplace_back(std::make_tuple(3, 3, 1.));
     paracel::digraph<size_t> grp(tpls), grp2;
     grp.add_edge(3, 4, 5.);
-    paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
-    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
+    try {
+      paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
+      paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
+    } catch (const std::runtime_error & e) {
+      std::cerr << e.what();
+    }
     PARACEL_CHECK_EQUAL(static_cast<int>(grp2.v()), 5);
     PARACEL_CHECK_EQUAL(static_cast<int>(grp2.e()), 10);
     PARACEL_CHECK_EQUAL(static_cast<int>(grp2.outdegree(0)), 2);
@@ -438,8 +454,12 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     G.add_edge(2, 5, 1.);
     G.add_edge(2, 6, 2.);
     G.add_edge(3, 3, 3.);
-    paracel::pkl_dat_sequential(G, "/var/tmp/test.pkl");
-    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", G2);
+    try {
+      paracel::pkl_dat_sequential(G, "/var/tmp/test.pkl");
+      paracel::unpkl_dat_sequential("/var/tmp/test.pkl", G2);
+    } catch (const std::runtime_error & e) {
+      std::cerr << e.what();
+    }
     PARACEL_CHECK_EQUAL(static_cast<int>(G2.v()), 4); 
     PARACEL_CHECK_EQUAL(static_cast<int>(G2.e()), 10);
     PARACEL_CHECK_EQUAL(static_cast<int>(G2.outdegree(0)), 3); 
@@ -460,8 +480,12 @@ BOOST_AUTO_TEST_CASE (pkl_sequential_usage_test) {
     paracel::bigraph<std::string> grp(tpls), grp2;
     grp.add_edge("c", "G", 3.6);
 
-    paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
-    paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
+    try {
+      paracel::pkl_dat_sequential(grp, "/var/tmp/test.pkl");
+      paracel::unpkl_dat_sequential("/var/tmp/test.pkl", grp2);
+    } catch (const std::runtime_error & e) {
+      std::cerr << e.what();
+    }
     PARACEL_CHECK_EQUAL(static_cast<int>(grp2.v()), 4);
     PARACEL_CHECK_EQUAL(static_cast<int>(grp2.e()), 11);
     PARACEL_CHECK_EQUAL(static_cast<int>(grp2.outdegree("a")), 3);

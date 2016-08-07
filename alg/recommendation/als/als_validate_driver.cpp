@@ -15,6 +15,7 @@
 
 #include <string>
 #include <iostream>
+#include <stdexcept>
 
 #include <mpi.h>
 #include <gflags/gflags.h>
@@ -39,13 +40,19 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string rating_input = pt.check_parse<std::string>("rating_input");
-  std::string factor_input = pt.check_parse<std::string>("factor_input");
-  std::string validate_input = pt.check_parse<std::string>("validate_input");
-  std::string output = pt.parse<std::string>("output");
-  std::string pattern = pt.parse<std::string>("pattern");
-  std::vector<double> lambdas = pt.parse_v<double>("lambdas");
-  
+  std::string rating_input, factor_input, validate_input, output, pattern;
+  std::vector<double> lambdas;
+  try {
+    rating_input = pt.check_parse<std::string>("rating_input");
+    factor_input = pt.check_parse<std::string>("factor_input");
+    validate_input = pt.check_parse<std::string>("validate_input");
+    output = pt.parse<std::string>("output");
+    pattern = pt.parse<std::string>("pattern");
+    lambdas = pt.parse_v<double>("lambdas");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   // model selection
   {
     std::vector<double> validate_errs, train_errs;
@@ -57,10 +64,15 @@ int main(int argc, char *argv[])
                                                              pattern);
 
     H_solver.init();
-    for(auto & lambda : lambdas) {
-      H_solver.learning(lambda);
-      train_errs.push_back(H_solver.cal_rmse());
-      validate_errs.push_back(H_solver.validate());
+    try {
+      for(auto & lambda : lambdas) {
+        H_solver.learning(lambda);
+        train_errs.push_back(H_solver.cal_rmse());
+        validate_errs.push_back(H_solver.validate());
+      }
+    } catch(const std::runtime_error & e) {
+      std::cerr << e.what();
+      return 1;
     }
     if(comm.get_rank() == 0) {
       for(size_t i = 0; i < train_errs.size(); ++i) {

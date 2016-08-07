@@ -13,6 +13,7 @@
  *
  */
 
+#include <stdexcept>
 #include <string>
 #include <mpi.h>
 #include <gflags/gflags.h>
@@ -34,14 +35,20 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string user_fac_input = pt.check_parse<std::string>("user_fac_input");
-  std::string item_fac_input = pt.check_parse<std::string>("item_fac_input");
-  std::string output = pt.parse<std::string>("output");
-  std::string handle_fn = pt.check_parse<std::string>("handle_file");
-  int level = pt.parse<int>("level");
-  int tree_start_indx = pt.parse<int>("tree_start_index");
-  int tree_end_indx = pt.parse<int>("tree_end_index");
-
+  std::string user_fac_input, item_fac_input, output, handle_fn;
+  int level, tree_start_indx, tree_end_indx;
+  try {
+    user_fac_input = pt.check_parse<std::string>("user_fac_input");
+    item_fac_input = pt.check_parse<std::string>("item_fac_input");
+    output = pt.parse<std::string>("output");
+    handle_fn = pt.check_parse<std::string>("handle_file");
+    level = pt.parse<int>("level");
+    tree_start_indx = pt.parse<int>("tree_start_index");
+    tree_end_indx = pt.parse<int>("tree_end_index");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::alg::decision_tree_builder_factor solver(comm,
                                                     FLAGS_server_info,
                                                     user_fac_input,

@@ -14,14 +14,15 @@
   */
 
 
-#include<cstdio>
-#include<cstdlib>
-#include<ctime>
-#include<cmath>
-#include<string>
-#include<vector>
-#include<unordered_map>
-#include<algorithm>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+#include <stdexcept>
 #include <gflags/gflags.h>
 #include "ps.hpp"
 #include "utils.hpp"
@@ -361,13 +362,21 @@ int main(int argc, char *argv[])
 	google::ParseCommandLineFlags(&argc, &argv, true);
   
 	paracel::json_parser pt(FLAGS_cfg_file);
-	std::string input = pt.check_parse<std::string>("input");
-	std::string output = pt.parse<std::string>("output");
-	double alpha = pt.parse<double>("alpha");
-	double beta = pt.parse<double>("beta");
-	int k_topics = pt.parse<int>("k_topics");
-	int iters = pt.parse<int>("iters");
-	int top_words = pt.parse<int>("top_words");
+  std::string input, output;
+  double alpha, beta;
+  int k_topics, iters, top_words;
+	try {
+	  input = pt.check_parse<std::string>("input");
+	  output = pt.parse<std::string>("output");
+	  alpha = pt.parse<double>("alpha");
+	  beta = pt.parse<double>("beta");
+	  k_topics = pt.parse<int>("k_topics");
+	  iters = pt.parse<int>("iters");
+	  top_words = pt.parse<int>("top_words");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
 	paracel::tool::LDAmodel solver(comm,
                                  input,
                                  output,

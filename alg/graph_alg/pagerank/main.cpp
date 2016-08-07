@@ -15,6 +15,7 @@
 
 #include <string>
 #include <iostream>
+#include <stdexcept>
 #include <gflags/gflags.h>
 
 #include "pr.hpp"
@@ -36,14 +37,21 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser jp(FLAGS_cfg_file);
-  string input = jp.check_parse<string>("input");
-  string output = jp.parse<string>("output");
-  int rounds = jp.parse<int>("rounds");
-  double df = jp.parse<double>("damping_factor");
-  string handle_fn = jp.check_parse<string>("handle_file");
-  string update_fcn = jp.parse<string>("update_function");
-  string filter_fcn = jp.parse<string>("filter_function");
-  
+  string input, output, handle_fn, update_fcn, filter_fcn;
+  int rounds;
+  double df;
+  try {
+    input = jp.check_parse<string>("input");
+    output = jp.parse<string>("output");
+    rounds = jp.parse<int>("rounds");
+    df = jp.parse<double>("damping_factor");
+    handle_fn = jp.check_parse<string>("handle_file");
+    update_fcn = jp.parse<string>("update_function");
+    filter_fcn = jp.parse<string>("filter_function");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::alg::pagerank pr_solver(comm,
                                    FLAGS_server_info,
                                    input,
