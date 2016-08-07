@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
   { // debug for list of triple sendrecv
     std::vector<std::vector<std::tuple<std::string, std::string, double> > > aa(2);
     std::vector<std::tuple<std::string, std::string, double> > bb;
-    int t = -1, f = -1;
+    int t = 0, f = 0;
     if(rk == 0) {
       std::vector<std::tuple<std::string, std::string, double> > aaa;
       std::tuple<std::string, std::string, double> tmp1;
