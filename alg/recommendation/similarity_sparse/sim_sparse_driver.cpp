@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <stdexcept>
 #include <gflags/gflags.h>
 #include "sim_sparse_row.hpp"
 #include "utils.hpp"
@@ -31,20 +32,27 @@ int main(int argc, char *argv[])
   google::SetUsageMessage("[options]\n\t--server_info\n\t--cfg_file\n");
   google::ParseCommandLineFlags(&argc, &argv, true);
   paracel::json_parser pt(FLAGS_cfg_file);
-  string input = pt.check_parse<string>("input");
-  string output = pt.parse<string>("output");
-  string fmt = pt.parse<string>("format");
-  int ktop = pt.parse<int>("topk");
-  int rbar = pt.parse<int>("rbar");
-  int cbar = pt.parse<int>("cbar");
-  int rubar = pt.parse<int>("rubar");
-  int cubar = pt.parse<int>("cubar");
-  double sim_bar = pt.parse<double>("sim_bar");
-  double sim_ubar = pt.parse<double>("sim_ubar");
-  double weight_bar = pt.parse<double>("weight_bar");
-  double intersect_bar = pt.parse<double>("intersect_bar");
-  string sim_method = pt.parse<string>("sim_method");
-
+  string input, output, fmt, sim_method;
+  int ktop, rbar, cbar, rubar, cubar;
+  double sim_bar, sim_ubar, weight_bar, intersect_bar;
+  try {
+    input = pt.check_parse<string>("input");
+    output = pt.parse<string>("output");
+    fmt = pt.parse<string>("format");
+    ktop = pt.parse<int>("topk");
+    rbar = pt.parse<int>("rbar");
+    cbar = pt.parse<int>("cbar");
+    rubar = pt.parse<int>("rubar");
+    cubar = pt.parse<int>("cubar");
+    sim_bar = pt.parse<double>("sim_bar");
+    sim_ubar = pt.parse<double>("sim_ubar");
+    weight_bar = pt.parse<double>("weight_bar");
+    intersect_bar = pt.parse<double>("intersect_bar");
+    sim_method = pt.parse<string>("sim_method");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::alg::sim_sparse_row solver(comm, FLAGS_server_info,
                                       input, output,
                                       fmt,

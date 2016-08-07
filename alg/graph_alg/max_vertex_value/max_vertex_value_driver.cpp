@@ -15,6 +15,7 @@
 
 #include <string>
 #include <iostream>
+#include <exception>
 
 #include <mpi.h>
 #include <gflags/gflags.h>
@@ -34,11 +35,16 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string input = pt.check_parse<std::string>("input");
-  std::string output = pt.parse<std::string>("output");
-  std::string update_file = pt.check_parse<std::string>("update_file");
-  std::string update_func = pt.parse<std::string>("update_func");
-  
+  std::string input, output, update_file, update_func;
+  try {
+    input = pt.check_parse<std::string>("input");
+    output = pt.parse<std::string>("output");
+    update_file = pt.check_parse<std::string>("update_file");
+    update_func = pt.parse<std::string>("update_func");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::alg::max_vertex_value mvv_solver(comm,
                                             FLAGS_server_info,
                                             input,

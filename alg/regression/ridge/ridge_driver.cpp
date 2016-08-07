@@ -15,6 +15,7 @@
 
 #include <string>
 #include <iostream>
+#include <stdexcept>
 
 #include <mpi.h>
 #include <gflags/gflags.h>
@@ -34,16 +35,23 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string training_input = pt.check_parse<std::string>("training_input");
-  std::string test_input = pt.check_parse<std::string>("test_input");
-  std::string predict_input = pt.check_parse<std::string>("predict_input");
-  std::string output = pt.parse<std::string>("output");
-  std::string update_file = pt.check_parse<std::string>("update_file");
-  std::string update_func = pt.parse<std::string>("update_func");
-  int rounds = pt.parse<int>("rounds");
-  double alpha = pt.parse<double>("alpha");
-  double beta = pt.parse<double>("beta");
-
+  std::string training_input, test_input, predict_input, output, update_file, update_func;
+  int rounds;
+  double alpha, beta;
+  try {
+    training_input = pt.check_parse<std::string>("training_input");
+    test_input = pt.check_parse<std::string>("test_input");
+    predict_input = pt.check_parse<std::string>("predict_input");
+    output = pt.parse<std::string>("output");
+    update_file = pt.check_parse<std::string>("update_file");
+    update_func = pt.parse<std::string>("update_func");
+    rounds = pt.parse<int>("rounds");
+    alpha = pt.parse<double>("alpha");
+    beta = pt.parse<double>("beta");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::alg::ridge_regression solver(comm,
                                         FLAGS_server_info,
                                         training_input,

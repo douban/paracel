@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <stdexcept>
 #include <gflags/gflags.h>
 
 #include "kmeans.hpp"
@@ -39,12 +40,20 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser jp(FLAGS_cfg_file);
-  string input = jp.check_parse<string>("input");
-  string output = jp.parse<string>("output");
-  string type = jp.parse<string>("type");
-  int k = jp.parse<int>("kclusters");
-  string update_fn = jp.check_parse<string>("update_file");
-  vector<string> update_funcs = jp.parse_v<string>("update_functions");
+  string input, output, type, update_fn;
+  int k;
+  vector<string> update_funcs;
+  try {
+    input = jp.check_parse<string>("input");
+    output = jp.parse<string>("output");
+    type = jp.parse<string>("type");
+    k = jp.parse<int>("kclusters");
+    update_fn = jp.check_parse<string>("update_file");
+    update_funcs = jp.parse_v<string>("update_functions");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   int rounds = jp.parse<int>("rounds");
   paracel::alg::kmeans solver(comm,
                               FLAGS_server_info,

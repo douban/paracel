@@ -55,9 +55,13 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string registery_fn = pt.check_parse<std::string>("registery_file");
-  std::string filter_fcn = pt.parse<std::string>("filter_function");
-
+  try {
+    std::string registery_fn = pt.check_parse<std::string>("registery_file");
+    std::string filter_fcn = pt.parse<std::string>("filter_function");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::demo solver(comm, FLAGS_server_info, registery_fn, filter_fcn);
   solver.solve();
   return 0;

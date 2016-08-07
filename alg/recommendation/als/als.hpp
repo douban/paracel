@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <exception>
+#include <iostream>
 #include <unordered_set>
 #include <unordered_map>
 
@@ -95,7 +97,12 @@ class alternating_least_square_standard : public paracel::paralg {
     };
     paracel_sequential_loadall(factor_input, local_parser_factor);
     
-    learning();
+    try {
+      learning();
+    } catch (const std::runtime_error & e) {
+      std::cerr << e.what();
+      return;
+    }
   }
 
   void dump_result() {

@@ -928,8 +928,12 @@ class paralg {
 
   template <class T>
   void pkl_dat(const T & m, std::string prefix = "tmp") {
-    paracel::pkl_dat_sequential(m,
-                                prefix + std::to_string(worker_comm.get_rank()) + ".pkl");
+    try {
+      paracel::pkl_dat_sequential(m,
+                                  prefix + std::to_string(worker_comm.get_rank()) + ".pkl");
+    } catch (const std::runtime_error & e) {
+      throw e;
+    }
   }
 
   // TODO
@@ -1003,7 +1007,12 @@ class paralg {
     if(merge && get_worker_id() == 0) {
       paracel_sync();
       paracel::str_type output_regx = output + filename + "*";
-      files_merge(output_regx, filename);
+      try {
+        files_merge(output_regx, filename);
+      } catch (const std::runtime_error & e) {
+        std::cerr << e.what();
+        abort();
+      }
     }
   }
 
@@ -1029,7 +1038,12 @@ class paralg {
     if(merge && get_worker_id() == 0) {
       paracel_sync();
       paracel::str_type output_regx = output + filename + "*";
-      files_merge(output_regx, filename);
+      try {
+        files_merge(output_regx, filename);
+      } catch (const std::runtime_error & e) {
+        std::cerr << e.what();
+        abort();
+      }
     }
   }
 
@@ -1055,7 +1069,12 @@ class paralg {
     if(merge && get_worker_id() == 0) {
       paracel_sync();
       paracel::str_type output_regx = output + filename + "*";
-      files_merge(output_regx, filename);
+      try {
+        files_merge(output_regx, filename);
+      } catch (const std::runtime_error & e) {
+        std::cerr << e.what();
+        abort();
+      }
     }
   }
 
@@ -1087,7 +1106,12 @@ class paralg {
     if(merge && get_worker_id() == 0) {
       paracel_sync();
       paracel::str_type output_regx = output + filename + "*";
-      files_merge(output_regx, filename);
+      try {
+        files_merge(output_regx, filename);
+      } catch (const std::runtime_error & e) {
+        std::cerr << e.what();
+        abort();
+      }
     }
   }
 
@@ -1121,7 +1145,12 @@ class paralg {
     if(merge && get_worker_id() == 0) {
       paracel_sync();
       paracel::str_type output_regx = output + filename + "*";
-      files_merge(output_regx, filename);
+      try {
+        files_merge(output_regx, filename);
+      } catch (const std::runtime_error & e) {
+        std::cerr << e.what();
+        abort();
+      }
     }
   }
 
@@ -1155,7 +1184,12 @@ class paralg {
     if(merge && get_worker_id() == 0) {
       paracel_sync();
       paracel::str_type output_regx = output + filename + "*";
-      files_merge(output_regx, filename);
+      try {
+        files_merge(output_regx, filename);
+      } catch (const std::runtime_error & e) {
+        std::cerr << e.what();
+        abort();
+      }
     }
   }
 

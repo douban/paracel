@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <stdexcept>
 #include <unordered_map>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
@@ -175,9 +176,16 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string input = pt.check_parse<std::string>("input");
-  std::string output = pt.parse<std::string>("output");
-  int k = pt.parse<int>("k");
+  std::string input, output;
+  int k;
+  try {
+    input = pt.check_parse<std::string>("input");
+    output = pt.parse<std::string>("output");
+    k = pt.parse<int>("k");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::tool::svd svd_solver(comm, input, output, k);
   svd_solver.solve();
   svd_solver.dump_result();
