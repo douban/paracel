@@ -19,6 +19,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <stdexcept>
 #include <gflags/gflags.h>
 #include "ps.hpp"
 #include "utils.hpp"
@@ -150,10 +151,18 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string input = pt.check_parse<std::string>("input");
-  std::string output = pt.parse<std::string>("output");
-  double lambda = pt.parse<double>("lambda");
-  int rounds = pt.parse<int>("rounds");
+  std::string input, output;
+  double lambda;
+  int rounds;
+  try {
+    input = pt.check_parse<std::string>("input");
+    output = pt.parse<std::string>("output");
+    lambda = pt.parse<double>("lambda");
+    rounds = pt.parse<int>("rounds");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::tool::lasso solver(comm, input, output, lambda, rounds);
   solver.solve();
   solver.dump_result();

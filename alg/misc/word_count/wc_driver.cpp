@@ -15,6 +15,7 @@
 
 #include <string>
 #include <iostream>
+#include <stdexcept>
 
 #include <mpi.h>
 #include <gflags/gflags.h>
@@ -40,13 +41,19 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string input = pt.check_parse<std::string>("input");
-  std::string output = pt.parse<std::string>("output");
-  int topk = pt.parse<int>("topk");
-  std::string handle_fn = pt.check_parse<std::string>("handle_file");
-  std::string update_fcn = pt.parse<std::string>("update_function");
-  std::string filter_fcn = pt.parse<std::string>("filter_function");
-  
+  std::string input, output, handle_fn, update_fcn, filter_fcn;
+  int topk;
+  try {
+    input = pt.check_parse<std::string>("input");
+    output = pt.parse<std::string>("output");
+    topk = pt.parse<int>("topk");
+    handle_fn = pt.check_parse<std::string>("handle_file");
+    update_fcn = pt.parse<std::string>("update_function");
+    filter_fcn = pt.parse<std::string>("filter_function");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::alg::word_count wc_solver(comm,
                                      FLAGS_server_info,
                                      input,

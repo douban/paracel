@@ -20,6 +20,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <stdexcept>
 
 #include <gflags/gflags.h>
 
@@ -181,17 +182,26 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string training_input = pt.check_parse<std::string>("training_input");
-  std::string test_input = pt.check_parse<std::string>("test_input");
-  std::string predict_input = pt.check_parse<std::string>("predict_input");
-  std::string output = pt.parse<std::string>("output");
-  std::string update_file = pt.check_parse<std::string>("update_file");
-  std::string update_func = pt.parse<std::string>("update_func");
-  std::string method = pt.parse<std::string>("method");
-  int rounds = pt.parse<int>("rounds");
-  double alpha = pt.parse<double>("alpha");
-  double beta = pt.parse<double>("beta");
-  bool debug = pt.parse<bool>("debug");
+  std::string training_input, test_input, predict_input, output, update_file, update_func, method;
+  int rounds;
+  double alpha, beta;
+  bool debug;
+  try {
+    training_input = pt.check_parse<std::string>("training_input");
+    test_input = pt.check_parse<std::string>("test_input");
+    predict_input = pt.check_parse<std::string>("predict_input");
+    output = pt.parse<std::string>("output");
+    update_file = pt.check_parse<std::string>("update_file");
+    update_func = pt.parse<std::string>("update_func");
+    method = pt.parse<std::string>("method");
+    rounds = pt.parse<int>("rounds");
+    alpha = pt.parse<double>("alpha");
+    beta = pt.parse<double>("beta");
+    debug = pt.parse<bool>("debug");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::tool::logistic_regression lr_solver(comm,
                                                training_input,
                                                output,

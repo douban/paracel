@@ -15,6 +15,7 @@
 
 #include <string>
 #include <iostream>
+#include <stdexcept>
 #include <gflags/gflags.h>
 
 #include "svd.hpp"
@@ -34,14 +35,18 @@ int main(int argc, char *argv[])
 
   google::SetUsageMessage("[options]\n\t--server_info\n\t--cfg_file\n");
   google::ParseCommandLineFlags(&argc, &argv, true);
-  
+
   paracel::json_parser jp(FLAGS_cfg_file);
-  string input = jp.check_parse<string>("input");
-  string output = jp.parse<string>("output");
-  int k = jp.parse<int>("k");
-  string update_fn = jp.check_parse<string>("update_file");
-  string update_fcn = jp.parse<string>("update_function");
-  
+  try {
+    string input = jp.check_parse<string>("input");
+    string output = jp.parse<string>("output");
+    int k = jp.parse<int>("k");
+    string update_fn = jp.check_parse<string>("update_file");
+    string update_fcn = jp.parse<string>("update_function");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::alg::svd solver(comm,
                            FLAGS_server_info,
                            input,

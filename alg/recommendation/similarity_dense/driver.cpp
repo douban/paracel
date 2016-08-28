@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <stdexcept>
 #include <gflags/gflags.h>
 #include "sim_dense.hpp"
 #include "utils.hpp"
@@ -31,11 +32,18 @@ int main(int argc, char *argv[])
   google::SetUsageMessage("[options]\n\t--server_info\n\t--cfg_file\n");
   google::ParseCommandLineFlags(&argc, &argv, true);
   paracel::json_parser jp(FLAGS_cfg_file);
-  string input = jp.check_parse<string>("input");
-  string output = jp.parse<string>("output");
-  double simbar = jp.parse<double>("simbar");
-  int ktop = jp.parse<int>("topk");
-
+  string input, output;
+  double simbar;
+  int ktop;
+  try {
+    input = jp.check_parse<string>("input");
+    output = jp.parse<string>("output");
+    simbar = jp.parse<double>("simbar");
+    ktop = jp.parse<int>("topk");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::alg::sim_dense solver(comm, FLAGS_server_info, input, input, output, simbar, ktop);
   solver.solve();
   solver.dump_result();

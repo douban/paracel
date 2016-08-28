@@ -131,7 +131,13 @@ class decision_tree_builder_factor : public paracel::paralg {
   // id fac1|fac2|fac3...
   void init_ufac(const std::string & fn) {
     ufac.resize(0);
-    auto lines = paracel_loadall(fn);
+    std::vector<std::string> lines;
+    try {
+      lines = paracel_loadall(fn);
+    } catch (const std::runtime_error & e) {
+      std::cerr << e.what();
+      abort();
+    }
     for(auto & line : lines) {
       auto tmp = paracel::str_split(line, '\t');
       auto facs = paracel::str_split(tmp[1], '|');

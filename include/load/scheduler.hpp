@@ -144,7 +144,8 @@ public:
       } else {
         if(stf.size() != 3) {
           std::cout << line << std::endl;
-          throw std::runtime_error("internal error in lines_organize: fmt of input files not supported"); 
+          std::cerr << "internal error in lines_organize: fmt of input files not supported" << std::endl;
+          abort();
         }
         paracel::compact_triple_type tpl(std::stoull(stf[0]), 
                                          std::stoull(stf[1]), 
@@ -192,7 +193,8 @@ public:
       } else {
 	      if(stf.size() != 3) { 
           std::cout << line << std::endl;
-          throw std::runtime_error("internal error in lines_organize: fmt of input files not supported"); 
+          std::cerr << "internal error in lines_organize: fmt of input files not supported" << std::endl;
+          abort();
         }
         // fsv case
         paracel::triple_type tpl(stf[0], stf[1], std::stod(stf[2]));

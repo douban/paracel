@@ -14,10 +14,12 @@
  */
 
 #include <cmath>
+#include <vector>
 #include <string>
 #include <iostream>
 #include <algorithm>
 #include <unordered_map>
+#include <stdexcept>
 
 #include <gflags/gflags.h>
 
@@ -68,7 +70,13 @@ class steady_state_inversion {
     pt->paracel_load_as_graph(bi_G, bigraph_input, f_parser);
 
     // load and init score, pl, pr
-    auto linelst = pt->paracel_loadall(dis_input);
+    vector<string> linelst;
+    try {
+      linelst = pt->paracel_loadall(dis_input);
+    } catch (const std::runtime_error & e) {
+      std::cerr << e.what();
+      abort();
+    }
     for(auto & line : linelst) {
       auto lst = paracel::str_split(line, ',');
       string key = lst[0];
@@ -236,10 +244,15 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   paracel::json_parser pt(FLAGS_cfg_file);
-  string bigraph_input = pt.check_parse<string>("bigraph_input");
-  string dis_input = pt.check_parse<string>("distribution_input");
-  string output = pt.parse<string>("output");
-
+  string bigraph_input, dis_input, output;
+  try {
+    bigraph_input = pt.check_parse<string>("bigraph_input");
+    dis_input = pt.check_parse<string>("distribution_input");
+    output = pt.parse<string>("output");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::tool::steady_state_inversion solver(comm, bigraph_input, dis_input, output);
   solver.solve();
   solver.dump_result();

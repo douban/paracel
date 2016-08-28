@@ -15,6 +15,7 @@
 
 #include <string>
 #include <iostream>
+#include <stdexcept>
 
 #include <mpi.h>
 #include <gflags/gflags.h>
@@ -39,12 +40,18 @@ int main(int argc, char *argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
   
   paracel::json_parser pt(FLAGS_cfg_file);
-  std::string rating_input = pt.check_parse<std::string>("rating_input");
-  std::string factor_input = pt.check_parse<std::string>("factor_input");
-  std::string output = pt.parse<std::string>("output");
-  std::string pattern = pt.parse<std::string>("pattern");
-  double lambda = pt.parse<double>("lambda");
-  
+  std::string rating_input, factor_input, output, pattern;
+  double lambda;
+  try {
+    rating_input = pt.check_parse<std::string>("rating_input");
+    factor_input = pt.check_parse<std::string>("factor_input");
+    output = pt.parse<std::string>("output");
+    pattern = pt.parse<std::string>("pattern");
+    lambda = pt.parse<double>("lambda");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::alg::alternating_least_square_standard H_solver(comm, FLAGS_server_info,
                                                            rating_input, factor_input,
                                                            output,

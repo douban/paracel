@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include <unordered_map>
+#include <stdexcept>
 
 #include <gflags/gflags.h>
 
@@ -119,11 +120,17 @@ int main(int argc, char *argv[])
   google::SetUsageMessage("[options]\n\t--cfg_file\n");
   google::ParseCommandLineFlags(&argc, &argv, true);
   paracel::json_parser jp(FLAGS_cfg_file);
-  std::string input = jp.check_parse<std::string>("input");
-  std::string output = jp.parse<std::string>("output");
-  int ktop = jp.parse<int>("kclusters");
-  int rounds = jp.parse<int>("rounds");
-
+  std::string input, output;
+  int ktop, rounds;
+  try {
+    input = jp.check_parse<std::string>("input");
+    output = jp.parse<std::string>("output");
+    ktop = jp.parse<int>("kclusters");
+    rounds = jp.parse<int>("rounds");
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what();
+    return 1;
+  }
   paracel::alg::kmeans solver(comm, input, output, ktop, rounds);
   solver.solve();
   solver.dump_result();
