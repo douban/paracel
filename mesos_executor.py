@@ -1,7 +1,8 @@
 #! /usr/bin/python2.7
 # copy from dpark project: https://github.com/douban/dpark
 
-import sys, os.path
+import sys
+import os.path
 P = 'site-packages'
 apath = os.path.abspath(__file__)
 if P in apath:
@@ -16,8 +17,8 @@ import subprocess
 import threading
 from threading import Thread
 import socket
-import psutil
 import time
+import psutil
 
 import zmq
 
@@ -63,9 +64,8 @@ def launch_task(self, driver, task):
     t2 = Thread(target=forword, args=[errr, addr2, prefix])
     t2.daemon = True
     t2.start()
-    wout = os.fdopen(outw,'w',0)
-    werr = os.fdopen(errw,'w',0)
-
+    wout = os.fdopen(outw, 'w', 0)
+    werr = os.fdopen(errw, 'w', 0)
 
     if addr3:
         subscriber = ctx.socket(zmq.SUB)
@@ -98,8 +98,8 @@ def launch_task(self, driver, task):
             print >>werr, 'CWD %s is not exists, use /tmp instead' % cwd
             cwd = '/tmp'
         p = subprocess.Popen(command,
-                stdout=wout, stderr=werr,
-                cwd=cwd, env=env, shell=shell)
+                             stdout=wout, stderr=werr,
+                             cwd=cwd, env=env, shell=shell)
         tid = task.task_id.value
         self.ps[tid] = p
         code = None
@@ -119,7 +119,7 @@ def launch_task(self, driver, task):
                 process = psutil.Process(p.pid)
 
                 rss = sum((proc.get_memory_info().rss
-                          for proc in process.get_children(recursive=True)),
+                           for proc in process.get_children(recursive=True)),
                           process.get_memory_info().rss)
                 rss = (rss >> 20)
             except Exception, e:

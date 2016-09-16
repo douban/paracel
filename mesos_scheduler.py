@@ -80,7 +80,7 @@ class SubmitScheduler(object):
         self.options = options
         self.command = command
         self.total_tasks = list(reversed([Task(i)
-            for i in range(options.start, options.tasks)]))
+                                          for i in range(options.start, options.tasks)]))
         self.task_launched = {}
         self.slaveTasks = {}
         self.started = False
@@ -210,13 +210,13 @@ class SubmitScheduler(object):
 
             cpus, mem = self.getResource(offer)
             logger.debug("got resource offer %s: cpus:%s, mem:%s at %s",
-                offer.id.value, cpus, mem, offer.hostname)
+                         offer.id.value, cpus, mem, offer.hostname)
             sid = offer.slave_id.value
             tasks = []
             while (self.total_tasks and cpus+1e-4 >= self.cpus and mem >= self.mem
-                    and (tpn ==0 or tpn > 0 and len(self.slaveTasks.get(sid,set())) < tpn)):
+                   and (tpn == 0 or tpn > 0 and len(self.slaveTasks.get(sid, set())) < tpn)):
                 logger.debug("Accepting slot on slave %s (%s)",
-                    offer.slave_id.value, offer.hostname)
+                             offer.slave_id.value, offer.hostname)
                 t = self.total_tasks.pop()
                 task = self.create_task(offer, t, cpus)
                 tasks.append(task)
@@ -243,7 +243,7 @@ class SubmitScheduler(object):
             for i, x in enumerate(command):
                 command[i] = x % {'RANK': t.id, 'SIZE': self.options.tasks}
         task.data = pickle.dumps([os.getcwd(), command, env, self.options.shell,
-            self.std_port, self.err_port, None])
+                                  self.std_port, self.err_port, None])
 
         cpu = task.resources.add()
         cpu.name = "cpus"
@@ -379,7 +379,7 @@ class MPIScheduler(SubmitScheduler):
         for offer in offers:
             cpus, mem = self.getResource(offer)
             logger.debug("got resource offer %s: cpus:%s, mem:%s at %s",
-                offer.id.value, cpus, mem, offer.hostname)
+                         offer.id.value, cpus, mem, offer.hostname)
             if launched >= self.options.tasks or offer.hostname in self.used_hosts:
                 driver.launchTasks(offer.id, [], REFUSE_FILTER)
                 continue
@@ -403,7 +403,7 @@ class MPIScheduler(SubmitScheduler):
 
         if launched < self.options.tasks:
             logger.warning('not enough offers: need %d offer %d, waiting more resources',
-                            self.options.tasks, launched)
+                           self.options.tasks, launched)
 
     @safe
     def statusUpdate(self, driver, update):
@@ -488,7 +488,7 @@ class MPIScheduler(SubmitScheduler):
             slaves = self.try_to_start_mpi(self.command, self.options.tasks, self.used_hosts.items())
         except Exception:
             self.broadcast_command({})
-            self.next_try = time.time() + random.randint(5,10)
+            self.next_try = time.time() + random.randint(5, 10)
             return
 
         commands = dict(zip(self.used_hosts.keys(), slaves))
@@ -551,39 +551,39 @@ class MPIScheduler(SubmitScheduler):
 
 if __name__ == "__main__":
     parser = OptionParser(usage="Usage: mrun [options] <command>")
-    parser.allow_interspersed_args=False
+    parser.allow_interspersed_args = False
     parser.add_option("-s", "--master", type="string", default="mesos",
-                        help="url of master (default: mesos)")
+                      help="url of master (default: mesos)")
     parser.add_option("-i", "--mpi", action="store_true",
-                        help="run MPI tasks")
+                      help="run MPI tasks")
     parser.add_option("-n", "--tasks", type="int", default=1,
-                        help="number task to launch (default: 1)")
+                      help="number task to launch (default: 1)")
     parser.add_option("-b", "--start", type="int", default=0,
-                        help="which task to start (default: 0)")
+                      help="which task to start (default: 0)")
     parser.add_option("-p", "--task_per_node", type="int", default=0,
-                        help="max number of tasks on one node (default: 0)")
-    parser.add_option("-r","--retry", type="int", default=0,
-                        help="retry times when failed (default: 0)")
+                      help="max number of tasks on one node (default: 0)")
+    parser.add_option("-r", "--retry", type="int", default=0,
+                      help="retry times when failed (default: 0)")
     parser.add_option("-t", "--timeout", type="int", default=3600*24,
-                        help="timeout of job in seconds (default: 86400)")
-    parser.add_option("-c","--cpus", type="float", default=1.0,
-                        help="number of CPUs per task (default: 1)")
-    parser.add_option("-m","--mem", type="string", default='100m',
-                        help="MB of memory per task (default: 100m)")
-    parser.add_option("-g","--group", type="string", default='',
-                        help="which group to run (default: ''")
-    parser.add_option("-I","--image", type="string",
-                        help="image name for Docker")
-    parser.add_option("-V","--volumes", type="string",
-                        help="volumes to mount into Docker")
+                      help="timeout of job in seconds (default: 86400)")
+    parser.add_option("-c", "--cpus", type="float", default=1.0,
+                      help="number of CPUs per task (default: 1)")
+    parser.add_option("-m", "--mem", type="string", default='100m',
+                      help="MB of memory per task (default: 100m)")
+    parser.add_option("-g", "--group", type="string", default='',
+                      help="which group to run (default: ''")
+    parser.add_option("-I", "--image", type="string",
+                      help="image name for Docker")
+    parser.add_option("-V", "--volumes", type="string",
+                      help="volumes to mount into Docker")
     parser.add_option("--expand", action="store_true",
-                        help="expand expression in command line")
+                      help="expand expression in command line")
     parser.add_option("--shell", action="store_true",
-                        help="using shell re-intepret the cmd args")
+                      help="using shell re-intepret the cmd args")
     parser.add_option("-q", "--quiet", action="store_true",
-                        help="be quiet", )
+                      help="be quiet", )
     parser.add_option("-v", "--verbose", action="store_true",
-                        help="show more useful log", )
+                      help="show more useful log", )
     (options, command) = parser.parse_args()
 
     # set your default mesos master address below
@@ -606,7 +606,7 @@ if __name__ == "__main__":
         sys.exit(2)
 
     logging.basicConfig(format='[mrun] %(threadName)s %(asctime)-15s %(message)s',
-                    level=options.quiet and logging.ERROR
+                        level=options.quiet and logging.ERROR
                         or options.verbose and logging.DEBUG
                         or logging.WARNING)
 
@@ -619,8 +619,7 @@ if __name__ == "__main__":
         sched = SubmitScheduler(options, command)
 
     logger.debug("Connecting to mesos master %s", options.master)
-    driver = mesos.MesosSchedulerDriver(sched, sched.framework,
-        options.master)
+    driver = mesos.MesosSchedulerDriver(sched, sched.framework, options.master)
 
     driver.start()
     def handler(signm, frame):
@@ -648,7 +647,7 @@ if __name__ == "__main__":
                 sched.next_try = 0
                 driver.reviveOffers()
 
-            if not sched.started and now > sched.last_offer_time + 60 + random.randint(0,5):
+            if not sched.started and now > sched.last_offer_time + 60 + random.randint(0, 5):
                 logger.warning("too long to get offer, reviving...")
                 sched.last_offer_time = now
                 driver.reviveOffers()
