@@ -1,11 +1,9 @@
-import random
-import sys 
 import glob
 from dpark import DparkContext
 
-RATING_PATH='/nfs/wuhong/offline_use/rating_new/'
-TRAINING_PATH='/nfs/wuhong/paracel/data/als_fm/train'
-TEST_PATH='/nfs/wuhong/paracel/data/als_fm/test'
+RATING_PATH = '/nfs/wuhong/offline_use/rating_new/'
+TRAINING_PATH = '/nfs/wuhong/paracel/data/als_fm/train'
+TEST_PATH = '/nfs/wuhong/paracel/data/als_fm/test'
 
 dpark = DparkContext()
 
@@ -22,9 +20,9 @@ def local_filter2(line):
     return False
 
 dpark.textFile(glob.glob(RATING_PATH)).filter(
-        local_filter1
+    local_filter1
     ).saveAsTextFile(TRAINING_PATH)
 
 dpark.textFile(glob.glob(RATING_PATH)).filter(
-        local_filter2
+    local_filter2
     ).saveAsTextFile(TEST_PATH)

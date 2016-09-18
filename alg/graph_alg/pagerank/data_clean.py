@@ -3,11 +3,13 @@
 # make sure no duplicates exist
 # create 'node v which link nothing but being linked' with v,SENTINEL
 # default SENTINEL will be set with 2147483648
+import sys
+
 def clean_and_fmt(fn, fo):
     D = {}
     S0 = set([])
     S1 = set([])
-    for line in f:
+    for line in fn:
         lst = line.strip().split(',')
         S0.add(lst[0])
         S1.add(lst[1])
@@ -23,7 +25,6 @@ def clean_and_fmt(fn, fo):
         fo.write('%s,2147483648\n' % item)
 
 if __name__ == '__main__':
-    import sys
     f = file(sys.argv[1])
     f_o = file(sys.argv[2], 'w')
     clean_and_fmt(f, f_o)

@@ -16,7 +16,8 @@
 
 try:
     from optparse import OptionParser
-except:
+except ImportError as e:
+    print e
     print 'optparse module required'
     exit(0)
 
@@ -27,20 +28,22 @@ import random
 import subprocess
 
 import logging
-logging.basicConfig(filename='paracelrun_log', format = '%(asctime)s : %(levelname)s : %(message)s', level = logging.INFO)
+logging.basicConfig(filename='paracelrun_log', format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 PARACEL_INSTALL_PREFIX = os.path.dirname(os.path.abspath(__file__))
 
-def paracelrun_cpp_proxy(nsrv, initport):
+def paracelrun_cpp_proxy(n_srv, init_port):
+    '''Get the ports from started parameter server procs'''
     from subprocess import Popen, PIPE
-    cmd_lst = [os.path.join(PARACEL_INSTALL_PREFIX, 'bin/paracelrun_cpp_proxy --nsrv'), str(nsrv), '--init_port', str(initport)]
+    cmd_lst = [os.path.join(PARACEL_INSTALL_PREFIX, 'bin/paracelrun_cpp_proxy --nsrv'), str(n_srv), '--init_port', str(init_port)]
     cmd = ' '.join(cmd_lst)
     logger.info(cmd)
-    p = Popen(cmd.split(), stdin = PIPE, stdout = PIPE)
+    p = Popen(cmd.split(), stdin=PIPE, stdout=PIPE)
     return p.stdout.readline()
 
 def get_free_port():
+    ''''Get available port in os'''
     def is_avaliable(port):
         cmd = 'netstat -tuln | grep LISTEN | cut -f 2 -d :'
         tmp = os.popen(cmd)
@@ -61,6 +64,7 @@ def get_free_port():
     return port
 
 def init_starter(method, mem_limit, ppn, hostfile, group):
+    '''Assemble commands for running paracel programs'''
     starter = ''
     if not hostfile:
         hostfile = '~/.mpi/large.18'
@@ -80,45 +84,45 @@ def init_starter(method, mem_limit, ppn, hostfile, group):
 
 if __name__ == '__main__':
     optpar = OptionParser()
-    optpar.add_option('-p', '--snum', default = 1,
-                      action = 'store', type = 'int', dest = 'parasrv_num',
-                      help = 'number of parameter servers')
+    optpar.add_option('-p', '--snum', default=1,
+                      action='store', type='int', dest='parasrv_num',
+                      help='number of parameter servers')
     optpar.add_option('--m_server',
-                      action = 'store', type = 'string', dest = 'method_server',
-                      help = 'running method for parameter servers. If not given, set with the same value of -m or --method', metavar = 'local | mesos | mpi')
+                      action='store', type='string', dest='method_server',
+                      help='running method for parameter servers. If not given, set with the same value of -m or --method', metavar='local | mesos | mpi')
     optpar.add_option('--ppn_server',
-                      action = 'store', type = 'int', dest = 'ppn_server',
-                      help = 'mesos case: procs number per node of parameter servers. If not given, set with the same value of --ppn')
+                      action='store', type='int', dest='ppn_server',
+                      help='mesos case: procs number per node of parameter servers. If not given, set with the same value of --ppn')
     optpar.add_option('--mem_limit_server',
-                      action = 'store', type = 'int', dest = 'mem_limit_server',
-                      help = 'mesos case: memory size of each task in parameter servers. If not given, set with the same value of --mem_limit')
+                      action='store', type='int', dest='mem_limit_server',
+                      help='mesos case: memory size of each task in parameter servers. If not given, set with the same value of --mem_limit')
     optpar.add_option('--hostfile_server',
-                      action = 'store', type = 'string', dest = 'hostfile_server',
-                      help = 'mpi case: hostfile for mpirun of parameter servers. If not given, set with the same value of --hostfile')
-    optpar.add_option('-w', '--wnum', default = 1,
-                      action = 'store', type = 'int', dest = 'worker_num',
-                      help = 'number of workers for learning')
-    optpar.add_option('-m', '--method', default = 'local',
-                      action = 'store', type = 'string', dest = 'method',
-                      help = 'running method for workers', metavar = 'local | mesos | mpi')
-    optpar.add_option('--ppn', default = 4,
-                      action = 'store', type = 'int', dest = 'ppn',
-                      help = 'mesos case: procs number per node for workers')
-    optpar.add_option('--mem_limit', default = 200,
-                      action = 'store', type = 'int', dest = 'mem_limit',
-                      help = 'mesos case: memory size of each task of workers')
+                      action='store', type='string', dest='hostfile_server',
+                      help='mpi case: hostfile for mpirun of parameter servers. If not given, set with the same value of --hostfile')
+    optpar.add_option('-w', '--wnum', default=1,
+                      action='store', type='int', dest='worker_num',
+                      help='number of workers for learning')
+    optpar.add_option('-m', '--method', default='local',
+                      action='store', type='string', dest='method',
+                      help='running method for workers', metavar='local | mesos | mpi')
+    optpar.add_option('--ppn', default=4,
+                      action='store', type='int', dest='ppn',
+                      help='mesos case: procs number per node for workers')
+    optpar.add_option('--mem_limit', default=200,
+                      action='store', type='int', dest='mem_limit',
+                      help='mesos case: memory size of each task of workers')
     optpar.add_option('--hostfile',
-                      action = 'store', type = 'string', dest = 'hostfile',
-                      help = 'mpi case: hostfile for mpirun for workers')
+                      action='store', type='string', dest='hostfile',
+                      help='mpi case: hostfile for mpirun for workers')
     optpar.add_option('-c', '--cfg_file',
-                      action = 'store', type = 'string', dest = 'config',
-                      help = 'config file in json fmt, for alg usage')
-    optpar.add_option('-g', '--group', default = '',
-                      action = 'store', type = 'string', dest = 'worker_group',
-                      help = 'mesos case: which group for worker to run')
+                      action='store', type='string', dest='config',
+                      help='config file in json fmt, for alg usage')
+    optpar.add_option('-g', '--group', default='',
+                      action='store', type='string', dest='worker_group',
+                      help='mesos case: which group for worker to run')
     optpar.add_option('--group_server',
-                      action = 'store', type = 'string', dest = 'server_group',
-                      help = 'mesos case: which group for server to run')
+                      action='store', type='string', dest='server_group',
+                      help='mesos case: which group for server to run')
     (options, args) = optpar.parse_args()
 
     nsrv = 1
@@ -155,7 +159,7 @@ if __name__ == '__main__':
     start_parasrv_cmd_lst = [server_starter, str(nsrv), os.path.join(PARACEL_INSTALL_PREFIX, 'bin/start_server --start_host'), socket.gethostname(), ' --init_port', str(initport)]
     start_parasrv_cmd = ' '.join(start_parasrv_cmd_lst)
     logger.info(start_parasrv_cmd)
-    procs = subprocess.Popen(start_parasrv_cmd, shell = True, preexec_fn = os.setpgrp)
+    procs = subprocess.Popen(start_parasrv_cmd, shell=True, preexec_fn=os.setpgrp)
 
     try:
         serverinfo = paracelrun_cpp_proxy(nsrv, initport)

@@ -14,15 +14,16 @@
 #
 
 try:
-    from sklearn import datasets
-except:
-    print 'sklearn module required'
-    exit(0)
-
-try:
     from optparse import OptionParser
 except:
     print 'optparse module required'
+    exit(0)
+
+try:
+    from sklearn import datasets
+except ImportError as e:
+    print e
+    print 'sklearn module required'
     exit(0)
 
 import numpy as np
@@ -69,16 +70,15 @@ def gen_svd_data(output):
     cmd = 'wget http://paracel.io/data/svd.dat -O ' + output
     os.system(cmd)
 
-def gen_cls_data(output, sz, k = 100, sep = ','):
+def gen_cls_data(output, sz, k=100, sep=','):
     x, y = datasets.make_classification(sz, k)
     dump_data(output, x, y, sep)
 
-def gen_reg_data(output, sz, k = 100, sep = ','):
+def gen_reg_data(output, sz, k=100, sep=','):
     x, y = datasets.make_regression(sz, k)
     dump_data(output, x, y, sep)
 
-def gen_sim_data(output, sz, k = 10, sep = ','):
-    import numpy as np
+def gen_sim_data(output, sz, k=10, sep=','):
     vl = np.random.rand(sz, k)
     f = open(output, 'wb')
     for i in vl:
@@ -89,8 +89,8 @@ def gen_sim_data(output, sz, k = 10, sep = ','):
         f.write(str(i[-1]) + '\n')
     f.close()
 
-def gen_kmeans_data(output, sz, centers, k = 10, sep = ','):
-    sample, label = datasets.make_blobs(n_samples = sz, centers = centers, n_features = k)
+def gen_kmeans_data(output, sz, centers, k=10, sep=','):
+    sample, label = datasets.make_blobs(n_samples=sz, centers=centers, n_features=k)
     m, n = sample.shape
     f = open(output, 'wb')
     for i in xrange(m):
@@ -106,10 +106,8 @@ def gen_kmeans_data(output, sz, centers, k = 10, sep = ','):
     f.close()
 
 
-def gen_lda_data(output, n_docs, n_topics = 10):
-    
-    def gen_document(word_dist, n_topics, length = 100, alpha = 0.1):
-        
+def gen_lda_data(output, n_docs, n_topics=10):
+    def gen_document(word_dist, n_topics, length=100, alpha=0.1):
         def sample_index(p):
             return np.random.multinomial(1, p).argmax()
         
@@ -122,22 +120,21 @@ def gen_lda_data(output, n_docs, n_topics = 10):
         return data
 
     def gen_word_distribution(n_topics):
-    
-        def word_prob(width, index, horizontal = False):
+        def word_prob(width, index, horizontal=False):
             m = np.zeros((width, width))
             if horizontal:
                 m[index, :] = 1.0 / width
             else:
                 m[:, index] = 1.0 / width
             return m.flatten()
-    
+        
         width = n_topics / 2
         vocab_size = width ** 2
         m = np.zeros((n_topics, vocab_size))
         for k in xrange(width):
             m[k, :] = word_prob(width, k)
         for k in xrange(width):
-            m[k + width, :] = word_prob(width, k, horizontal = True)
+            m[k + width, :] = word_prob(width, k, horizontal=True)
         return m
 
     word_dist = gen_word_distribution(n_topics)
@@ -148,47 +145,47 @@ def gen_lda_data(output, n_docs, n_topics = 10):
 
 if __name__ == '__main__':
     optpar = OptionParser()
-    optpar.add_option('-m', '--method', action = 'store', type = 'string', dest = 'method',
-                      help = 'wc | classification | regression | pagerank | similarity | kmeans | lda | svd | mf | als...')
-    optpar.add_option('-o', '--out', action = 'store', type = 'string', dest = 'output')
-    optpar.add_option('-s', '--sep', action = 'store', type = 'string', dest =
-                      'sep', help = "seperator, default : ','")
-    optpar.add_option('-n', '--datasize', action = 'store', type = 'int', dest = 'size')
-    optpar.add_option('-k', '--nfeatures', action = 'store', type = 'int', dest = 'k')
-    optpar.add_option('--ncenters', action = 'store', type = 'int', dest =
-                      'ncenters', help = 'number of centers for kmeans method')
+    optpar.add_option('-m', '--method', action='store', type='string', dest='method',
+                      help='wc | classification | regression | pagerank | similarity | kmeans | lda | svd | mf | als...')
+    optpar.add_option('-o', '--out', action='store', type='string', dest='output')
+    optpar.add_option('-s', '--sep', action='store', type='string', dest='sep',
+                      help="seperator, default : ','")
+    optpar.add_option('-n', '--datasize', action='store', type='int', dest='size')
+    optpar.add_option('-k', '--nfeatures', action='store', type='int', dest='k')
+    optpar.add_option('--ncenters', action='store', type='int',
+                      dest='ncenters', help='number of centers for kmeans method')
     options, args = optpar.parse_args()
 
     # check input
     if options.method == 'wc':
         gen_wc_data(options.output)
     if options.method == 'classification':
-		    if options.k and options.sep:
-			      gen_cls_data(options.output, options.size, options.k, options.sep)
-		    elif options.k:
-			      gen_cls_data(options.output, options.size, options.k)
-		    else:
-			      gen_cls_data(options.output, options.size)
+        if options.k and options.sep:
+            gen_cls_data(options.output, options.size, options.k, options.sep)
+        elif options.k:
+            gen_cls_data(options.output, options.size, options.k)
+        else:
+            gen_cls_data(options.output, options.size)
     if options.method == 'svd':
         gen_svd_data(options.output)
     if options.method == 'regression':
-		    if options.k and options.sep:
-			      gen_reg_data(options.output, options.size, options.k, options.sep)
-		    elif options.k:
-			      gen_reg_data(options.output, options.size, options.k)
-		    else:
-			      gen_reg_data(options.output, options.size)
+        if options.k and options.sep:
+            gen_reg_data(options.output, options.size, options.k, options.sep)
+        elif options.k:
+            gen_reg_data(options.output, options.size, options.k)
+        else:
+            gen_reg_data(options.output, options.size)
     if options.method == 'pagerank':
         gen_pr_data(options.output)
     if options.method == 'mf':
         gen_mf_data(options.output)
     if options.method == 'similarity':
-		    if options.k and options.sep:
-			      gen_sim_data(options.output, options.size, options.k, options.sep)
-		    elif options.k:
-			      gen_sim_data(options.output, options.size, options.k)
-		    else:
-			      gen_sim_data(options.output, options.size)
+        if options.k and options.sep:
+            gen_sim_data(options.output, options.size, options.k, options.sep)
+        elif options.k:
+            gen_sim_data(options.output, options.size, options.k)
+        else:
+            gen_sim_data(options.output, options.size)
     if options.method == 'kmeans':
         if options.k and options.sep:
             gen_kmeans_data(options.output, options.size, options.ncenters, options.k, options.sep)
