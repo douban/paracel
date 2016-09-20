@@ -18,6 +18,13 @@ import zmq
 ctx = zmq.Context()
 
 import pymesos as mesos
+
+version = getattr(mesos, '__VERSION__', None)
+if version is not None:
+    version = tuple(int(n) for n in version.split('.'))
+    assert version < (0, 2, 0), \
+        'Pymesos version %s is not supported' % (version,)
+
 from mesos.interface import mesos_pb2
 
 try:
