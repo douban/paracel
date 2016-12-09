@@ -1,4 +1,4 @@
-#! /usr/bin/python2.7
+#!/usr/bin/env python
 # copy from dpark project: https://github.com/douban/dpark
 
 import sys
@@ -12,28 +12,25 @@ if P in apath:
         sys.path = [p.replace(sysp, virltualenv) for p in sys.path]
 
 import os
-import pickle
-import subprocess
-import threading
-from threading import Thread
-import socket
-import time
-import psutil
-
 import zmq
+import time
+import socket
+import pickle
+import pymesos
+import subprocess
 
-import pymesos as mesos
+version = getattr(pymesos, '__VERSION__', None)
+assert version is not None, 'Pymesos is too old'
+version = tuple(int(n) for n in version.split('.'))
+assert version >= (0, 2, 0), \
+    'Pymesos version %s is not supported' % (version,)
 
-version = getattr(mesos, '__VERSION__', None)
-if version is not None:
-    version = tuple(int(n) for n in version.split('.'))
-    assert version < (0, 2, 0), \
-        'Pymesos version %s is not supported' % (version,)
-
-from mesos.interface import mesos_pb2
-from mesos.interface import Executor
+from addict import Dict
+from threading import Thread
+from pymesos import Executor, MesosExecutorDriver, decode_data
 
 ctx = zmq.Context()
+
 
 def forword(fd, addr, prefix=''):
     f = os.fdopen(fd, 'r', 4096)
@@ -42,25 +39,30 @@ def forword(fd, addr, prefix=''):
     while True:
         try:
             line = f.readline()
-            if not line: break
-            out.send(prefix+line)
+            if not line:
+                break
+            out.send(prefix + line)
         except IOError:
             break
     f.close()
     out.close()
 
+
 def reply_status(driver, task_id, status):
-    update = mesos_pb2.TaskStatus()
-    update.task_id.MergeFrom(task_id)
+    update = Dict()
+    update.task_id = task_id
     update.state = status
     update.timestamp = time.time()
     driver.sendStatusUpdate(update)
 
+
 def launch_task(self, driver, task):
-    reply_status(driver, task.task_id, mesos_pb2.TASK_RUNNING)
+    reply_status(driver, task.task_id, 'TASK_RUNNING')
 
     host = socket.gethostname()
-    cwd, command, _env, shell, addr1, addr2, addr3 = pickle.loads(task.data)
+    cwd, command, _env, shell, addr1, addr2, addr3 = pickle.loads(
+        decode_data(task.data)
+    )
 
     prefix = "[%s@%s] " % (str(task.task_id.value), host)
     outr, outw = os.pipe()
@@ -75,21 +77,22 @@ def launch_task(self, driver, task):
     werr = os.fdopen(errw, 'w', 0)
 
     if addr3:
+        tid = int(task.task_id.value.split('-')[0])
         subscriber = ctx.socket(zmq.SUB)
         subscriber.connect(addr3)
         subscriber.setsockopt(zmq.SUBSCRIBE, '')
         poller = zmq.Poller()
         poller.register(subscriber, zmq.POLLIN)
-        socks = dict(poller.poll(60 * 1000))
+        socks = dict(poller.poll(min(tid / 100.0 + 1, 5) * 60 * 1000))
         if socks and socks.get(subscriber) == zmq.POLLIN:
             hosts = pickle.loads(subscriber.recv(zmq.NOBLOCK))
             line = hosts.get(host)
             if line:
                 command = line.split(' ')
             else:
-                return reply_status(driver, task.task_id, mesos_pb2.TASK_FAILED)
+                return reply_status(driver, task.task_id, 'TASK_FAILED')
         else:
-            return reply_status(driver, task.task_id, mesos_pb2.TASK_FAILED)
+            return reply_status(driver, task.task_id, 'TASK_FAILED')
 
     mem = 100
     for r in task.resources:
@@ -100,7 +103,6 @@ def launch_task(self, driver, task):
     try:
         env = dict(os.environ)
         env.update(_env)
-        env['SQLSTORE_SOURCE'] = ' '.join(command)
         if not os.path.exists(cwd):
             print >>werr, 'CWD %s is not exists, use /tmp instead' % cwd
             cwd = '/tmp'
@@ -123,32 +125,35 @@ def launch_task(self, driver, task):
 
             last_time = now
             try:
+                import psutil
                 process = psutil.Process(p.pid)
 
-                rss = sum((proc.get_memory_info().rss
+                rss = sum((proc.memory_info().rss
                            for proc in process.get_children(recursive=True)),
-                          process.get_memory_info().rss)
+                          process.memory_info().rss)
                 rss = (rss >> 20)
-            except Exception, e:
-                continue
 
-            if rss > mem * 1.5:
-                print >>werr, "task %s used too much memory: %dMB > %dMB * 1.5, kill it. " \
-                "use -m argument to request more memory." % (
-                    tid, rss, mem)
-                p.kill()
-            elif rss > mem:
-                print >>werr, "task %s used too much memory: %dMB > %dMB, " \
-                "use -m to request for more memory" % (
-                    tid, rss, mem)
+                if rss > mem * 1.5:
+                    print >>werr, "task %s used too much memory: %dMB > %dMB * 1.5, kill it. " \
+                        "use -m argument to request more memory." % (
+                            tid, rss, mem)
+                    p.kill()
+
+                elif rss > mem:
+                    print >>werr, "task %s used too much memory: %dMB > %dMB, " \
+                        "use -m to request for more memory" % (
+                            tid, rss, mem)
+
+            except Exception:
+                pass
 
         if code == 0:
-            status = mesos_pb2.TASK_FINISHED
+            status = 'TASK_FINISHED'
         else:
             print >>werr, ' '.join(command) + ' exit with %s' % code
-            status = mesos_pb2.TASK_FAILED
-    except Exception, e:
-        status = mesos_pb2.TASK_FAILED
+            status = 'TASK_FAILED'
+    except Exception:
+        status = 'TASK_FAILED'
         import traceback
         print >>werr, 'exception while open ' + ' '.join(command)
         for line in traceback.format_exc():
@@ -164,7 +169,9 @@ def launch_task(self, driver, task):
     self.ps.pop(tid, None)
     self.ts.pop(tid, None)
 
+
 class MyExecutor(Executor):
+
     def __init__(self):
         self.ps = {}
         self.ts = {}
@@ -179,13 +186,16 @@ class MyExecutor(Executor):
         try:
             if task_id.value in self.ps:
                 self.ps[task_id.value].kill()
-                reply_status(driver, task_id, mesos_pb2.TASK_KILLED)
-        except: pass
+                reply_status(driver, task_id, 'TASK_KILLED')
+        except:
+            pass
 
     def shutdown(self, driver):
         for p in self.ps.values():
-            try: p.kill()
-            except: pass
+            try:
+                p.kill()
+            except:
+                pass
         for t in self.ts.values():
             t.join()
 
@@ -196,4 +206,4 @@ if __name__ == "__main__":
         os.setgid(int(gid))
         os.setuid(int(uid))
     executor = MyExecutor()
-    mesos.MesosExecutorDriver(executor).run()
+    MesosExecutorDriver(executor, use_addict=True).run()
